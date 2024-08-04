@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>915</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="imageLabel">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>411</width>
+      <height>521</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel#imageLabel {
+    border: 2px solid rgb(76, 175, 80); /* 边框颜色 */
+    border-radius: 10px; /* 边框圆角 */
+    background-color: rgb(34, 34, 34); /* 背景颜色 */
+    padding: 5px; /* 内边距 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* 投影效果 */
+}
+</string>
+    </property>
+    <property name="text">
+     <string>video</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>915</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuArmFaceID">
+    <property name="title">
+     <string>ArmFaceID</string>
+    </property>
+   </widget>
+   <addaction name="menuArmFaceID"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
