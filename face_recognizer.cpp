@@ -9,9 +9,9 @@ FaceRecognizer::FaceRecognizer(std::function<void()> onCaptureHook,
     : onCaptureHook(onCaptureHook), onDetectHook(onDetectHook) {}
 
 void FaceRecognizer::Start() {
-    QString url = "192.168.11.182:4747/video";
-    videoCapture.open(url.toStdString());
-    cv::Mat frame;
-    videoCapture >> frame;
-    cv::imshow("test", 0);
+    // QString url = "192.168.11.182:4747/video";
+    // videoCapture.open(url.toStdString());
+    cv::Mat frame = cv::imread("/home/yu/codefield/ArmFaceID/LDH.jpg", 1);
+    // videoCapture >> frame;
+    cv::imshow("test", frame);
 }
