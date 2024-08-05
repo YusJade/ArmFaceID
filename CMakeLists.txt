@@ -47,7 +47,14 @@ else()
     endif()
 endif()
 
-target_link_libraries(ArmFaceID PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+message("链接到lib:")
+message(${OpenCV_LIBS})
+
+target_link_libraries(ArmFaceID PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    ${OpenCV_LIBS})
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

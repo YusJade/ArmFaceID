@@ -141,10 +141,26 @@ ArmFaceID: CMakeFiles/ArmFaceID.dir/mainwindow.cpp.o
 ArmFaceID: CMakeFiles/ArmFaceID.dir/face_recognizer.cpp.o
 ArmFaceID: CMakeFiles/ArmFaceID.dir/build.make
 ArmFaceID: /home/yu/Qt/6.5.3/gcc_64/lib/libQt6Widgets.so.6.5.3
+ArmFaceID: /usr/local/lib/libopencv_gapi.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_highgui.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_ml.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_stitching.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_video.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_videoio.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_face.so.4.10.0
 ArmFaceID: /home/yu/Qt/6.5.3/gcc_64/lib/libQt6Gui.so.6.5.3
 ArmFaceID: /home/yu/Qt/6.5.3/gcc_64/lib/libQt6Core.so.6.5.3
 ArmFaceID: /usr/lib/x86_64-linux-gnu/libGLX.so
 ArmFaceID: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+ArmFaceID: /usr/local/lib/libopencv_imgcodecs.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_objdetect.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_calib3d.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_dnn.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_features2d.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_flann.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_photo.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_imgproc.so.4.10.0
+ArmFaceID: /usr/local/lib/libopencv_core.so.4.10.0
 ArmFaceID: CMakeFiles/ArmFaceID.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable ArmFaceID"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ArmFaceID.dir/link.txt --verbose=$(VERBOSE)

@@ -359,6 +359,8 @@ CMakeFiles/ArmFaceID.dir/mainwindow.cpp.o: \
  /home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/ArmFaceID_autogen/include/./ui_mainwindow.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/QVariant \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qvariant.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/QAction \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qaction.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QApplication \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qapplication.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcoreapplication.h \
@@ -370,7 +372,16 @@ CMakeFiles/ArmFaceID.dir/mainwindow.cpp.o: \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qinputmethod.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qlocale.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qguiapplication_platform.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QLabel \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qlabel.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qframe.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpicture.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qiodevice.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qtextdocument.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qurl.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QMainWindow \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QMenu \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qmenu.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QMenuBar \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qmenubar.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qmenu.h \

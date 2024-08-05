@@ -1,8 +1,7 @@
 CMakeFiles/ArmFaceID.dir/main.cpp.o: \
  /home/yu/codefield/ArmFaceID/main.cpp /usr/include/stdc-predef.h \
- /home/yu/codefield/ArmFaceID/mainwindow.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QMainWindow \
- /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qmainwindow.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QApplication \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qapplication.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qtguiglobal.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qglobal.h \
@@ -158,37 +157,61 @@ CMakeFiles/ArmFaceID.dir/main.cpp.o: \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qtguiexports.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qwidget.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qwindowdefs.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qobjectdefs.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qnamespace.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qtmetamacros.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
- /usr/include/c++/11/memory /usr/include/c++/11/bits/allocator.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcoreapplication.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qstring.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qchar.h \
+ /usr/include/c++/11/functional /usr/include/c++/11/bits/stl_function.h \
+ /usr/include/c++/11/backward/binders.h \
+ /usr/include/c++/11/bits/refwrap.h \
+ /usr/include/c++/11/bits/std_function.h \
+ /usr/include/c++/11/unordered_map /usr/include/c++/11/bits/allocator.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++allocator.h \
  /usr/include/c++/11/ext/new_allocator.h \
  /usr/include/c++/11/bits/memoryfwd.h \
- /usr/include/c++/11/bits/stl_uninitialized.h \
  /usr/include/c++/11/ext/alloc_traits.h \
  /usr/include/c++/11/bits/alloc_traits.h \
+ /usr/include/c++/11/bits/hashtable.h \
+ /usr/include/c++/11/bits/hashtable_policy.h \
+ /usr/include/c++/11/bits/node_handle.h \
+ /usr/include/c++/11/bits/unordered_map.h \
+ /usr/include/c++/11/bits/erase_if.h /usr/include/c++/11/vector \
+ /usr/include/c++/11/bits/stl_uninitialized.h \
+ /usr/include/c++/11/bits/stl_vector.h \
+ /usr/include/c++/11/bits/stl_bvector.h \
+ /usr/include/c++/11/bits/vector.tcc /usr/include/c++/11/bits/stl_algo.h \
+ /usr/include/c++/11/cstdlib /usr/include/c++/11/bits/algorithmfwd.h \
+ /usr/include/c++/11/bits/stl_heap.h \
  /usr/include/c++/11/bits/stl_tempbuf.h \
- /usr/include/c++/11/bits/stl_raw_storage_iter.h \
- /usr/include/c++/11/bits/align.h /usr/include/c++/11/bit \
- /usr/include/c++/11/bits/unique_ptr.h \
- /usr/include/c++/11/bits/stl_function.h \
- /usr/include/c++/11/backward/binders.h \
- /usr/include/c++/11/bits/shared_ptr.h /usr/include/c++/11/iosfwd \
- /usr/include/c++/11/bits/stringfwd.h /usr/include/c++/11/bits/postypes.h \
- /usr/include/c++/11/cwchar /usr/include/wchar.h \
- /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
+ /usr/include/c++/11/bits/uniform_int_dist.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qstringview.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qbytearray.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qrefcount.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qnamespace.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qtmetamacros.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qarraydata.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qpair.h /usr/include/string.h \
+ /usr/include/strings.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qarraydatapointer.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qarraydataops.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcontainertools_impl.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qxptype_traits.h \
+ /usr/include/c++/11/cstring /usr/include/c++/11/iterator \
+ /usr/include/c++/11/iosfwd /usr/include/c++/11/bits/stringfwd.h \
+ /usr/include/c++/11/bits/postypes.h /usr/include/c++/11/cwchar \
+ /usr/include/wchar.h /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
  /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
- /usr/include/c++/11/bits/shared_ptr_base.h \
- /usr/include/c++/11/bits/allocated_ptr.h \
- /usr/include/c++/11/bits/refwrap.h /usr/include/c++/11/ext/atomicity.h \
+ /usr/include/c++/11/bits/stream_iterator.h \
+ /usr/include/c++/11/bits/streambuf_iterator.h \
+ /usr/include/c++/11/streambuf /usr/include/c++/11/bits/localefwd.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/c++locale.h \
+ /usr/include/c++/11/clocale /usr/include/locale.h \
+ /usr/include/x86_64-linux-gnu/bits/locale.h /usr/include/c++/11/cctype \
+ /usr/include/ctype.h /usr/include/c++/11/bits/ios_base.h \
+ /usr/include/c++/11/ext/atomicity.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/gthr.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/gthr-default.h \
  /usr/include/pthread.h /usr/include/sched.h \
@@ -204,44 +227,6 @@ CMakeFiles/ArmFaceID.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/atomic_word.h \
  /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
- /usr/include/c++/11/ext/concurrence.h \
- /usr/include/c++/11/bits/shared_ptr_atomic.h \
- /usr/include/c++/11/backward/auto_ptr.h \
- /usr/include/c++/11/pstl/glue_memory_defs.h \
- /usr/include/c++/11/pstl/execution_defs.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qobject.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qstring.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qchar.h \
- /usr/include/c++/11/functional /usr/include/c++/11/bits/std_function.h \
- /usr/include/c++/11/unordered_map /usr/include/c++/11/bits/hashtable.h \
- /usr/include/c++/11/bits/hashtable_policy.h \
- /usr/include/c++/11/bits/node_handle.h \
- /usr/include/c++/11/bits/unordered_map.h \
- /usr/include/c++/11/bits/erase_if.h /usr/include/c++/11/vector \
- /usr/include/c++/11/bits/stl_vector.h \
- /usr/include/c++/11/bits/stl_bvector.h \
- /usr/include/c++/11/bits/vector.tcc /usr/include/c++/11/bits/stl_algo.h \
- /usr/include/c++/11/cstdlib /usr/include/c++/11/bits/algorithmfwd.h \
- /usr/include/c++/11/bits/stl_heap.h \
- /usr/include/c++/11/bits/uniform_int_dist.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qstringview.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qbytearray.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qrefcount.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qarraydata.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qpair.h /usr/include/string.h \
- /usr/include/strings.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qarraydatapointer.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qarraydataops.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcontainertools_impl.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qxptype_traits.h \
- /usr/include/c++/11/cstring /usr/include/c++/11/iterator \
- /usr/include/c++/11/bits/stream_iterator.h \
- /usr/include/c++/11/bits/streambuf_iterator.h \
- /usr/include/c++/11/streambuf /usr/include/c++/11/bits/localefwd.h \
- /usr/include/x86_64-linux-gnu/c++/11/bits/c++locale.h \
- /usr/include/c++/11/clocale /usr/include/locale.h \
- /usr/include/x86_64-linux-gnu/bits/locale.h /usr/include/c++/11/cctype \
- /usr/include/ctype.h /usr/include/c++/11/bits/ios_base.h \
  /usr/include/c++/11/bits/locale_classes.h /usr/include/c++/11/string \
  /usr/include/c++/11/bits/char_traits.h \
  /usr/include/c++/11/bits/ostream_insert.h \
@@ -265,7 +250,18 @@ CMakeFiles/ArmFaceID.dir/main.cpp.o: \
  /usr/include/c++/11/system_error \
  /usr/include/x86_64-linux-gnu/c++/11/bits/error_constants.h \
  /usr/include/c++/11/stdexcept /usr/include/c++/11/bits/streambuf.tcc \
- /usr/include/c++/11/algorithm \
+ /usr/include/c++/11/memory \
+ /usr/include/c++/11/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/11/bits/align.h /usr/include/c++/11/bit \
+ /usr/include/c++/11/bits/unique_ptr.h \
+ /usr/include/c++/11/bits/shared_ptr.h \
+ /usr/include/c++/11/bits/shared_ptr_base.h \
+ /usr/include/c++/11/bits/allocated_ptr.h \
+ /usr/include/c++/11/ext/concurrence.h \
+ /usr/include/c++/11/bits/shared_ptr_atomic.h \
+ /usr/include/c++/11/backward/auto_ptr.h \
+ /usr/include/c++/11/pstl/glue_memory_defs.h \
+ /usr/include/c++/11/pstl/execution_defs.h /usr/include/c++/11/algorithm \
  /usr/include/c++/11/pstl/glue_algorithm_defs.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qbytearrayalgorithms.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qbytearrayview.h \
@@ -278,6 +274,11 @@ CMakeFiles/ArmFaceID.dir/main.cpp.o: \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qutf8stringview.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qstringtokenizer.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qstringbuilder.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcoreevent.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qobjectdefs.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qeventloop.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qobject.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qlist.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qhashfunctions.h \
  /usr/include/c++/11/numeric /usr/include/c++/11/bits/stl_numeric.h \
@@ -307,18 +308,11 @@ CMakeFiles/ArmFaceID.dir/main.cpp.o: \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qbindingstorage.h \
  /usr/include/c++/11/chrono /usr/include/c++/11/ratio \
  /usr/include/c++/11/ctime \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qmargins.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qaction.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qkeysequence.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qicon.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qsize.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpixmap.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpaintdevice.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qrect.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qpoint.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qcolor.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qrgb.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qrgba64.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qnativeinterface.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qdebug.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qtextstream.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qstringconverter_base.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcontiguouscache.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
  /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
@@ -330,40 +324,200 @@ CMakeFiles/ArmFaceID.dir/main.cpp.o: \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qsharedpointer.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qshareddata.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qimage.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpixelformat.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qtransform.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpolygon.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qregion.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qline.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qvariant.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qdebug.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qtextstream.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qstringconverter_base.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcontiguouscache.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qmap.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qshareddata_impl.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qset.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qhash.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qvarlengtharray.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtCore/q20memory.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcoreapplication_platform.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qwindowdefs.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qpoint.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qsize.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qmargins.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qcursor.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qbitmap.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpixmap.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpaintdevice.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qrect.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qcolor.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qrgb.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qrgba64.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qimage.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpixelformat.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qtransform.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpolygon.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qregion.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qline.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qguiapplication.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qinputmethod.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qlocale.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qvariant.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qguiapplication_platform.h \
+ /home/yu/codefield/ArmFaceID/mainwindow.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QMainWindow \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qmainwindow.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qwidget.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qaction.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qkeysequence.h \
+ /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qicon.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qpalette.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qbrush.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qfont.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qfontmetrics.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qfontinfo.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qsizepolicy.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qcursor.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qbitmap.h \
  /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qtabwidget.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/QApplication \
- /home/yu/Qt/6.5.3/gcc_64/include/QtWidgets/qapplication.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcoreapplication.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcoreevent.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qeventloop.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qnativeinterface.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qcoreapplication_platform.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qguiapplication.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qinputmethod.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtCore/qlocale.h \
- /home/yu/Qt/6.5.3/gcc_64/include/QtGui/qguiapplication_platform.h
+ /home/yu/codefield/ArmFaceID/face_recognizer.h \
+ /usr/include/c++/11/thread /usr/include/c++/11/bits/std_thread.h \
+ /usr/include/c++/11/bits/this_thread_sleep.h \
+ /usr/local/include/opencv4/opencv2/opencv.hpp \
+ /usr/local/include/opencv4/opencv2/opencv_modules.hpp \
+ /usr/local/include/opencv4/opencv2/core.hpp \
+ /usr/local/include/opencv4/opencv2/core/cvdef.h \
+ /usr/local/include/opencv4/opencv2/core/version.hpp \
+ /usr/local/include/opencv4/opencv2/core/hal/interface.h \
+ /usr/local/include/opencv4/opencv2/core/cv_cpu_dispatch.h \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/emmintrin.h \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/xmmintrin.h \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/mmintrin.h \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/mm_malloc.h \
+ /usr/local/include/opencv4/opencv2/core/base.hpp \
+ /usr/include/c++/11/climits \
+ /usr/local/include/opencv4/opencv2/core/cvstd.hpp \
+ /usr/local/include/opencv4/opencv2/core/cvstd_wrapper.hpp \
+ /usr/local/include/opencv4/opencv2/core/neon_utils.hpp \
+ /usr/local/include/opencv4/opencv2/core/vsx_utils.hpp \
+ /usr/local/include/opencv4/opencv2/core/check.hpp \
+ /usr/local/include/opencv4/opencv2/core/traits.hpp \
+ /usr/local/include/opencv4/opencv2/core/matx.hpp \
+ /usr/local/include/opencv4/opencv2/core/saturate.hpp \
+ /usr/local/include/opencv4/opencv2/core/fast_math.hpp \
+ /usr/local/include/opencv4/opencv2/core/matx.inl.hpp \
+ /usr/local/include/opencv4/opencv2/core/types.hpp \
+ /usr/include/c++/11/cfloat \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/float.h \
+ /usr/local/include/opencv4/opencv2/core/mat.hpp \
+ /usr/local/include/opencv4/opencv2/core/bufferpool.hpp \
+ /usr/local/include/opencv4/opencv2/core/mat.inl.hpp \
+ /usr/local/include/opencv4/opencv2/core/persistence.hpp \
+ /usr/local/include/opencv4/opencv2/core/operations.hpp \
+ /usr/local/include/opencv4/opencv2/core/cvstd.inl.hpp \
+ /usr/include/c++/11/complex /usr/include/c++/11/sstream \
+ /usr/include/c++/11/istream /usr/include/c++/11/ios \
+ /usr/include/c++/11/bits/basic_ios.h \
+ /usr/include/c++/11/bits/locale_facets.h /usr/include/c++/11/cwctype \
+ /usr/include/wctype.h /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_base.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h \
+ /usr/include/c++/11/bits/locale_facets.tcc \
+ /usr/include/c++/11/bits/basic_ios.tcc /usr/include/c++/11/ostream \
+ /usr/include/c++/11/bits/ostream.tcc \
+ /usr/include/c++/11/bits/istream.tcc \
+ /usr/include/c++/11/bits/sstream.tcc \
+ /usr/local/include/opencv4/opencv2/core/utility.hpp \
+ /usr/include/c++/11/mutex /usr/include/c++/11/bits/std_mutex.h \
+ /usr/include/c++/11/bits/unique_lock.h \
+ /usr/local/include/opencv4/opencv2/core/optim.hpp \
+ /usr/local/include/opencv4/opencv2/core/ovx.hpp \
+ /usr/local/include/opencv4/opencv2/core/cvdef.h \
+ /usr/local/include/opencv4/opencv2/calib3d.hpp \
+ /usr/local/include/opencv4/opencv2/features2d.hpp \
+ /usr/local/include/opencv4/opencv2/flann/miniflann.hpp \
+ /usr/local/include/opencv4/opencv2/flann/defines.h \
+ /usr/local/include/opencv4/opencv2/flann/config.h \
+ /usr/local/include/opencv4/opencv2/core/affine.hpp \
+ /usr/local/include/opencv4/opencv2/core/utils/logger.hpp \
+ /usr/include/c++/11/iostream \
+ /usr/local/include/opencv4/opencv2/core/utils/logger.defines.hpp \
+ /usr/local/include/opencv4/opencv2/core/utils/logtag.hpp \
+ /usr/local/include/opencv4/opencv2/dnn.hpp \
+ /usr/local/include/opencv4/opencv2/dnn/dnn.hpp \
+ /usr/local/include/opencv4/opencv2/core/async.hpp \
+ /usr/local/include/opencv4/opencv2/dnn/version.hpp \
+ /usr/local/include/opencv4/opencv2/dnn/dict.hpp \
+ /usr/local/include/opencv4/opencv2/dnn/layer.hpp \
+ /usr/local/include/opencv4/opencv2/dnn/dnn.inl.hpp \
+ /usr/local/include/opencv4/opencv2/dnn/utils/inference_engine.hpp \
+ /usr/local/include/opencv4/opencv2/dnn/dnn.hpp \
+ /usr/local/include/opencv4/opencv2/flann.hpp \
+ /usr/local/include/opencv4/opencv2/flann/flann_base.hpp \
+ /usr/local/include/opencv4/opencv2/flann/general.h \
+ /usr/local/include/opencv4/opencv2/flann/matrix.h \
+ /usr/local/include/opencv4/opencv2/flann/params.h \
+ /usr/local/include/opencv4/opencv2/flann/any.h \
+ /usr/local/include/opencv4/opencv2/flann/defines.h \
+ /usr/local/include/opencv4/opencv2/flann/saving.h \
+ /usr/local/include/opencv4/opencv2/flann/nn_index.h \
+ /usr/local/include/opencv4/opencv2/flann/result_set.h \
+ /usr/include/c++/11/set /usr/include/c++/11/bits/stl_set.h \
+ /usr/include/c++/11/bits/stl_multiset.h \
+ /usr/local/include/opencv4/opencv2/flann/all_indices.h \
+ /usr/local/include/opencv4/opencv2/flann/kdtree_index.h \
+ /usr/local/include/opencv4/opencv2/flann/dynamic_bitset.h \
+ /usr/local/include/opencv4/opencv2/flann/dist.h \
+ /usr/local/include/opencv4/opencv2/flann/heap.h \
+ /usr/local/include/opencv4/opencv2/flann/allocator.h \
+ /usr/local/include/opencv4/opencv2/flann/random.h \
+ /usr/local/include/opencv4/opencv2/flann/kdtree_single_index.h \
+ /usr/local/include/opencv4/opencv2/flann/kmeans_index.h \
+ /usr/local/include/opencv4/opencv2/flann/logger.h \
+ /usr/local/include/opencv4/opencv2/flann/composite_index.h \
+ /usr/local/include/opencv4/opencv2/flann/linear_index.h \
+ /usr/local/include/opencv4/opencv2/flann/hierarchical_clustering_index.h \
+ /usr/local/include/opencv4/opencv2/flann/lsh_index.h \
+ /usr/local/include/opencv4/opencv2/flann/lsh_table.h \
+ /usr/include/c++/11/iomanip /usr/include/c++/11/locale \
+ /usr/include/c++/11/bits/locale_facets_nonio.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/time_members.h \
+ /usr/include/x86_64-linux-gnu/c++/11/bits/messages_members.h \
+ /usr/include/libintl.h /usr/include/c++/11/bits/codecvt.h \
+ /usr/include/c++/11/bits/locale_facets_nonio.tcc \
+ /usr/include/c++/11/bits/locale_conv.h \
+ /usr/include/c++/11/bits/quoted_string.h /usr/include/c++/11/math.h \
+ /usr/local/include/opencv4/opencv2/flann/autotuned_index.h \
+ /usr/local/include/opencv4/opencv2/flann/ground_truth.h \
+ /usr/local/include/opencv4/opencv2/flann/index_testing.h \
+ /usr/local/include/opencv4/opencv2/flann/timer.h \
+ /usr/local/include/opencv4/opencv2/flann/sampling.h \
+ /usr/local/include/opencv4/opencv2/highgui.hpp \
+ /usr/local/include/opencv4/opencv2/imgcodecs.hpp \
+ /usr/local/include/opencv4/opencv2/videoio.hpp \
+ /usr/local/include/opencv4/opencv2/imgproc.hpp \
+ /usr/local/include/opencv4/opencv2/imgproc/segmentation.hpp \
+ /usr/local/include/opencv4/opencv2/ml.hpp \
+ /usr/local/include/opencv4/opencv2/ml/ml.inl.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect/aruco_detector.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect/aruco_dictionary.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect/aruco_board.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect/graphical_code_detector.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect/detection_based_tracker.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect/face.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect/charuco_detector.hpp \
+ /usr/local/include/opencv4/opencv2/objdetect/barcode.hpp \
+ /usr/local/include/opencv4/opencv2/photo.hpp \
+ /usr/local/include/opencv4/opencv2/stitching.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/warpers.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/warpers.hpp \
+ /usr/local/include/opencv4/opencv2/core/cuda.hpp \
+ /usr/local/include/opencv4/opencv2/core/cuda_types.hpp \
+ /usr/local/include/opencv4/opencv2/core/cuda.inl.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/warpers_inl.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/warpers.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/matchers.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/motion_estimators.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/matchers.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/util.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/util_inl.hpp \
+ /usr/include/c++/11/queue /usr/include/c++/11/deque \
+ /usr/include/c++/11/bits/stl_deque.h /usr/include/c++/11/bits/deque.tcc \
+ /usr/include/c++/11/bits/stl_queue.h \
+ /usr/local/include/opencv4/opencv2/stitching/detail/camera.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/exposure_compensate.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/seam_finders.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/blenders.hpp \
+ /usr/local/include/opencv4/opencv2/stitching/detail/camera.hpp \
+ /usr/local/include/opencv4/opencv2/video.hpp \
+ /usr/local/include/opencv4/opencv2/video/tracking.hpp \
+ /usr/local/include/opencv4/opencv2/video/background_segm.hpp
