@@ -1,0 +1,70 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-1b441dfe85c9bf09a633.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "ArmFaceID",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ArmFaceID::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ArmFaceID-Debug-31f5a744892122e98656.json",
+					"name" : "ArmFaceID",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ArmFaceID_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ArmFaceID_autogen-Debug-5dfec5e9e4189a348f4f.json",
+					"name" : "ArmFaceID_autogen",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "E:/Documents/CodeField/ArmFaceID/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug",
+		"source" : "E:/Documents/CodeField/ArmFaceID"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

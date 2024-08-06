@@ -1,0 +1,8 @@
+/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/ArmFaceID.dir
+/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/edit_cache.dir
+/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/rebuild_cache.dir
+/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/list_install_components.dir
+/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/install.dir
+/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/install/local.dir
+/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/install/strip.dir
+/home/yu/codefield/ArmFaceID/build/Desktop_Qt_6_5_3_GCC_64bit-Debug/CMakeFiles/ArmFaceID_autogen.dir
