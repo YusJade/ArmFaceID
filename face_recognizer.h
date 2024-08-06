@@ -1,20 +1,28 @@
 #ifndef FACE_RECOGNIZER_H
 #define FACE_RECOGNIZER_H
 
+#ifdef _WIN32
+    #include <opencv2/opencv.hpp>
+#elif __linux__
+    #include <opencv4/opencv2/opencv.hpp>
+#endif
 #include <functional>
 #include <thread>
-#include <opencv4/opencv2/opencv.hpp>
-// #include <memory>
+
+typedef std::function<void(cv::Mat image)> OnCaptureHook;
+typedef std::function<void()> OnDetectHook;
 
 class FaceRecognizer {
  public:
   FaceRecognizer();
-  FaceRecognizer(std::function<void()>, std::function<void()>);
+  FaceRecognizer(OnCaptureHook, OnDetectHook);
   void Start();
+  void DetectFace(cv::Mat image, std::vector<cv::Rect> &faces);
 
  private:
-  std::function<void()> onCaptureHook;
-  std::function<void()> onDetectHook;
+  cv::CascadeClassifier faceClassifier;
+  OnCaptureHook onCaptureHook;
+  OnDetectHook onDetectHook;
   std::unique_ptr<std::thread> workThread;
   cv::VideoCapture videoCapture;
 };

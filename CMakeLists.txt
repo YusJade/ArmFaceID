@@ -9,7 +9,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SeetaFace_DIR "/usr/local/lib/cmake")
+if(WIN32)
+  set(SeetaFace_DIR "D:\\SeetaFace2\\lib\\cmake")
+elseif(LINUX)
+  set(SeetaFace_DIR "/usr/local/lib/cmake")
+endif()
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
@@ -28,6 +32,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         face_recognizer.h face_recognizer.cpp
+        utils/utils.h utils/utils.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET ArmFaceID APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
