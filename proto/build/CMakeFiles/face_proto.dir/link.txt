@@ -1,0 +1,2 @@
+D:\mingw64\bin\ar.exe qc libface_proto.a CMakeFiles/face_proto.dir/face_network.pb.obj CMakeFiles/face_proto.dir/face_network.grpc.pb.obj
+D:\mingw64\bin\ranlib.exe libface_proto.a

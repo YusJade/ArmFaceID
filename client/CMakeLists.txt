@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WIN32)
   set(SeetaFace_DIR "D:\\SeetaFace2\\lib\\cmake")
+  set(CMAKE_PREFIX_PATH "E:/Qt/6.5.3/mingw_64")
 elseif(LINUX)
   set(SeetaFace_DIR "/usr/local/lib/cmake")
 endif()

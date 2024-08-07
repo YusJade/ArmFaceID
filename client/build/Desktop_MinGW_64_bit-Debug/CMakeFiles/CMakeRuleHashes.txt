@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+3558cbf59bed8c57157197397926303e CMakeFiles/ArmFaceID_autogen
