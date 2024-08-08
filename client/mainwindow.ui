@@ -148,7 +148,7 @@
      <string>TextLabel</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_8">
+   <widget class="QLabel" name="faceLabel">
     <property name="geometry">
      <rect>
       <x>440</x>

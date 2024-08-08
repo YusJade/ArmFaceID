@@ -3,7 +3,7 @@
 
 #include "rpc_manager.h"
 
-constexpr char kServerAddrInfo[] = "localhost:50001";
+constexpr char kServerAddrInfo[] = "localhost:50051";
 
 int main(int argc, char *argv[]) {
   arm_face_id::RpcManagerImpl rpc_service;

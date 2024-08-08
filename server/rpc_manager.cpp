@@ -10,7 +10,9 @@ grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
   std::vector<uchar> image_encoded;
   cv::imencode(".jpg", test_image, image_encoded);
   std::string bytes(image_encoded.begin(), image_encoded.end());
-  response->set_face_img(bytes);
+  // response->set_face_img(bytes);
+  // 直接返回请求里的图片
+  response->set_face_img(request->face_img());
   response->set_id("1");
   response->set_name("LDH");
   return grpc::Status::OK;

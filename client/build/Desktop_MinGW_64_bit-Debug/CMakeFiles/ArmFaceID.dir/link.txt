@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\ArmFaceID.dir/objects.a
-D:\mingw64\bin\ar.exe qc CMakeFiles\ArmFaceID.dir/objects.a @CMakeFiles\ArmFaceID.dir\objects1.rsp
-D:\mingw64\bin\g++.exe -DQT_QML_DEBUG -g -mwindows -Wl,--whole-archive CMakeFiles\ArmFaceID.dir/objects.a -Wl,--no-whole-archive -o ArmFaceID.exe -Wl,--out-implib,libArmFaceID.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\ArmFaceID.dir\linkLibs.rsp

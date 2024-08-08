@@ -1,21 +1,23 @@
 #include "face_recognizer.h"
 
-#include <QString>
 #include <QDebug>
+#include <QString>
 
-FaceRecognizer::FaceRecognizer():
-  onCaptureHook(), onDetectHook(), videoCapture(1) {
-
-  if (!faceClassifier.load("D:\\opencv-5.10.0\\etc\\haarcascades\\haarcascade_frontalface_alt.xml")) {
+FaceRecognizer::FaceRecognizer()
+    : onCaptureHook(), onDetectHook(), videoCapture(1) {
+  if (!faceClassifier.load("D:\\opencv-5.10.0\\etc\\haarcascades\\haarcascade_"
+                           "frontalface_alt.xml")) {
     qDebug() << "无法加载分类器模型！";
   }
 }
 
 FaceRecognizer::FaceRecognizer(OnCaptureHook onCaptureHook,
                                OnDetectHook onDetectHook)
-    : onCaptureHook(onCaptureHook), onDetectHook(onDetectHook), videoCapture(1) {
-
-  if (!faceClassifier.load("D:\\opencv-5.10.0\\etc\\haarcascades\\haarcascade_frontalface_alt.xml")) {
+    : onCaptureHook(onCaptureHook),
+      onDetectHook(onDetectHook),
+      videoCapture(1) {
+  if (!faceClassifier.load("D:\\opencv-5.10.0\\etc\\haarcascades\\haarcascade_"
+                           "frontalface_alt.xml")) {
     qDebug() << "无法加载分类器模型！";
   }
 }
@@ -31,7 +33,7 @@ void FaceRecognizer::Start() {
   // cv::Mat firstFrame;
   // videoCapture.read(firstFrame);
   // cv::imshow("test", firstFrame);
-  workThread = std::make_unique<std::thread>([&]{
+  workThread = std::make_unique<std::thread>([&] {
     while (true) {
       cv::Mat frame;
       videoCapture.read(frame);
@@ -44,6 +46,8 @@ void FaceRecognizer::Start() {
       if (!faces.empty()) {
         auto face_rect = faces.at(0);
         cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 255));
+        // 通过 cv::Mat 的重载运算符截取出矩形部分
+        onDetectHook(frame(face_rect));
       }
       onCaptureHook(frame);
       std::this_thread::sleep_for(std::chrono::microseconds(100));

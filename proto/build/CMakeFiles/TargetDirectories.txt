@@ -1,3 +1,0 @@
-E:/Documents/CodeField/ArmFaceID/proto/build/CMakeFiles/face_proto.dir
-E:/Documents/CodeField/ArmFaceID/proto/build/CMakeFiles/edit_cache.dir
-E:/Documents/CodeField/ArmFaceID/proto/build/CMakeFiles/rebuild_cache.dir

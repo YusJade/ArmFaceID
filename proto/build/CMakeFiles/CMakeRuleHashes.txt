@@ -1,3 +1,0 @@
-# Hashes of file build rules.
-cabcc7a50d3208da6604c40fb144adba face_network.grpc.pb.h
-23882f815974c122c1ccbdd3e0bc85bc face_network.pb.h
