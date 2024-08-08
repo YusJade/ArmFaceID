@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(WIN32)
   set(SeetaFace_DIR "D:\\SeetaFace2\\lib\\cmake")
   set(CMAKE_PREFIX_PATH "E:/Qt/6.5.3/mingw_64")
+  set(OpenCV_DIR D:\\cmake-install-modules\\opencv-4.10.0)
 elseif(LINUX)
   set(SeetaFace_DIR "/usr/local/lib/cmake")
 endif()
@@ -75,6 +76,9 @@ set_target_properties(ArmFaceID PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
+message("GNUInstallDirs")
+message(GNUInstallDirs)
 
 include(GNUInstallDirs)
 install(TARGETS ArmFaceID

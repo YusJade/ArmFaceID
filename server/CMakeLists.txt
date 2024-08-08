@@ -6,6 +6,7 @@ if(WIN32)
     set(absl_DIR D:\\cmake-install-modules\\lib\\cmake\\absl)
     set(utf8_range_DIR D:\\cmake-install-modules\\lib\\cmake\\utf8_range)
     set(gRPC_DIR D:\\cmake-install-modules\\lib\\cmake\\grpc)
+    set(OpenCV_DIR D:\\cmake-install-modules\\opencv-4.10.0)
 endif()
 
 # 查找 gRPC 包
