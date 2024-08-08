@@ -61,7 +61,8 @@ message(${OpenCV_LIBS})
 
 target_link_libraries(ArmFaceID PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
-    ${OpenCV_LIBS})
+    ${OpenCV_LIBS}
+    face_proto)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
