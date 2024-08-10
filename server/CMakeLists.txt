@@ -7,12 +7,14 @@ if(WIN32)
     set(utf8_range_DIR D:\\cmake-install-modules\\lib\\cmake\\utf8_range)
     set(gRPC_DIR D:\\cmake-install-modules\\lib\\cmake\\grpc)
     set(OpenCV_DIR D:\\cmake-install-modules\\opencv-4.10.0)
+    set(SeetaFace_DIR D:\\cmake-install-modules\\SeetaFace\\lib\\cmake)
 endif()
 
 # 查找 gRPC 包
 find_package(protobuf CONFIG REQUIRED) # 使用 Modules 模式会找不到包
 find_package(gRPC REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(SeetaFace CONFIG REQUIRED)
 
 # 设置源文件
 set(SOURCES
