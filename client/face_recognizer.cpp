@@ -1,13 +1,19 @@
 #include "face_recognizer.h"
 
+#include <QApplication>
 #include <QDebug>
+#include <QMessageBox>
 #include <QString>
 
 FaceRecognizer::FaceRecognizer()
     : onCaptureHook(), onDetectHook(), videoCapture(1) {
-  if (!faceClassifier.load("D:\\opencv-5.10.0\\etc\\haarcascades\\haarcascade_"
+  if (!faceClassifier.load("D:\\cmake-install-modules\\opencv-4.10."
+                           "0\\etc\\haarcascades\\haarcascade_"
                            "frontalface_alt.xml")) {
-    qDebug() << "无法加载分类器模型！";
+    QMessageBox::critical(nullptr, "错误",
+                          "发生了一个致命错误，程序即将关闭。");
+    QApplication::exit(1);
+    // qDebug() << "无法加载分类器模型！";
   }
 }
 
@@ -16,9 +22,13 @@ FaceRecognizer::FaceRecognizer(OnCaptureHook onCaptureHook,
     : onCaptureHook(onCaptureHook),
       onDetectHook(onDetectHook),
       videoCapture(1) {
-  if (!faceClassifier.load("D:\\opencv-5.10.0\\etc\\haarcascades\\haarcascade_"
+  if (!faceClassifier.load("D:\\cmake-install-modules\\opencv-4.10."
+                           "0\\etc\\haarcascades\\haarcascade_"
                            "frontalface_alt.xml")) {
-    qDebug() << "无法加载分类器模型！";
+    QMessageBox::critical(nullptr, "错误",
+                          "发生了一个致命错误，程序即将关闭。");
+    QApplication::exit(1);
+    // qDebug() << "无法加载分类器模型！";
   }
 }
 

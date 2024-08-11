@@ -2,6 +2,19 @@ syntax = "proto3";
 
 package arm_face_id;
 
+message RegisterRequest {
+  bytes face_img = 1;
+  string name = 2;
+  int64 id = 3;
+}
+
+message RegisterResult {
+  bytes face_img = 1;
+  string name = 2;
+  int64 id = 3;
+  string last_recognized_date = 4;
+}
+
 message RecognizeRequest {
   bytes face_img = 1;
 }
@@ -9,10 +22,12 @@ message RecognizeRequest {
 message RecognizeResult {
   bytes face_img = 1;
   string name = 2;
-  string id = 3;
+  int64 id = 3;
   string last_recognized_date = 4;
 }
 
 service RpcManager {
   rpc RecognizeFace(RecognizeRequest) returns (RecognizeResult) { }
+
+  rpc Register(RegisterRequest) returns (RegisterResult) { }
 }

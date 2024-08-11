@@ -24,9 +24,9 @@ endif()
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(OpenCV REQUIRED)
-find_package(SeetaFace REQUIRED)
-# find_package(protobuf CONFIG REQUIRED)
-# find_package(gRPC CONFIG REQUIRED)
+# find_package(SeetaFace REQUIRED)
+find_package(protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -61,7 +61,9 @@ else()
     endif()
 endif()
 
-include_directories(${OpenCV_INCLUDE_DIRS})
+include_directories(
+  ${OpenCV_INCLUDE_DIRS}
+  ${gRPC_INCLUDE_DIRS})
 
 message("链接到lib:")
 message(${OpenCV_LIBS})

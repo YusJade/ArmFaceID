@@ -18,7 +18,11 @@ class RpcManagerImpl final : public arm_face_id::RpcManager::Service {
 
   ::grpc::Status RecognizeFace(::grpc::ServerContext* context,
                                const arm_face_id::RecognizeRequest* request,
-                               arm_face_id::RecognizeResult* response);
+                               arm_face_id::RecognizeResult* response) override;
+
+  ::grpc::Status Register(::grpc::ServerContext* context,
+                          const ::arm_face_id::RegisterRequest* request,
+                          ::arm_face_id::RegisterResult* response) override;
 
  private:
   std::unique_ptr<::seeta::FaceEngine> face_engine_ptr;

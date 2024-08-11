@@ -4,13 +4,17 @@
 
 #include "utils/utils.h"
 
+constexpr float kThrehold = 0.8;
+
 arm_face_id::RpcManagerImpl::RpcManagerImpl() {
-  seeta::ModelSetting FD_model_setting("FD_model_path",
+  seeta::ModelSetting FD_model_setting("fd_2_00.dat",
                                        seeta::ModelSetting::Device::CPU);
-  seeta::ModelSetting PD_model_setting("PD_model_path",
+  seeta::ModelSetting PD_model_setting("pd_2_00_pts5.dat",
                                        seeta::ModelSetting::Device::CPU);
-  seeta::ModelSetting FR_model_setting("FD_model_path",
+  seeta::ModelSetting FR_model_setting("fr_2_10.dat",
                                        seeta::ModelSetting::Device::CPU);
+  face_engine_ptr = std::make_unique<seeta::FaceEngine>(
+      FD_model_setting, PD_model_setting, FR_model_setting);
 }
 
 grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
@@ -35,6 +39,47 @@ grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
   seeta_image_data.data = img_decoded.data;
 
   float similarity = 0.0;
-  int64_t faces = face_engine_ptr->Query(seeta_image_data, &similarity);
+  int64_t id = face_engine_ptr->Query(seeta_image_data, &similarity);
+  std::vector<uchar> img_bytes;
+  response->set_id(id);
+  response->set_face_img(request->face_img());
   return grpc::Status::OK;
+}
+
+grpc::Status arm_face_id::RpcManagerImpl::Register(
+    grpc::ServerContext* context, const arm_face_id::RegisterRequest* request,
+    arm_face_id::RegisterResult* response) {
+  cv::Mat image;
+  utils::decodeMat(request->face_img(), image);
+
+  SeetaImageData seeta_img{image.cols, image.rows, image.channels(),
+                           image.data};
+  float similarity = 0.0;
+
+  int64_t id = face_engine_ptr->Query(seeta_img, &similarity);
+  if (similarity >= kThrehold) {
+    std::cerr << "Face registeration already exist!" << std::endl;
+
+    return grpc::Status(grpc::StatusCode::ALREADY_EXISTS, "fail",
+                        "face registeration already exist!");
+  }
+
+  id = face_engine_ptr->Register(
+      SeetaImageData{image.cols, image.rows, image.channels(), image.data});
+
+  if (id != -1) {
+    std::cerr << "Face register id:" << id << std::endl;
+    std::vector<uchar> img_bytes;
+    utils::encodeMat(image, ".jpg", img_bytes);
+    response->set_face_img(std::string(img_bytes.begin(), img_bytes.end()));
+    response->set_id(id);
+    response->set_name(request->name());
+
+    return grpc::Status::OK;
+  }
+
+  std::cerr << "Face register fail!" << std::endl;
+
+  return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "fail",
+                      "fail to register face!");
 }

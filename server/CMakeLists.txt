@@ -20,6 +20,7 @@ find_package(SeetaFace CONFIG REQUIRED)
 set(SOURCES
     main.cpp
     rpc_manager.cpp 
+    utils/utils.cpp
 )
 
 # 创建可执行文件
@@ -29,9 +30,12 @@ target_link_libraries(server
     PUBLIC
         face_proto
         ${OpenCV_LIBS}
+        ${SeetaFace_LIBRARIES}
 )
 target_include_directories(server PUBLIC
-    ${gRPC_INCLUDE_DIRS}
+    # ${gRPC_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
-    ${PROTOBUF_INCLUDE_DIRS} 
-    ${CMAKE_CURRENT_BINARY_DIR})
+    ${SeetaFace_INCLUDE_DIRS}
+    # ${PROTOBUF_INCLUDE_DIRS} 
+    CMAKE_CURRENT_SOURCE_DIR
+    )

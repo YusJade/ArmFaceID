@@ -36,8 +36,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>0</y>
+      <x>410</x>
+      <y>-10</y>
       <width>261</width>
       <height>51</height>
      </rect>
@@ -55,11 +55,18 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>370</y>
-      <width>111</width>
-      <height>41</height>
+      <x>410</x>
+      <y>330</y>
+      <width>101</width>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>思源宋体 CN VF Medium</family>
+      <pointsize>10</pointsize>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::WinPanel</enum>
@@ -71,11 +78,18 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>500</y>
-      <width>81</width>
+      <x>530</x>
+      <y>410</y>
+      <width>101</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>思源宋体 CN VF Medium</family>
+      <pointsize>10</pointsize>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::WinPanel</enum>
@@ -87,11 +101,18 @@
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>440</y>
-      <width>91</width>
+      <x>410</x>
+      <y>370</y>
+      <width>101</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>思源宋体 CN VF Medium</family>
+      <pointsize>10</pointsize>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::WinPanel</enum>
@@ -103,11 +124,18 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>500</y>
-      <width>91</width>
+      <x>410</x>
+      <y>410</y>
+      <width>101</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>思源宋体 CN VF Medium</family>
+      <pointsize>10</pointsize>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::WinPanel</enum>
@@ -116,14 +144,21 @@
      <string>上次认证时间</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
+   <widget class="QLabel" name="idLabel">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>440</y>
-      <width>81</width>
+      <x>530</x>
+      <y>370</y>
+      <width>101</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>思源宋体 CN VF Medium</family>
+      <pointsize>10</pointsize>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::WinPanel</enum>
@@ -135,11 +170,18 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>370</y>
-      <width>81</width>
+      <x>530</x>
+      <y>330</y>
+      <width>101</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>思源宋体 CN VF Medium</family>
+      <pointsize>10</pointsize>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::WinPanel</enum>
@@ -151,17 +193,43 @@
    <widget class="QLabel" name="faceLabel">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>70</y>
-      <width>211</width>
+      <x>420</x>
+      <y>40</y>
+      <width>221</width>
       <height>271</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>思源宋体 CN VF Heavy</family>
+      <bold>true</bold>
+     </font>
     </property>
     <property name="frameShape">
      <enum>QFrame::Shape::WinPanel</enum>
     </property>
     <property name="text">
      <string>face</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="registerBtn">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>470</y>
+      <width>201</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>思源宋体 CN VF</family>
+      <pointsize>18</pointsize>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>注册</string>
     </property>
    </widget>
   </widget>

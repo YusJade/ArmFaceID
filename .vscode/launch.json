@@ -24,6 +24,27 @@
         }
       ],
       //"preLaunchTask": "C/C++: g++.exe build active file"
+    },
+    {
+      "name": "(gdb) 启动 client",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/client/ArmFaceID.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "D:\\mingw64\\bin\\gdb.exe",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      //"preLaunchTask": "C/C++: g++.exe build active file"
     }
   ]
 }

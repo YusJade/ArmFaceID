@@ -17,6 +17,8 @@ class MainWindow : public QMainWindow {
 
   void SetDisplayLabelImg(QImage image);
   void SetFaceLabelImg(QImage image);
+  void SetIdLabel(QString text);
+  QString registerBtnState() const;
 
  private:
   Ui::MainWindow *ui;
