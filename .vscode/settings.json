@@ -82,6 +82,9 @@
     "xtr1common": "cpp",
     "xtree": "cpp",
     "xutility": "cpp",
-    "qapplication": "cpp"
+    "qapplication": "cpp",
+    "qmainwindow": "cpp",
+    "qvboxlayout": "cpp",
+    "qlabel": "cpp"
   }
 }

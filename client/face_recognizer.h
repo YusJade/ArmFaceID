@@ -1,6 +1,7 @@
 #ifndef FACE_RECOGNIZER_H
 #define FACE_RECOGNIZER_H
 
+#include <seeta/FaceDetector.h>
 #ifdef _WIN32
 #include <opencv2/opencv.hpp>
 #elif __linux__
@@ -14,7 +15,7 @@ typedef std::function<void(cv::Mat)> OnDetectHook;
 
 class FaceRecognizer {
  public:
-  FaceRecognizer();
+  // FaceRecognizer();
   FaceRecognizer(OnCaptureHook, OnDetectHook);
   void Start();
   void DetectFace(cv::Mat image, std::vector<cv::Rect> &faces);
@@ -25,6 +26,7 @@ class FaceRecognizer {
   OnDetectHook onDetectHook;
   std::unique_ptr<std::thread> workThread;
   cv::VideoCapture videoCapture;
+  std::unique_ptr<seeta::FaceDetector> face_detector;
 };
 
 #endif  // FACE_RECOGNIZER_H

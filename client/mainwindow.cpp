@@ -24,10 +24,6 @@ void MainWindow::SetFaceLabelImg(QImage image) {
   ui->faceLabel->setPixmap(QPixmap::fromImage(image));
 }
 
-void MainWindow::SetIdLabel(QString text){
-  ui->idLabel->setText(text);
-}
+void MainWindow::SetIdLabel(QString text) { ui->idLabel->setText(text); }
 
-QString MainWindow::registerBtnState() const {
-  return ui->registerBtn->text();
-}
+QString MainWindow::registerBtnState() const { return ui->registerBtn->text(); }

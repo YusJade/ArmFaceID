@@ -24,7 +24,7 @@ endif()
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(OpenCV REQUIRED)
-# find_package(SeetaFace REQUIRED)
+find_package(SeetaFace REQUIRED)
 find_package(protobuf CONFIG REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 
@@ -65,12 +65,11 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
   ${gRPC_INCLUDE_DIRS})
 
-message("链接到lib:")
-message(${OpenCV_LIBS})
 
 target_link_libraries(ArmFaceID PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     ${OpenCV_LIBS}
+    ${SeetaFace_LIBRARIES}
     face_proto)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -84,8 +83,9 @@ set_target_properties(ArmFaceID PROPERTIES
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+    WIN32_EXECUTABLE FALSE
 )
+
 
 message("GNUInstallDirs")
 message(GNUInstallDirs)
