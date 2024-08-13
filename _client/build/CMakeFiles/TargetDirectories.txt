@@ -1,3 +1,0 @@
-E:/Documents/CodeField/ArmFaceID/_client/build/CMakeFiles/client.dir
-E:/Documents/CodeField/ArmFaceID/_client/build/CMakeFiles/edit_cache.dir
-E:/Documents/CodeField/ArmFaceID/_client/build/CMakeFiles/rebuild_cache.dir

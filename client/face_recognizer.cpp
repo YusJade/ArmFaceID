@@ -67,6 +67,7 @@ void FaceRecognizer::Start() {
       //   // 通过 cv::Mat 的重载运算符截取出矩形部分
       //   onDetectHook(frame(cv_face_rect));
       // }
+
       // opencv 实现人脸检测
       std::vector<cv::Rect> faces;
       DetectFace(frame, faces);
@@ -86,7 +87,7 @@ void FaceRecognizer::Start() {
 void FaceRecognizer::DetectFace(cv::Mat image, std::vector<cv::Rect> &faces) {
   cv::Mat image_gray;
   cv::cvtColor(image, image_gray, cv::COLOR_BGR2GRAY);
-  // cv::equalizeHist(image_gray, image_gray);
+  cv::equalizeHist(image_gray, image_gray);
 
   faceClassifier.detectMultiScale(image_gray, faces);
 }

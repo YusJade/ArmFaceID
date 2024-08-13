@@ -85,6 +85,11 @@
     "qapplication": "cpp",
     "qmainwindow": "cpp",
     "qvboxlayout": "cpp",
-    "qlabel": "cpp"
+    "qlabel": "cpp",
+    "future": "cpp",
+    "condition_variable": "cpp",
+    "coroutine": "cpp",
+    "resumable": "cpp",
+    "qimage": "cpp"
   }
 }
