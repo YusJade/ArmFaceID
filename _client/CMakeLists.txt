@@ -29,5 +29,9 @@ target_link_libraries(client
     Qt6::Core
     Qt6::Widgets
     ${OpenCV_LIBS}
-    ${GFLAGS_LIBRARIES}
+    absl::flags
+    absl::log
+    absl::flags_parse
+    absl::flags_usage
+    # ${GFLAGS_LIBRARIES}
     face_proto)

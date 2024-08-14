@@ -23,11 +23,11 @@ class DisplayWidget : public FaceProcessorListener {
 
  private:
   std::shared_ptr<arm_face_id::RpcClient> rpc_client;
-  QWidget* widget_;
-  QLabel* capture_lbl_;
-  QLabel* face_lbl_;
-  QLabel* name_lbl_;
-  QLabel* id_lbl_;
+  QWidget* widget_ = nullptr;
+  QLabel* capture_lbl_ = nullptr;
+  QLabel* face_lbl_ = nullptr;
+  QLabel* name_lbl_ = nullptr;
+  QLabel* id_lbl_ = nullptr;
 };
 
 }  // namespace arm_face_id
