@@ -29,8 +29,13 @@
       "name": "(gdb) 启动 client",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/client/ArmFaceID.exe",
-      "args": [],
+      "program": "${workspaceFolder}/build/_client/client.exe",
+      "args": [
+        "-camera_id=1",
+        "-rpc_server_addr=localhost:50051",
+        "-network_camera_url=http://192.168.11.182:4747/video",
+        "-model_path=E:\\Downloads\\lbpcascade_frontalface_improved.xml"
+      ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
