@@ -2,7 +2,14 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
+#include <QMenu>
+#include <QMenuBar>
+#include <QPushButton>
+#include <QStackedLayout>
+#include <QToolButton>
 #include <QVBoxLayout>
+#include <QWidgetAction>
 
 #include <absl/log/absl_log.h>
 #include <absl/strings/str_format.h>
@@ -46,11 +53,57 @@ QWidget* arm_face_id::DisplayWidget::InitWidget() {
   in_vbox_layout_l->addWidget(new QLabel("Arm Face Id Project"));
 
   in_vbox_layout_r->addWidget(face_lbl_);
-  in_vbox_layout_r->addWidget(name_lbl_);
-  in_vbox_layout_r->addWidget(id_lbl_);
+
+  QStackedLayout* switch_layout = new QStackedLayout;
+  QVBoxLayout* detect_layout = new QVBoxLayout;
+  QVBoxLayout* registry_layout = new QVBoxLayout;
+
+  detect_layout->addWidget(name_lbl_);
+  detect_layout->addWidget(id_lbl_);
+
+  QLineEdit* edit_name = new QLineEdit;
+  QPushButton* register_btn = new QPushButton("reigster");
+
+  registry_layout->addWidget(edit_name);
+  registry_layout->addWidget(register_btn);
+
+  QWidget* detect_widget = new QWidget;
+  QWidget* registry_widget = new QWidget;
+  detect_widget->setLayout(detect_layout);
+  registry_widget->setLayout(registry_layout);
+
+  switch_layout->addWidget(detect_widget);
+  switch_layout->addWidget(registry_widget);
+
+  in_vbox_layout_r->addLayout(switch_layout);
 
   hbox_layout->addLayout(in_vbox_layout_l);
   hbox_layout->addLayout(in_vbox_layout_r);
+
+  QMenuBar* menu_bar = new QMenuBar;
+  QMenu* menu = new QMenu("功能");
+
+  QToolButton* to_registry_btn = new QToolButton;
+  QToolButton* to_detect_btn = new QToolButton;
+  to_registry_btn->setText("registry");
+  to_detect_btn->setText("detect");
+
+  QObject::connect(to_registry_btn, QToolButton::clicked,
+                   [=] { switch_layout->setCurrentIndex(1); });
+  QObject::connect(to_detect_btn, QToolButton::clicked,
+                   [=] { switch_layout->setCurrentIndex(0); });
+
+  QWidgetAction* action_registry = new QWidgetAction(widget_);
+  QWidgetAction* action_detect = new QWidgetAction(widget_);
+
+  action_registry->setDefaultWidget(to_registry_btn);
+  action_detect->setDefaultWidget(to_detect_btn);
+
+  menu->addAction(action_registry);
+  menu->addAction(action_detect);
+
+  menu_bar->addMenu(menu);
+  hbox_layout->setMenuBar(menu_bar);
 
   widget_->setLayout(hbox_layout);
 

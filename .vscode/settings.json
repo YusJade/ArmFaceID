@@ -90,6 +90,7 @@
     "condition_variable": "cpp",
     "coroutine": "cpp",
     "resumable": "cpp",
-    "qimage": "cpp"
+    "qimage": "cpp",
+    "qlineedit": "cpp"
   }
 }
