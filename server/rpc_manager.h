@@ -1,6 +1,8 @@
 #ifndef RPC_MANAGER_H
 #define RPC_MANAGER_H
 
+#include <mutex>
+
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/support/status.h>
 #include <opencv2/opencv.hpp>
@@ -26,6 +28,7 @@ class RpcManagerImpl final : public arm_face_id::RpcManager::Service {
 
  private:
   std::unique_ptr<::seeta::FaceEngine> face_engine_ptr;
+  std::mutex mutex_;
 };
 
 }  // namespace arm_face_id

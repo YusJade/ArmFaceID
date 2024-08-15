@@ -91,6 +91,8 @@
     "coroutine": "cpp",
     "resumable": "cpp",
     "qimage": "cpp",
-    "qlineedit": "cpp"
+    "qlineedit": "cpp",
+    "qtconcurrent": "cpp",
+    "source_location": "cpp"
   }
 }

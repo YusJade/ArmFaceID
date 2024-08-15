@@ -10,24 +10,27 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidgetAction>
+#include <QtConcurrent>
 
 #include <absl/log/absl_log.h>
 #include <absl/strings/str_format.h>
 
 #include "utils.h"
 
-arm_face_id::DisplayWidget::DisplayWidget(const std::string& rpc_server_addr)
-    : rpc_client(std::make_shared<arm_face_id::RpcClient>(grpc::CreateChannel(
-          rpc_server_addr, grpc::InsecureChannelCredentials()))) {}
+arm_face_id::DisplayWidget::DisplayWidget(const std::string& rpc_server_addr,
+                                          FaceProcessor* processor)
+    : rpc_client_(std::make_shared<arm_face_id::RpcClient>(grpc::CreateChannel(
+          rpc_server_addr, grpc::InsecureChannelCredentials()))),
+      processor_(processor) {}
 
 void arm_face_id::DisplayWidget::OnImageCaptured(cv::Mat captureed_image) {
   capture_lbl_->setPixmap(
-      QPixmap::fromImage(utils::matToQImage(captureed_image)));
+      QPixmap::fromImage(utils::MatToQImage(captureed_image)));
 }
 
 void arm_face_id::DisplayWidget::OnFaceDetected(cv::Mat detected_image,
                                                 cv::Rect face_rect) {
-  face_lbl_->setPixmap(QPixmap::fromImage(utils::matToQImage(detected_image)));
+  face_lbl_->setPixmap(QPixmap::fromImage(utils::MatToQImage(detected_image)));
 }
 
 void arm_face_id::DisplayWidget::OnFaceRecognized(RecognitionResult result) {
@@ -64,6 +67,20 @@ QWidget* arm_face_id::DisplayWidget::InitWidget() {
   QLineEdit* edit_name = new QLineEdit;
   QPushButton* register_btn = new QPushButton("reigster");
 
+  QObject::connect(register_btn, QPushButton::clicked, [=] {
+    std::thread thread([this, edit_name] {
+      ABSL_LOG(INFO) << "preparing register...";
+      rpc_client_->Register(utils::QImageToMat(face_lbl_->pixmap().toImage()),
+                            edit_name->text().toStdString());
+    });
+    thread.detach();
+    // QtConcurrent::run([this, edit_name] {
+    //   ABSL_LOG(INFO) << "preparing register...";
+    //   rpc_client_->Register(utils::QImageToMat(face_lbl_->pixmap().toImage()),
+    //                         edit_name->text().toStdString());
+    // });
+  });
+
   registry_layout->addWidget(edit_name);
   registry_layout->addWidget(register_btn);
 
@@ -89,9 +106,14 @@ QWidget* arm_face_id::DisplayWidget::InitWidget() {
   to_detect_btn->setText("detect");
 
   QObject::connect(to_registry_btn, QToolButton::clicked,
-                   [=] { switch_layout->setCurrentIndex(1); });
-  QObject::connect(to_detect_btn, QToolButton::clicked,
-                   [=] { switch_layout->setCurrentIndex(0); });
+                   [switch_layout, this] {
+                     processor_->Stop();
+                     switch_layout->setCurrentIndex(1);
+                   });
+  QObject::connect(to_detect_btn, QToolButton::clicked, [switch_layout, this] {
+    processor_->Continue();
+    switch_layout->setCurrentIndex(0);
+  });
 
   QWidgetAction* action_registry = new QWidgetAction(widget_);
   QWidgetAction* action_detect = new QWidgetAction(widget_);

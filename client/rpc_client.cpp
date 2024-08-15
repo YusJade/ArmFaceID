@@ -1,17 +1,18 @@
 #include "rpc_client.h"
 
-#include "utils/utils.h"
+#include "utils.h"
 
 arm_face_id::RpcClient::RpcClient(std::shared_ptr<::grpc::Channel> channel)
     : stub(RpcManager::NewStub(channel)) {}
 
-cv::Mat arm_face_id::RpcClient::RecognizeFace(cv::Mat face_img) {
+arm_face_id::RecognizeResult arm_face_id::RpcClient::RecognizeFace(
+    cv::Mat face_img) {
   arm_face_id::RecognizeRequest request;
   arm_face_id::RecognizeResult result;
   grpc::ClientContext context;
 
   std::vector<uchar> bytes;
-  utils::encodeMat(face_img, ".jpg", bytes);
+  utils::EncodeMat(face_img, ".jpg", bytes);
   std::string bytes_str(bytes.begin(), bytes.end());
   request.set_face_img(bytes_str);
 
@@ -20,13 +21,13 @@ cv::Mat arm_face_id::RpcClient::RecognizeFace(cv::Mat face_img) {
 
   cv::Mat decoded_img;
   if (status.ok()) {
-    std::cerr << "Success to complete a rpc request.\n";
+    ABSL_LOG(INFO) << "Success to complete a rpc request.\n";
     // TODO: face_img 为空报错？
-    utils::decodeMat(result.face_img(), decoded_img);
+    utils::DecodeMat(result.face_img(), decoded_img);
   } else {
-    std::cerr << "Fail to complete a rpc request!\n";
+    ABSL_LOG(INFO) << "Fail to complete a rpc request!\n";
   }
-  return decoded_img;
+  return result;
 }
 
 int64_t arm_face_id::RpcClient::Register(cv::Mat image, std::string name) {
@@ -35,7 +36,7 @@ int64_t arm_face_id::RpcClient::Register(cv::Mat image, std::string name) {
   grpc::ClientContext context;
 
   std::vector<uchar> bytes;
-  utils::encodeMat(image, ".jpg", bytes);
+  utils::EncodeMat(image, ".jpg", bytes);
 
   request.set_face_img(std::string(bytes.begin(), bytes.end()));
 

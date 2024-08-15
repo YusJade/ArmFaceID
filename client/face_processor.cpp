@@ -1,7 +1,11 @@
 #include "face_processor.h"
 
+#include <QtConcurrent>
+
 #include <absl/log/absl_log.h>
 #include <absl/strings/str_format.h>
+
+#include "utils.h"
 
 void arm_face_id::FaceProcessor::Start() {
   if (!listener_ptr_) {
@@ -23,13 +27,29 @@ void arm_face_id::FaceProcessor::Start() {
       cv::cvtColor(frame, frame_gray, cv::COLOR_BGR2GRAY);
       cv::equalizeHist(frame_gray, frame_gray);
 
+      // 若检测到人脸，则提交到服务端进行识别
       face_classifier_.detectMultiScale(frame_gray, faces);
       if (!faces.empty()) {
         auto face_rect = faces.at(0);
         cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 255));
-
         // 通过 cv::Mat 的重载运算符截取出矩形部分
         listener_ptr_->OnFaceDetected(frame(face_rect), face_rect);
+        if (is_pause_) {
+          continue;
+        }
+        QtConcurrent::run([this, face_rect, frame] {
+          // TODO
+          RecognizeResult result = rpc_client_.RecognizeFace(frame);
+          cv::Mat img_decoded;
+
+          // 识别出结果，调用监听接口 OnFaceRecognized
+          utils::DecodeMat(result.face_img(), img_decoded);
+          if (result.id() >= 0) {
+            listener_ptr_->OnFaceRecognized(
+                FaceProcessorListener::RecognitionResult{
+                    img_decoded, result.id(), result.name()});
+          }
+        });
       }
       listener_ptr_->OnImageCaptured(frame);
       std::this_thread::sleep_for(std::chrono::microseconds(100));

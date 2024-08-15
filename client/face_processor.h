@@ -43,10 +43,13 @@ class FaceProcessor {
   FaceProcessor() = delete;
   ~FaceProcessor() = default;
 
+  inline void Continue() { is_pause_ = false; }
+  inline void Stop() { is_pause_ = true; }
   void Start();
   void RegisterListener(std::shared_ptr<FaceProcessorListener>&& listener);
 
  private:
+  bool is_pause_ = false;
   ::std::shared_ptr<FaceProcessorListener> listener_ptr_;
   ::std::unique_ptr<std::thread> work_thread_;
   ::cv::CascadeClassifier face_classifier_;
