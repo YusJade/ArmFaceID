@@ -1,5 +1,6 @@
 #include "rpc_manager.h"
 
+#include <QVBoxLayout>
 #include <vector>
 
 #include "utils/utils.h"
@@ -8,11 +9,11 @@ constexpr float kThrehold = 0.8;
 
 arm_face_id::RpcManagerImpl::RpcManagerImpl() {
   seeta::ModelSetting FD_model_setting("fd_2_00.dat",
-                                       seeta::ModelSetting::Device::CPU, 0);
+                                       seeta::ModelSetting::Device::GPU, 0);
   seeta::ModelSetting PD_model_setting("pd_2_00_pts5.dat",
-                                       seeta::ModelSetting::Device::CPU, 0);
+                                       seeta::ModelSetting::Device::GPU, 0);
   seeta::ModelSetting FR_model_setting("fr_2_10.dat",
-                                       seeta::ModelSetting::Device::CPU, 0);
+                                       seeta::ModelSetting::Device::GPU, 0);
   face_engine_ptr = std::make_unique<seeta::FaceEngine>(
       FD_model_setting, PD_model_setting, FR_model_setting);
 }
@@ -46,7 +47,19 @@ grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
   // seeta_image_data.data = img_decoded.data;
 
   float similarity = 0.0;
+  // 获取开始时间点
+  auto start = std::chrono::high_resolution_clock::now();
+
   int64_t id = face_engine_ptr->Query(seeta_image_data, &similarity);
+
+  // 获取结束时间点
+  auto end = std::chrono::high_resolution_clock::now();
+  // 计算函数执行的时间间隔
+  std::chrono::duration<double, std::milli> duration = end - start;
+  // 输出执行时间
+  ABSL_LOG(INFO) << "Query execution time: " << duration.count() << " ms"
+                 << std::endl;
+
   std::vector<uchar> img_bytes;
   response->set_id(id);
   response->set_face_img(request->face_img());
@@ -61,8 +74,13 @@ grpc::Status arm_face_id::RpcManagerImpl::Register(
   cv::Mat image;
   utils::DecodeMat(request->face_img(), image);
 
-  SeetaImageData seeta_img{image.cols, image.rows, image.channels(),
-                           image.data};
+  img_lbl->setPixmap(QPixmap::fromImage(utils::MatToQImage(image)));
+
+  SeetaImageData seeta_img;
+  seeta_img.channels = image.channels();
+  seeta_img.data = image.data;
+  seeta_img.height = image.rows;
+  seeta_img.width = image.cols;
   float similarity = 0.0;
 
   int64_t id = face_engine_ptr->Query(seeta_img, &similarity);
@@ -73,8 +91,18 @@ grpc::Status arm_face_id::RpcManagerImpl::Register(
                         "face registeration already exist!");
   }
 
-  id = face_engine_ptr->Register(
-      SeetaImageData{image.cols, image.rows, image.channels(), image.data});
+  // 获取开始时间点
+  auto start = std::chrono::high_resolution_clock::now();
+
+  id = face_engine_ptr->Register(seeta_img);
+
+  // 获取结束时间点
+  auto end = std::chrono::high_resolution_clock::now();
+  // 计算函数执行的时间间隔
+  std::chrono::duration<double, std::milli> duration = end - start;
+  // 输出执行时间
+  ABSL_LOG(INFO) << "Register execution time: " << duration.count() << " ms"
+                 << std::endl;
 
   if (id != -1) {
     std::cerr << "Face register id:" << id << std::endl;
@@ -91,4 +119,13 @@ grpc::Status arm_face_id::RpcManagerImpl::Register(
 
   return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "fail",
                       "fail to register face!");
+}
+
+QWidget* arm_face_id::RpcManagerImpl::DisplayWidget() {
+  widget_ = new QWidget;
+  img_lbl = new QLabel("img_register");
+  QVBoxLayout* layout = new QVBoxLayout;
+  widget_->setLayout(layout);
+  layout->addWidget(img_lbl);
+  return widget_;
 }

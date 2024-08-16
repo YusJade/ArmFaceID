@@ -30,6 +30,7 @@ void arm_face_id::DisplayWidget::OnImageCaptured(cv::Mat captureed_image) {
 
 void arm_face_id::DisplayWidget::OnFaceDetected(cv::Mat detected_image,
                                                 cv::Rect face_rect) {
+  face_img_ = detected_image;
   face_lbl_->setPixmap(QPixmap::fromImage(utils::MatToQImage(detected_image)));
 }
 
@@ -70,8 +71,7 @@ QWidget* arm_face_id::DisplayWidget::InitWidget() {
   QObject::connect(register_btn, QPushButton::clicked, [=] {
     std::thread thread([this, edit_name] {
       ABSL_LOG(INFO) << "preparing register...";
-      rpc_client_->Register(utils::QImageToMat(face_lbl_->pixmap().toImage()),
-                            edit_name->text().toStdString());
+      rpc_client_->Register(face_img_, edit_name->text().toStdString());
     });
     thread.detach();
     // QtConcurrent::run([this, edit_name] {

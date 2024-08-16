@@ -24,7 +24,7 @@ target_include_directories(client
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${OpenCV_INCLUDE_DIRS})
 
-target_link_libraries(client 
+target_link_libraries(client  
   PRIVATE
     Qt6::Core
     Qt6::Widgets

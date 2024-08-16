@@ -7,12 +7,15 @@
 
 #include "utils.h"
 
+int arm_face_id::FaceProcessor::max_process_cnter_ = 100;
+
 void arm_face_id::FaceProcessor::Start() {
   if (!listener_ptr_) {
     std::cerr << "fail to find listener, the service will not be started.";
     return;
   }
   work_thread_ = std::make_unique<std::thread>([&] {
+    bool is_in_progress = false;
     while (true) {
       cv::Mat frame;
       video_capture_.read(frame);
@@ -30,18 +33,26 @@ void arm_face_id::FaceProcessor::Start() {
       // 若检测到人脸，则提交到服务端进行识别
       face_classifier_.detectMultiScale(frame_gray, faces);
       if (!faces.empty()) {
+        process_cnter_++;
         auto face_rect = faces.at(0);
         cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 255));
         // 通过 cv::Mat 的重载运算符截取出矩形部分
-        listener_ptr_->OnFaceDetected(frame(face_rect), face_rect);
-        if (is_pause_) {
+        listener_ptr_->OnFaceDetected(frame, face_rect);
+        if (is_pause_ || is_in_progress) {
           continue;
         }
-        QtConcurrent::run([this, face_rect, frame] {
+        QtConcurrent::run([this, face_rect, frame, &is_in_progress] {
           // TODO
+          is_in_progress = true;
           RecognizeResult result = rpc_client_.RecognizeFace(frame);
+          is_in_progress = false;
           cv::Mat img_decoded;
-
+          // // 限制查询频率
+          // if (process_cnter_ >= max_process_cnter_) {
+          //   process_cnter_ = 0;
+          //   return;
+          // }
+          // ++process_cnter_;
           // 识别出结果，调用监听接口 OnFaceRecognized
           utils::DecodeMat(result.face_img(), img_decoded);
           if (result.id() >= 0) {
@@ -49,6 +60,7 @@ void arm_face_id::FaceProcessor::Start() {
                 FaceProcessorListener::RecognitionResult{
                     img_decoded, result.id(), result.name()});
           }
+          return;
         });
       }
       listener_ptr_->OnImageCaptured(frame);
@@ -58,7 +70,7 @@ void arm_face_id::FaceProcessor::Start() {
   work_thread_->detach();
 }
 
-void arm_face_id::FaceProcessor::RegisterListener(
+void arm_face_id::FaceProcessor::SetListener(
     std::shared_ptr<FaceProcessorListener>&& listener) {
   listener_ptr_ = listener;
 }

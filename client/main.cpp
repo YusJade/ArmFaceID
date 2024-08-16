@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
       std::make_shared<arm_face_id::DisplayWidget>(rpc_server_addr,
                                                    &face_processor);
 
-  face_processor.RegisterListener(widget);
+  face_processor.SetListener(widget);
   QWidget* w = widget->InitWidget();
   face_processor.Start();
 

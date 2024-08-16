@@ -23,6 +23,7 @@ class DisplayWidget : public FaceProcessorListener {
   QWidget* widget();
 
  private:
+  cv::Mat face_img_;
   FaceProcessor* processor_ = nullptr;
   std::shared_ptr<arm_face_id::RpcClient> rpc_client_;
   QWidget* widget_ = nullptr;

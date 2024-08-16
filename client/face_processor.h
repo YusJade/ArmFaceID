@@ -46,7 +46,7 @@ class FaceProcessor {
   inline void Continue() { is_pause_ = false; }
   inline void Stop() { is_pause_ = true; }
   void Start();
-  void RegisterListener(std::shared_ptr<FaceProcessorListener>&& listener);
+  void SetListener(std::shared_ptr<FaceProcessorListener>&& listener);
 
  private:
   bool is_pause_ = false;
@@ -55,6 +55,9 @@ class FaceProcessor {
   ::cv::CascadeClassifier face_classifier_;
   ::cv::VideoCapture video_capture_;
   RpcClient rpc_client_;
+  int process_cnter_ = 0;
+
+  static int max_process_cnter_;
 };
 
 }  // namespace arm_face_id

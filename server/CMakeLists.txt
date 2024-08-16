@@ -15,6 +15,8 @@ find_package(protobuf CONFIG REQUIRED) # 使用 Modules 模式会找不到包
 find_package(gRPC REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(SeetaFace CONFIG REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent)
+find_package(absl REQUIRED)
 
 # 设置源文件
 set(SOURCES
@@ -28,6 +30,13 @@ add_executable(server ${SOURCES})
 # 链接 gRPC 库
 target_link_libraries(server
     PUBLIC
+        Qt6::Core
+        Qt6::Widgets
+        Qt6::Concurrent
+        absl::flags
+        absl::log
+        absl::flags_parse
+        absl::flags_usage
         face_proto
         ${OpenCV_LIBS}
         ${SeetaFace_LIBRARIES}
