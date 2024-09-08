@@ -12,8 +12,9 @@
 constexpr char kServerAddrInfo[] = "localhost:50051";
 
 int main(int argc, char* argv[]) {
+  QApplication app(argc, argv);
   absl::InitializeLog();
-  absl::SetStderrThreshold(absl::LogSeverity::kInfo);
+  SetStderrThreshold(absl::LogSeverity::kInfo);
   arm_face_id::RpcManagerImpl rpc_service;
 
   grpc::ServerBuilder server_builder;
@@ -21,14 +22,15 @@ int main(int argc, char* argv[]) {
                                   grpc::InsecureServerCredentials());
   server_builder.RegisterService(&rpc_service);
 
-  std::unique_ptr<grpc::Server> rpc_server(server_builder.BuildAndStart());
+  const std::unique_ptr rpc_server(server_builder.BuildAndStart());
 
-  QApplication app(argc, argv);
-  QWidget* widget = rpc_service.DisplayWidget();
+  rpc_service.InitRegisterWidget();
+  rpc_service.InitRpcWidget();
+  QWidget* widget = rpc_service.Widget();
   widget->show();
 
   std::thread thread([&] { rpc_server->Wait(); });
   thread.detach();
 
-  return app.exec();
+  return QApplication::exec();
 }

@@ -41,6 +41,7 @@ target_link_libraries(server
         ${OpenCV_LIBS}
         ${SeetaFace_LIBRARIES}
 )
+
 target_include_directories(server PUBLIC
     # ${gRPC_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}

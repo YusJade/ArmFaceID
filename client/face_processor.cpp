@@ -15,7 +15,7 @@ void arm_face_id::FaceProcessor::Start() {
     return;
   }
   work_thread_ = std::make_unique<std::thread>([&] {
-    bool is_in_progress = false;
+    bool detect_once = false;
     while (true) {
       cv::Mat frame;
       video_capture_.read(frame);
@@ -32,36 +32,21 @@ void arm_face_id::FaceProcessor::Start() {
 
       // 若检测到人脸，则提交到服务端进行识别
       face_classifier_.detectMultiScale(frame_gray, faces);
-      if (!faces.empty()) {
-        process_cnter_++;
+      if (!faces.empty() && !detect_once) {
+        detect_once = true;
         auto face_rect = faces.at(0);
         cv::rectangle(frame, face_rect, cv::Scalar(0, 255, 255));
+        this->listener_ptr_->OnFaceDetected(frame, face_rect);
         // 通过 cv::Mat 的重载运算符截取出矩形部分
-        listener_ptr_->OnFaceDetected(frame, face_rect);
-        if (is_pause_ || is_in_progress) {
-          continue;
-        }
-        QtConcurrent::run([this, face_rect, frame, &is_in_progress] {
-          // TODO
-          is_in_progress = true;
-          RecognizeResult result = rpc_client_.RecognizeFace(frame);
-          is_in_progress = false;
-          cv::Mat img_decoded;
-          // // 限制查询频率
-          // if (process_cnter_ >= max_process_cnter_) {
-          //   process_cnter_ = 0;
-          //   return;
-          // }
-          // ++process_cnter_;
-          // 识别出结果，调用监听接口 OnFaceRecognized
-          utils::DecodeMat(result.face_img(), img_decoded);
-          if (result.id() >= 0) {
-            listener_ptr_->OnFaceRecognized(
-                FaceProcessorListener::RecognitionResult{
-                    img_decoded, result.id(), result.name()});
-          }
-          return;
-        });
+        cv::Mat face_mat(frame(face_rect));
+        auto rpc_res = rpc_client_.RecognizeFace(face_mat);
+
+        FaceProcessorListener::RecognitionResult recognition_result;
+        recognition_result.id = rpc_res.id();
+        recognition_result.name = rpc_res.name();
+        listener_ptr_->OnFaceRecognized(recognition_result);
+      } else if (faces.empty()) {
+        detect_once = false;
       }
       listener_ptr_->OnImageCaptured(frame);
       std::this_thread::sleep_for(std::chrono::microseconds(100));

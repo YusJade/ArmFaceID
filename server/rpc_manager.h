@@ -2,6 +2,7 @@
 #define RPC_MANAGER_H
 
 #include <QLabel>
+#include <QStackedWidget>
 #include <QWidget>
 #include <mutex>
 
@@ -16,25 +17,34 @@
 
 namespace arm_face_id {
 
-class RpcManagerImpl final : public arm_face_id::RpcManager::Service {
+class RpcManagerImpl final : public RpcManager::Service {
  public:
   RpcManagerImpl();
+  ~RpcManagerImpl();
 
-  ::grpc::Status RecognizeFace(::grpc::ServerContext* context,
-                               const arm_face_id::RecognizeRequest* request,
-                               arm_face_id::RecognizeResult* response) override;
+  grpc::Status RecognizeFace(grpc::ServerContext* context,
+                             const RecognizeRequest* request,
+                             RecognizeResult* response) override;
 
-  ::grpc::Status Register(::grpc::ServerContext* context,
-                          const ::arm_face_id::RegisterRequest* request,
-                          ::arm_face_id::RegisterResult* response) override;
+  grpc::Status Register(grpc::ServerContext* context,
+                        const RegisterRequest* request,
+                        RegisterResult* response) override;
 
-  QWidget* DisplayWidget();
+  QWidget* InitRpcWidget();
+  QWidget* Widget();
+  QWidget* InitRegisterWidget();
 
  private:
-  std::unique_ptr<::seeta::FaceEngine> face_engine_ptr;
+  std::unique_ptr<seeta::FaceEngine> face_engine_ptr;
   std::mutex mutex_;
-  QWidget* widget_;
-  QLabel* img_lbl;
+  QWidget* rpc_widget_;
+  QWidget* display_widget_;
+  QWidget* register_widget_;
+  QStackedWidget* stacked_widget_;
+  QLabel* img_lbl_;
+  QLabel* cam_img_lbl_;
+  ::cv::CascadeClassifier face_classifier_;
+  ::cv::Mat native_register_img_;
 };
 
 }  // namespace arm_face_id

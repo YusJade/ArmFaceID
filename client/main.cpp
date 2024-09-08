@@ -12,7 +12,7 @@
 
 ABSL_FLAG(std::string, model_path, ".",
           "[Required] set the path of cascade classifer model `s path.");
-ABSL_FLAG(int, camera_id, 0, "[Optional] set the id of camera device.");
+ABSL_FLAG(int, camera_id, 1, "[Optional] set the id of camera device.");
 ABSL_FLAG(std::string, network_camera_url, "",
           "[Optional] set the url of network camera.");
 ABSL_FLAG(std::string, rpc_server_addr, "",
@@ -38,8 +38,8 @@ int main(int argc, char* argv[]) {
   // std::shared_ptr<arm_face_id::RpcClient> rpc_client =
   //     std::make_shared<arm_face_id::RpcClient>(grpc::CreateChannel(
   //         rpc_server_addr, grpc::InsecureChannelCredentials()));
-  arm_face_id::FaceProcessorSetting setting(0, network_camera_url, model_path,
-                                            rpc_server_addr);
+  arm_face_id::FaceProcessorSetting setting(
+      camera_device_id, network_camera_url, model_path, rpc_server_addr);
 
   arm_face_id::FaceProcessor face_processor(setting);
   std::shared_ptr<arm_face_id::DisplayWidget> widget =

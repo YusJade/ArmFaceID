@@ -32,6 +32,7 @@ QImage utils::MatToQImage(const cv::Mat& mat) {
   }
 }
 
+// 转换出Mat为四通道，无法被Seetaface识别
 cv::Mat utils::QImageToMat(const QImage& qimage) {
   cv::Mat mat;
   switch (qimage.format()) {
