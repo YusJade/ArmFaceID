@@ -13,8 +13,12 @@ set(utf8_range_DIR D:\\cmake-install-modules\\lib\\cmake\\utf8_range)
 set(gRPC_DIR D:\\cmake-install-modules\\lib\\cmake\\grpc)
 set(OpenCV_DIR D:\\cmake-install-modules\\opencv-4.10.0)
 set(SeetaFace_DIR D:\\cmake-install-modules\\SeetaFace\\lib\\cmake)
-
 set(SeetaFace_INCLUDE_DIRS D:/cmake-install-modules/SeetaFace/include)
+elseif(UNIX)
+	message("----- Building On UNIX Platform -----")
+	set(CMAKE_PREFIX_PATH /home/yu/Qt/6.5.3/gcc_64/lib/cmake/)
+	message("[INFO]: Following Value be Set:")
+	message(CMAKE_PREFIX_PATH)
 endif()
 
 add_subdirectory(proto)

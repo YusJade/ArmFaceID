@@ -178,6 +178,10 @@ QWidget* arm_face_id::RpcManagerImpl::Widget() {
   // 创建工具栏按钮
   QAction* rpc_action = tool_bar->addAction("RPC");
   QAction* register_action = tool_bar->addAction("Register");
+  QAction* load_action = tool_bar->addAction("Load");
+  QAction* save_action = tool_bar->addAction("Save");
+
+  QObject::
 
   // 将按钮与槽函数关联
   QObject::connect(rpc_action, &QAction::triggered,

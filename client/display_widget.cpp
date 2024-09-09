@@ -68,7 +68,7 @@ QWidget* arm_face_id::DisplayWidget::InitWidget() {
   QLineEdit* edit_name = new QLineEdit;
   QPushButton* register_btn = new QPushButton("reigster");
 
-  QObject::connect(register_btn, QPushButton::clicked, [=] {
+  QObject::connect(register_btn, &QPushButton::clicked, [=] {
     std::thread thread([this, edit_name] {
       ABSL_LOG(INFO) << "preparing register...";
       rpc_client_->Register(face_img_, edit_name->text().toStdString());
@@ -105,12 +105,12 @@ QWidget* arm_face_id::DisplayWidget::InitWidget() {
   to_registry_btn->setText("registry");
   to_detect_btn->setText("detect");
 
-  QObject::connect(to_registry_btn, QToolButton::clicked,
+  QObject::connect(to_registry_btn, &QToolButton::clicked,
                    [switch_layout, this] {
                      processor_->Stop();
                      switch_layout->setCurrentIndex(1);
                    });
-  QObject::connect(to_detect_btn, QToolButton::clicked, [switch_layout, this] {
+  QObject::connect(to_detect_btn, &QToolButton::clicked, [switch_layout, this] {
     processor_->Continue();
     switch_layout->setCurrentIndex(0);
   });

@@ -8,6 +8,9 @@ if(WIN32)
     set(gRPC_DIR D:\\cmake-install-modules\\lib\\cmake\\grpc)
     set(OpenCV_DIR D:\\cmake-install-modules\\opencv-4.10.0)
     set(SeetaFace_DIR D:\\cmake-install-modules\\SeetaFace\\lib\\cmake)
+elseif(UNIX)
+    set(SeetaFace_DIR /usr/local/lib/cmake/)
+    set(Qt6_DIR /home/yu/Qt/6.5.3/gcc_64/lib/cmake/Qt6/)
 endif()
 
 # 查找 gRPC 包
