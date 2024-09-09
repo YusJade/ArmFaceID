@@ -21,8 +21,7 @@ arm_face_id::RpcManagerImpl::RpcManagerImpl() : cam_img_lbl_(new QLabel) {
   seeta::ModelSetting FR_model_setting("fr_2_10.dat",
                                        seeta::ModelSetting::Device::CPU);
   face_classifier_.load(
-      "D:/cmake-install-modules/opencv-4.10.0/etc/haarcascades/haarcascade_"
-      "frontalface_alt.xml");
+      "/usr/local/share/opencv4/haarcascades/haarcascade_frontalface_alt2.xml");
   face_engine_ptr = std::make_unique<seeta::FaceEngine>(
       FD_model_setting, PD_model_setting, FR_model_setting);
 
@@ -183,9 +182,9 @@ QWidget* arm_face_id::RpcManagerImpl::Widget() {
 
   QObject::
 
-  // 将按钮与槽函数关联
-  QObject::connect(rpc_action, &QAction::triggered,
-                   [&] { stacked_widget_->setCurrentWidget(rpc_widget_); });
+      // 将按钮与槽函数关联
+      QObject::connect(rpc_action, &QAction::triggered,
+                       [&] { stacked_widget_->setCurrentWidget(rpc_widget_); });
   QObject::connect(register_action, &QAction::triggered, [&] {
     stacked_widget_->setCurrentWidget(register_widget_);
   });
@@ -251,9 +250,9 @@ QWidget* arm_face_id::RpcManagerImpl::InitRegisterWidget() {
                        int64_t id = face_engine_ptr->Register(data);
                        if (id >= 0) {
                          id_lbl->setText(QString::number(id));
-                      }
-                    }
-  });
+                       }
+                     }
+                   });
 
   register_widget_->setLayout(layout);
   return register_widget_;
