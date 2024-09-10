@@ -20,12 +20,16 @@ find_package(OpenCV REQUIRED)
 find_package(SeetaFace CONFIG REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent)
 find_package(absl REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(fmt)
 
 # 设置源文件
 set(SOURCES
     main.cpp
     rpc_manager.cpp 
     utils/utils.cpp
+    gui.cpp
+    engine.cpp
 )
 
 # 创建可执行文件
@@ -40,6 +44,7 @@ target_link_libraries(server
         absl::log
         absl::flags_parse
         absl::flags_usage
+	fmt::fmt
         face_proto
         ${OpenCV_LIBS}
         ${SeetaFace_LIBRARIES}

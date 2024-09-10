@@ -1,22 +1,39 @@
 #pragma once
 
+#include <qstackedwidget.h>
 #include <qwidget.h>
+
 #include <QApplication>
+#include <QWidget>
 #include <cstdint>
 #include <memory>
-#include "face_engine.h"
-#include <QWidget>
+
 #include <opencv2/core/mat.hpp>
 
-class GUI {
-public:
-  explicit GUI(std::shared_ptr<seeta::FaceEngine> engine_ptr);
+#include "engine.h"
+#include "face_engine.h"
+
+namespace arm_face_id {
+
+class GUI : public ICamera {
+ public:
+  explicit GUI(std::shared_ptr<Engine> engine_ptr);
 
   void Init();
   QWidget* Get();
-private:
-  std::shared_ptr<seeta::FaceEngine> engine_ptr_;
+
+  void OnFrameCaptured(cv::Mat frame) override;
+
+ private:
+  std::shared_ptr<Engine> engine_ptr_;
   cv::Mat captured_face_mat_;
+  QWidget* main_widget_ = nullptr;
+  QStackedWidget* stacked_widget_ = nullptr;
+  QWidget* rpc_widget_ = nullptr;
+  QWidget* register_widget_ = nullptr;
 
   int64_t RegisterFace();
+  QWidget* InitRpcWidget();
+  QWidget* InitRegisterWidget();
 };
+}  // namespace arm_face_id

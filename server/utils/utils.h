@@ -5,8 +5,16 @@
 #include <vector>
 
 #include <opencv2/opencv.hpp>
+#include <spdlog/spdlog.h>
+
+#define ASSERET_WITH_LOG(msg, expr) \
+  if (!expr) {                      \
+    spdlog::error(msg);             \
+    assert(expr);                   \
+  }
 
 namespace utils {
+
 // 将cv::Mat转换为QImage
 QImage MatToQImage(const cv::Mat& mat);
 
