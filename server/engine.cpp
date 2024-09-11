@@ -44,7 +44,7 @@ arm_face_id::Engine::Engine(const EngineConfig& config)
 }
 
 void arm_face_id::Engine::Start() {
-  if (!worker_thread_) {
+  if (worker_thread_ != nullptr) {
     spdlog::warn("Engine thread has been started~");
     return;
   }
@@ -54,6 +54,7 @@ void arm_face_id::Engine::Start() {
     bool accessable = false;
     while (true) {
       camera_ >> frame;
+      InvokeAllICamera(frame);
       accessable = faces.empty() ? true : false;
       faces.clear();
       DetectFace(faces, frame);

@@ -6,8 +6,10 @@
 #include <QApplication>
 #include <QWidget>
 #include <cstdint>
+#include <functional>
 #include <memory>
 
+#include <absl/strings/internal/str_format/output.h>
 #include <opencv2/core/mat.hpp>
 
 #include "engine.h"
@@ -31,6 +33,8 @@ class GUI : public ICamera {
   QStackedWidget* stacked_widget_ = nullptr;
   QWidget* rpc_widget_ = nullptr;
   QWidget* register_widget_ = nullptr;
+
+  std::function<void(cv::Mat)> on_frame_captured_callback_;
 
   int64_t RegisterFace();
   QWidget* InitRpcWidget();

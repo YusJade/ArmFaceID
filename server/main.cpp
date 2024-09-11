@@ -19,10 +19,10 @@
 #include "rpc_manager.h"
 
 /**
- * ./build/server/server -native_camera_index=1 -classifier_path=D:/cmake-install-modules/opencv-4.10.0/etc/haarcascades/haarcascade_frontalface_alt2.xml
- * 
+ * ./build/server/server -native_camera_index=1
+ * -classifier_path=D:/cmake-install-modules/opencv-4.10.0/etc/haarcascades/haarcascade_frontalface_alt2.xml
+ *
  */
-
 ABSL_FLAG(std::string, classifier_path,
           "/home/yu/codefield/opencv/data/haarcascades_cuda/"
           "haarcascade_frontalface_alt2.xml",
@@ -64,8 +64,11 @@ int main(int argc, char* argv[]) {
 
   // arm_face_id::RpcManagerImpl rpc_service;
   QApplication app(argc, argv);
-  arm_face_id::GUI gui(engine_ptr);
-  gui.Get()->show();
+  std::shared_ptr<arm_face_id::GUI> gui_ptr =
+      std::make_shared<arm_face_id::GUI>(engine_ptr);
+  gui_ptr->Get()->show();
+  engine_ptr->RegisterICamera(gui_ptr);
+  engine_ptr->Start();
   return app.exec();
   // grpc::ServerBuilder server_builder;
   // server_builder.AddListeningPort(kServerAddrInfo,
