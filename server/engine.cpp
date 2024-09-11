@@ -1,12 +1,16 @@
 
 #include "engine.h"
 
+#include <chrono>
 #include <cstdint>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include <fmt/core.h>
+#include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
+#include <opencv2/imgproc.hpp>
 #include <seeta/CStruct.h>
 #include <spdlog/spdlog.h>
 
@@ -20,7 +24,7 @@ arm_face_id::Engine::Engine(const EngineConfig& config)
                    classifier_.load(config.classifier_path));
   spdlog::info("Initialized the Engine.");
   if (!config.network_camera_url.empty())
-    camera_.open(config.network_camera_url);
+    camera_.open("rstp://yu:yusjade@192.168.3.5:4747/video");
   if (camera_.isOpened()) {
     spdlog::info("Opened network camera at {}", config.network_camera_url);
     return;
@@ -39,8 +43,37 @@ arm_face_id::Engine::Engine(const EngineConfig& config)
       camera_.isOpened())
 }
 
+void arm_face_id::Engine::Start() {
+  if (!worker_thread_) {
+    spdlog::warn("Engine thread has been started~");
+    return;
+  }
+  worker_thread_ = std::make_unique<std::thread>([&, this] {
+    cv::Mat frame;
+    std::vector<cv::Rect> faces;
+    bool accessable = false;
+    while (true) {
+      camera_ >> frame;
+      accessable = faces.empty() ? true : false;
+      faces.clear();
+      DetectFace(faces, frame);
+      // current frame contains face will try to be recognized when last frame
+      // contains no face.
+      if (accessable && !faces.empty()) {
+        int64_t id = RecognizeFace(frame);
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    }
+  });
+  worker_thread_->detach();
+  spdlog::info("Engine thread is started.");
+}
+
 void arm_face_id::Engine::DetectFace(std::vector<cv::Rect>& faces,
                                      const cv::Mat& frame) {
+  cv::Mat gray_frame;
+  cv::cvtColor(frame, gray_frame, cv::COLOR_BGR2GRAY);
+  cv::equalizeHist(gray_frame, gray_frame);
   classifier_.detectMultiScale(frame, faces);
 }
 

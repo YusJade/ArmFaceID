@@ -2,11 +2,13 @@
 
 #include <cstdint>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/objdetect.hpp>
+#include <opencv2/video.hpp>
 #include <opencv2/videoio.hpp>
 #include <seeta/Struct.h>
 
@@ -31,6 +33,14 @@ class ICamera {
   virtual void OnFrameCaptured(cv::Mat) = 0;
 };
 
+// NOTE: This listener only be invoked by engine`s worker thread.
+class IEngineListener {
+ public:
+  virtual void OnFaceRecognized(int64_t, const cv::Mat &) = 0;
+  virtual void OnFaceDetected(const std::vector<cv::Rect> &,
+                              const cv::Mat &) = 0;
+};
+
 /**
  * @brief This Engine provide face detection,face recognintion,face register,and
  * persistence of related data, which will be injected into the objects depend
@@ -41,6 +51,8 @@ class Engine {
   explicit Engine(const EngineConfig &);
   Engine() = delete;
   Engine(const Engine &) = delete;
+
+  void Start();
 
   // use seeta::FaceEngine
   int64_t RecognizeFace(const cv::Mat &);
@@ -55,7 +67,9 @@ class Engine {
 
  private:
   std::unique_ptr<seeta::FaceEngine> face_engine_;
+  std::unique_ptr<std::thread> worker_thread_;
   std::vector<std::shared_ptr<ICamera>> icameras_;
+  std::vector<std::shared_ptr<IEngineListener>> ilisteners_;
   cv::CascadeClassifier classifier_;
   cv::VideoCapture camera_;
 
@@ -64,5 +78,7 @@ class Engine {
       i->OnFrameCaptured(frame);
     }
   }
+
+  // inline void InvokeAllIListeners(std::v)
 };
 }  // namespace arm_face_id
