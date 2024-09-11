@@ -24,7 +24,7 @@ arm_face_id::Engine::Engine(const EngineConfig& config)
                    classifier_.load(config.classifier_path));
   spdlog::info("Initialized the Engine.");
   if (!config.network_camera_url.empty())
-    camera_.open("rstp://yu:yusjade@192.168.3.5:4747/video");
+    camera_.open(config.network_camera_url);
   if (camera_.isOpened()) {
     spdlog::info("Opened network camera at {}", config.network_camera_url);
     return;

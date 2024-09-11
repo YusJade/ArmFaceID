@@ -8,6 +8,8 @@ if(WIN32)
     set(gRPC_DIR D:\\cmake-install-modules\\lib\\cmake\\grpc)
     set(OpenCV_DIR D:\\cmake-install-modules\\opencv-4.10.0)
     set(SeetaFace_DIR D:\\cmake-install-modules\\SeetaFace\\lib\\cmake)
+    set(spdlog_DIR D:/cmake-install-modules/spdlog/lib/cmake/spdlog)
+    set(fmt_DIR D:/cmake-install-modules/fmt/lib/cmake/fmt/)
 elseif(UNIX)
     set(SeetaFace_DIR /usr/local/lib/cmake/)
     set(Qt6_DIR /home/yu/Qt/6.5.3/gcc_64/lib/cmake/Qt6/)
@@ -21,7 +23,7 @@ find_package(SeetaFace CONFIG REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent)
 find_package(absl REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(fmt)
+find_package(fmt CONFIG REQUIRED)
 
 # 设置源文件
 set(SOURCES
@@ -37,6 +39,7 @@ add_executable(server ${SOURCES})
 # 链接 gRPC 库
 target_link_libraries(server
     PUBLIC
+    spdlog::spdlog
         Qt6::Core
         Qt6::Widgets
         Qt6::Concurrent
@@ -44,7 +47,6 @@ target_link_libraries(server
         absl::log
         absl::flags_parse
         absl::flags_usage
-	fmt::fmt
         face_proto
         ${OpenCV_LIBS}
         ${SeetaFace_LIBRARIES}
@@ -56,4 +58,5 @@ target_include_directories(server PUBLIC
     ${SeetaFace_INCLUDE_DIRS}
     # ${PROTOBUF_INCLUDE_DIRS} 
     CMAKE_CURRENT_SOURCE_DIR
+    ${fmt_INCLUDE_DIRS}
     )
