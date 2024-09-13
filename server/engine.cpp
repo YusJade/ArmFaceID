@@ -60,10 +60,12 @@ void arm_face_id::Engine::Start() {
       DetectFace(faces, frame);
       // current frame contains face will try to be recognized when last frame
       // contains no face.
-      if (accessable && !faces.empty()) {
-        int64_t id = RecognizeFace(frame);
+      if (!faces.empty()) {
+        spdlog::info("Detected {} faces.", faces.size());
+        InvokeAllOnFaceDetected(faces, frame);
+        // int64_t id = RecognizeFace(frame);
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds(300));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
   });
   worker_thread_->detach();

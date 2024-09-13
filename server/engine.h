@@ -65,6 +65,10 @@ class Engine {
     icameras_.push_back(icamera);
   }
 
+  inline void RegisterIListener(std::shared_ptr<IEngineListener> ilistener) {
+    ilisteners_.push_back(ilistener);
+  }
+
  private:
   std::unique_ptr<seeta::FaceEngine> face_engine_;
   std::unique_ptr<std::thread> worker_thread_;
@@ -76,6 +80,19 @@ class Engine {
   inline void InvokeAllICamera(const cv::Mat &frame) {
     for (auto i : icameras_) {
       i->OnFrameCaptured(frame);
+    }
+  }
+
+  inline void InvokeAllOnFaceDetected(const std::vector<cv::Rect> &faces,
+                                      const cv::Mat &frame) {
+    for (auto i : ilisteners_) {
+      i->OnFaceDetected(faces, frame);
+    }
+  }
+
+  inline void InvokeAllOnFaceRecognized(int64_t id, const cv::Mat &frame) {
+    for (auto i : ilisteners_) {
+      i->OnFaceRecognized(id, frame);
     }
   }
 

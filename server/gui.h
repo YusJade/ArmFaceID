@@ -17,7 +17,7 @@
 
 namespace arm_face_id {
 
-class GUI : public ICamera {
+class GUI : public ICamera, public IEngineListener {
  public:
   explicit GUI(std::shared_ptr<Engine> engine_ptr);
 
@@ -25,6 +25,9 @@ class GUI : public ICamera {
   QWidget* Get();
 
   void OnFrameCaptured(cv::Mat frame) override;
+
+  void OnFaceDetected(const std::vector<cv::Rect>&, const cv::Mat&) override;
+  void OnFaceRecognized(int64_t, const cv::Mat&) override;
 
  private:
   std::shared_ptr<Engine> engine_ptr_;

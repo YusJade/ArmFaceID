@@ -122,6 +122,7 @@ QWidget* arm_face_id::GUI::InitRegisterWidget() {
   register_button->setText("register");
   // add Widgets
   face_layout->addWidget(img_label);
+  face_layout->addStretch(4);
   face_layout->addWidget(register_button);
   // set strech factor
   face_layout->setStretchFactor(img_label, 3);
@@ -147,3 +148,8 @@ void arm_face_id::GUI::OnFrameCaptured(cv::Mat frame) {
   spdlog::info("GUI: OnFrameCaptured");
   on_frame_captured_callback_(frame);
 }
+
+void arm_face_id::GUI::OnFaceDetected(const std::vector<cv::Rect>&,
+                                      const cv::Mat&) {}
+
+void arm_face_id::GUI::OnFaceRecognized(int64_t, const cv::Mat&) {}

@@ -68,6 +68,7 @@ int main(int argc, char* argv[]) {
       std::make_shared<arm_face_id::GUI>(engine_ptr);
   gui_ptr->Get()->show();
   engine_ptr->RegisterICamera(gui_ptr);
+  engine_ptr->RegisterIListener(gui_ptr);
   engine_ptr->Start();
   return app.exec();
   // grpc::ServerBuilder server_builder;
