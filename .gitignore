@@ -7,4 +7,6 @@ fr_2_10.dat
 pd_2_00_pts5.dat
 *.7z
 /.cache
+/.qtcreator
+/.vscode
 

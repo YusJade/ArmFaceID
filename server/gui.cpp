@@ -120,6 +120,10 @@ QWidget* arm_face_id::GUI::InitRegisterWidget() {
   // img_label->setFixedSize(2.5 * 30, 3.5 * 30);
   QPushButton* register_button = new QPushButton(main_widget);
   register_button->setText("register");
+
+  QObject::connect(register_button, &QPushButton::clicked,
+                   [this] { engine_ptr_->RegisterFace(captured_face_mat_); });
+
   // add Widgets
   face_layout->addWidget(img_label);
   face_layout->addStretch(4);
@@ -134,7 +138,8 @@ QWidget* arm_face_id::GUI::InitRegisterWidget() {
   main_layout->setStretchFactor(log_groupbox, 5);
 
   on_frame_captured_callback_ =
-      std::function<void(cv::Mat)>([img_label](cv::Mat frame) {
+      std::function<void(cv::Mat)>([img_label, this](cv::Mat frame) {
+        captured_face_mat_ = frame;
         QPixmap pixmap = QPixmap::fromImage(utils::MatToQImage(frame));
         pixmap = pixmap.scaled(img_label->size(), Qt::KeepAspectRatio,
                                Qt::SmoothTransformation);

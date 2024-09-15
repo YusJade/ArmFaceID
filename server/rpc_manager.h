@@ -4,12 +4,14 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include <QWidget>
+#include <memory>
 #include <mutex>
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/support/status.h>
 #include <opencv2/opencv.hpp>
 
+#include "engine.h"
 #include "face_engine.h"
 
 #include "face_network.grpc.pb.h"
@@ -19,7 +21,8 @@ namespace arm_face_id {
 
 class RpcManagerImpl final : public RpcManager::Service {
  public:
-  RpcManagerImpl();
+  RpcManagerImpl(std::shared_ptr<Engine> engine_ptr);
+  RpcManagerImpl() = delete;
   ~RpcManagerImpl();
 
   grpc::Status RecognizeFace(grpc::ServerContext* context,
@@ -30,21 +33,9 @@ class RpcManagerImpl final : public RpcManager::Service {
                         const RegisterRequest* request,
                         RegisterResult* response) override;
 
-  QWidget* InitRpcWidget();
-  QWidget* Widget();
-  QWidget* InitRegisterWidget();
-
  private:
-  std::unique_ptr<seeta::FaceEngine> face_engine_ptr;
+  std::shared_ptr<Engine> engine_ptr_;
   std::mutex mutex_;
-  QWidget* rpc_widget_;
-  QWidget* display_widget_;
-  QWidget* register_widget_;
-  QStackedWidget* stacked_widget_;
-  QLabel* img_lbl_;
-  QLabel* cam_img_lbl_;
-  ::cv::CascadeClassifier face_classifier_;
-  ::cv::Mat native_register_img_;
 };
 
 }  // namespace arm_face_id

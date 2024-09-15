@@ -10,6 +10,7 @@
 #include <fmt/core.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
+#include <opencv2/core/utility.hpp>
 #include <opencv2/imgproc.hpp>
 #include <seeta/CStruct.h>
 #include <spdlog/spdlog.h>
@@ -23,6 +24,9 @@ arm_face_id::Engine::Engine(const EngineConfig& config)
   ASSERET_WITH_LOG("Failed to load model of Calssifier.",
                    classifier_.load(config.classifier_path));
   spdlog::info("Initialized the Engine.");
+
+  spdlog::info(cv::getBuildInformation());
+
   if (!config.network_camera_url.empty())
     camera_.open(config.network_camera_url);
   if (camera_.isOpened()) {
@@ -51,11 +55,11 @@ void arm_face_id::Engine::Start() {
   worker_thread_ = std::make_unique<std::thread>([&, this] {
     cv::Mat frame;
     std::vector<cv::Rect> faces;
-    bool accessable = false;
+    bool accessible = false;
     while (true) {
       camera_ >> frame;
       InvokeAllICamera(frame);
-      accessable = faces.empty() ? true : false;
+      accessible = faces.empty() ? true : false;
       faces.clear();
       DetectFace(faces, frame);
       // current frame contains face will try to be recognized when last frame
@@ -82,10 +86,34 @@ void arm_face_id::Engine::DetectFace(std::vector<cv::Rect>& faces,
 
 int64_t arm_face_id::Engine::RecognizeFace(const cv::Mat& frame) {
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
-  return face_engine_->Query(img_date);
+  auto id = face_engine_->Query(img_date);
+  if (id == -1) {
+    spdlog::debug(
+        "Failed to recognize any faces from image :< \n"
+        "\t\t > image: width-{}, height-{}, channels-{}, data-{}",
+        img_date.width, img_date.height, img_date.channels, img_date.data);
+  } else {
+    spdlog::debug(
+        "Recognize face (id: {}) from image :> \n"
+        "\t\t > image: width-{}, height-{}, channels-{}, data-{}",
+        id, img_date.width, img_date.height, img_date.channels, img_date.data);
+  }
+  return id;
 }
 
 int64_t arm_face_id::Engine::RegisterFace(const cv::Mat& frame) {
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
-  return face_engine_->Register(img_date);
+  auto id = face_engine_->Register(img_date);
+  if (id == -1) {
+    spdlog::debug(
+        "Failed to register face via this image :< \n"
+        "\t\t > image: width-{}, height-{}, channels-{}, data-{}",
+        img_date.width, img_date.height, img_date.channels, img_date.data);
+  } else {
+    spdlog::debug(
+        "Registered face (id: {}) via this image :> \n"
+        "\t\t > image: width-{}, height-{}, channels-{}, data-{}",
+        id, img_date.width, img_date.height, img_date.channels, img_date.data);
+  }
+  return id;
 }
