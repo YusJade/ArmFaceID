@@ -58,6 +58,7 @@ int main(int argc, char* argv[]) {
       std::make_shared<arm_face_id::GUI>(rpc_client);
   camera.RegisterListener(widget);
   camera.RegisterListener(face_processor_ptr);
+  face_processor_ptr->SetListener(widget);
   //   face_processor.SetListener(widget);
   QWidget* w = widget->Get();
   //   face_processor.Start();

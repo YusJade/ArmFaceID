@@ -1,6 +1,7 @@
 #include "face_processor.h"
 
 #include <QtConcurrent>
+#include <thread>
 #include <vector>
 
 #include <absl/log/absl_log.h>
@@ -106,6 +107,18 @@ void arm_face_id::FaceProcessor::OnFrameCaptured(cv::Mat frame) {
   std::vector<cv::Rect> faces;
   classifier_.detectMultiScale(frame, faces);
   if (!faces.empty()) {
-    rpc_client_ptr_->RecognizeFace(frame(faces.front()));
+    if (listener_ptr_) {
+      listener_ptr_->OnFaceDetected(frame, faces[0]);
+    }
+  }
+  if (!faces.empty() && is_face_once) {
+    std::thread thread([=] {
+      auto response = rpc_client_ptr_->RecognizeFace(frame(faces.front()));
+      ABSL_LOG(INFO) << "Recieved response: id=" << response.id();
+    });
+    thread.detach();
+    is_face_once = false;
+  } else {
+    is_face_once = true;
   }
 }

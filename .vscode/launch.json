@@ -32,12 +32,12 @@
       "name": "(gdb) 启动 client",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/_client/client.exe",
+      "program": "${workspaceFolder}/build/client/client.exe",
       "args": [
-        "-camera_id=1",
         "-rpc_server_addr=localhost:50051",
-        "-network_camera_url=http://192.168.11.182:4747/video",
-        "-model_path=E:\\Downloads\\lbpcascade_frontalface_improved.xml"
+        "-camera_id=1",
+        // "-network_camera_url=http://192.168.11.182:4747/video",
+        "-model_path=D:/cmake-install-modules/opencv-4.10.0/etc/haarcascades/haarcascade_frontalface_alt2.xml"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

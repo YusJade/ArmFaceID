@@ -23,7 +23,7 @@ arm_face_id::RecognizeResult arm_face_id::RpcClient::RecognizeFace(
   if (status.ok()) {
     ABSL_LOG(INFO) << "Success to complete a rpc request.\n";
     // TODO: face_img 为空报错？
-    utils::DecodeMat(result.face_img(), decoded_img);
+    // utils::DecodeMat(result.face_img(), decoded_img);
   } else {
     ABSL_LOG(INFO) << "Fail to complete a rpc request!\n";
   }
