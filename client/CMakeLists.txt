@@ -11,7 +11,8 @@ add_executable(client
   rpc_client.cpp
   face_processor.cpp
   face_processor_listener.cpp
-  display_widget.cpp)
+  gui.cpp
+  camera.cpp)
 
 find_package(OpenCV REQUIRED)
 find_package(gflags REQUIRED)

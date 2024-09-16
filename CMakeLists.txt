@@ -3,6 +3,7 @@ project(arm_face_id LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_TYPE DEBUG)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(WIN32)
 set(gflags_DIR D:/cmake-install-modules/gflags/lib/cmake/gflags)

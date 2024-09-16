@@ -150,7 +150,7 @@ QWidget* arm_face_id::GUI::InitRegisterWidget() {
 }
 
 void arm_face_id::GUI::OnFrameCaptured(cv::Mat frame) {
-  spdlog::info("GUI: OnFrameCaptured");
+  // spdlog::info("GUI: OnFrameCaptured");
   on_frame_captured_callback_(frame);
 }
 

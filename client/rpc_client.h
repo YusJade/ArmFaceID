@@ -15,8 +15,8 @@ class RpcClient {
  public:
   RpcClient(std::shared_ptr<::grpc::Channel> channel);
 
-  RecognizeResult RecognizeFace(cv::Mat face_img);
-  int64_t Register(cv::Mat image, std::string name);
+  RecognizeResult RecognizeFace(cv::Mat);
+  int64_t Register(cv::Mat, std::string);
 
  private:
   std::unique_ptr<RpcManager::Stub> stub;

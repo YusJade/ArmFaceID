@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(server)
 
+
+
 if(WIN32)
     set(protobuf_DIR D:\\cmake-install-modules\\lib\\cmake\\protobuf)
     set(absl_DIR D:\\cmake-install-modules\\lib\\cmake\\absl)
@@ -57,6 +59,6 @@ target_include_directories(server PUBLIC
     ${OpenCV_INCLUDE_DIRS}
     ${SeetaFace_INCLUDE_DIRS}
     # ${PROTOBUF_INCLUDE_DIRS} 
-    CMAKE_CURRENT_SOURCE_DIR
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${fmt_INCLUDE_DIRS}
     )

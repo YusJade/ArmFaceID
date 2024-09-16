@@ -4,6 +4,7 @@
 
 #include <grpcpp/support/status.h>
 
+#include "spdlog.h"
 #include "utils/utils.h"
 
 constexpr float kThrehold = 0.8;
@@ -17,6 +18,7 @@ arm_face_id::RpcManagerImpl::~RpcManagerImpl() {}
 grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
     grpc::ServerContext* context, const arm_face_id::RecognizeRequest* request,
     RecognizeResult* response) {
+  spdlog::info("Recieve a request");
   const std::string img_byte_seq = request->face_img();
   cv::Mat decoded_mat;
   utils::DecodeMat(img_byte_seq, decoded_mat);

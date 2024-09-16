@@ -1,9 +1,7 @@
 #pragma once
 
-#include <qstackedwidget.h>
-#include <qwidget.h>
-
 #include <QApplication>
+#include <QStackedWidget>
 #include <QWidget>
 #include <cstdint>
 #include <functional>

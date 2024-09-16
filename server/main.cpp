@@ -17,10 +17,11 @@
 #include "engine.h"
 #include "gui.h"
 #include "rpc_manager.h"
+#include "spdlog.h"
 
 /**
- * ./build/server/server -native_camera_index=1
- * -classifier_path=D:/cmake-install-modules/opencv-4.10.0/etc/haarcascades/haarcascade_frontalface_alt2.xml
+ ./build/server/server -native_camera_index=1
+ -classifier_path=D:/cmake-install-modules/opencv-4.10.0/etc/haarcascades/haarcascade_frontalface_alt2.xml
  *
  */
 ABSL_FLAG(std::string, classifier_path,
@@ -54,6 +55,7 @@ int main(int argc, char* argv[]) {
   engine_config.native_camera_index = absl::GetFlag(FLAGS_native_camera_index);
   engine_config.network_camera_url = absl::GetFlag(FLAGS_network_camera_url);
 
+  QApplication app(argc, argv);
   std::shared_ptr<arm_face_id::Engine> engine_ptr =
       std::make_shared<arm_face_id::Engine>(engine_config);
 
@@ -62,28 +64,27 @@ int main(int argc, char* argv[]) {
   absl::InitializeLog();
   SetStderrThreshold(absl::LogSeverity::kInfo);
 
+  arm_face_id::RpcManagerImpl rpc_service(engine_ptr);
+  grpc::ServerBuilder server_builder;
+  server_builder.AddListeningPort(kServerAddrInfo,
+                                  grpc::InsecureServerCredentials());
+  server_builder.RegisterService(&rpc_service);
+  const std::unique_ptr rpc_server(server_builder.BuildAndStart());
+
   // arm_face_id::RpcManagerImpl rpc_service;
-  QApplication app(argc, argv);
+
   std::shared_ptr<arm_face_id::GUI> gui_ptr =
       std::make_shared<arm_face_id::GUI>(engine_ptr);
   gui_ptr->Get()->show();
   engine_ptr->RegisterICamera(gui_ptr);
   engine_ptr->RegisterIListener(gui_ptr);
   engine_ptr->Start();
+
+  std::thread rpc_thread([&] {
+    spdlog::info("Started gRPC server.");
+    rpc_server->Wait();
+  });
+  rpc_thread.detach();
+
   return app.exec();
-  // grpc::ServerBuilder server_builder;
-  // server_builder.AddListeningPort(kServerAddrInfo,
-  //                                 grpc::InsecureServerCredentials());
-  // server_builder.RegisterService(&rpc_service);
-  // const std::unique_ptr rpc_server(server_builder.BuildAndStart());
-
-  // rpc_service.InitRegisterWidget();
-  // rpc_service.InitRpcWidget();
-  // QWidget* widget = rpc_service.Widget();
-  // widget->show();
-
-  // std::thread thread([&] { rpc_server->Wait(); });
-  // thread.detach();
-
-  // return QApplication::exec();
 }
