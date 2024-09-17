@@ -17,3 +17,12 @@ run the following commands to build:
 cmake -B ./build
 cmake --build ./build/
 ```
+
+## Cross Compile
+
+  - [ ] Qt5.12
+  - [ ] Opencv
+  - [ ] SeetaFace2
+  - [ ] spdlog
+  - [ ] absl
+  - [ ] gRPC
