@@ -3,8 +3,8 @@
 #include <cstdint>
 
 #include <grpcpp/support/status.h>
+#include <spdlog/spdlog.h>
 
-#include "spdlog.h"
 #include "utils/utils.h"
 
 constexpr float kThrehold = 0.8;

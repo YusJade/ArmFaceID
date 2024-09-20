@@ -6,8 +6,8 @@ if(WIN32)
 endif()
 
 
-find_package(protobuf CONFIG REQUIRED)
-find_package(gRPC CONFIG REQUIRED)
+# find_package(protobuf CONFIG REQUIRED)
+# find_package(gRPC CONFIG REQUIRED)
 find_package(c-ares CONFIG)
 # find_package(Threads)
 
@@ -35,6 +35,7 @@ target_include_directories(face_proto PUBLIC
 #
 # Compile protobuf and grpc files in mointor proto target to cpp
 #
+# set(CMAKE_PREFIX_PATH /usr/local/bin/)
 get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
 protobuf_generate(TARGET face_proto LANGUAGE cpp)
 protobuf_generate(TARGET face_proto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")

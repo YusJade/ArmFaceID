@@ -13,11 +13,11 @@
 #include <grpcpp/server_builder.h>
 #include <seeta/CStruct.h>
 #include <seeta/Struct.h>
+#include <spdlog/spdlog.h>
 
 #include "engine.h"
 #include "gui.h"
 #include "rpc_manager.h"
-#include "spdlog.h"
 
 /**
  ./build/server/server -native_camera_index=1
