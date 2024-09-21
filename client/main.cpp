@@ -7,7 +7,6 @@
 #include <absl/flags/flag.h>
 #include <absl/flags/parse.h>
 #include <absl/flags/usage.h>
-#include <gflags/gflags.h>
 
 #include "camera.h"
 #include "face_processor.h"

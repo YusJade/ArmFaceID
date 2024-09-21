@@ -1,41 +1,51 @@
-if(WIN32)
-    set(protobuf_DIR D:\\cmake-install-modules\\lib\\cmake\\protobuf)
-    set(absl_DIR D:\\cmake-install-modules\\lib\\cmake\\absl)
-    set(utf8_range_DIR D:\\cmake-install-modules\\lib\\cmake\\utf8_range)
-    set(gRPC_DIR D:\\cmake-install-modules\\lib\\cmake\\grpc)
+# 定义 proto 文件
+set(PROTO_FILES face_network.proto)
+
+# 设置 proto 文件路径
+set(PROTO_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(PROTO_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
+# 查找 Protobuf 编译器
+find_program(Protobuf_PROTOC_EXECUTABLE protoc)
+find_program(gRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
+
+if(NOT Protobuf_PROTOC_EXECUTABLE)
+  message(
+    FATAL_ERROR
+      "Could not find protoc executable. Make sure it's installed and in your PATH."
+  )
 endif()
 
+message(STATUS "Path of gRPC: ${gRPC_DIR} ${protobuf_DIR} ${absl_DIR}")
+# 生成 Protobuf 和 gRPC 文件
+foreach(proto_file ${PROTO_FILES})
+  get_filename_component(proto_file_name ${proto_file} NAME_WE)
 
-# find_package(protobuf CONFIG REQUIRED)
-# find_package(gRPC CONFIG REQUIRED)
-find_package(c-ares CONFIG)
-# find_package(Threads)
+  # 生成命令
+  add_custom_command(
+    OUTPUT ${PROTO_BINARY_DIR}/${proto_file_name}.pb.cc
+           ${PROTO_BINARY_DIR}/${proto_file_name}.grpc.pb.cc
+    COMMAND
+      /home/yu/aarch64/bin/protoc ARGS --proto_path=${PROTO_SOURCE_DIR}
+      --cpp_out=${PROTO_BINARY_DIR} --grpc_out=${PROTO_BINARY_DIR}
+      --plugin=protoc-gen-grpc=/home/yu/aarch64/bin/grpc_cpp_plugin
+      ${PROTO_SOURCE_DIR}/${proto_file}
+    MAIN_DEPENDENCY ${PROTO_SOURCE_DIR}/${proto_file}
+    COMMENT "Generating Protobuf and gRPC files for ${proto_file}"
+    VERBATIM)
 
-#
-# Protobuf/Grpc source files
-#
-set(PROTO_FILES
-    face_network.proto
-)
+  # 将生成的文件添加到目标
+  set(GENERATED_FILES
+      ${GENERATED_FILES} ${PROTO_BINARY_DIR}/${proto_file_name}.pb.cc
+      ${PROTO_BINARY_DIR}/${proto_file_name}.grpc.pb.cc)
+endforeach()
 
-#
-# Add Library target with protobuf sources
-#
-add_library(face_proto ${PROTO_FILES})
-target_link_libraries(face_proto
-    PUBLIC
-        protobuf::libprotobuf
-        gRPC::grpc
-        gRPC::grpc++
-)
-target_include_directories(face_proto PUBLIC
-    ${PROTOBUF_INCLUDE_DIRS} 
-    ${CMAKE_CURRENT_BINARY_DIR})
+# 添加库 target 并链接生成的文件
+add_library(face_proto ${GENERATED_FILES})
+target_link_libraries(
+  face_proto PUBLIC gRPC::grpc gRPC::grpc++ protobuf::libprotobuf absl::log
+                    absl::strings)
 
-#
-# Compile protobuf and grpc files in mointor proto target to cpp
-#
-# set(CMAKE_PREFIX_PATH /usr/local/bin/)
-get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
-protobuf_generate(TARGET face_proto LANGUAGE cpp)
-protobuf_generate(TARGET face_proto LANGUAGE grpc GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+# 包含目录设置
+target_include_directories(face_proto PUBLIC ${PROTOBUF_INCLUDE_DIRS}
+                                             ${PROTO_BINARY_DIR})

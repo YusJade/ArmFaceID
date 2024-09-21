@@ -16,7 +16,7 @@ QImage utils::MatToQImage(const cv::Mat& mat) {
     // 8-bit, 3 channels
     case CV_8UC3: {
       QImage image(mat.data, mat.cols, mat.rows, static_cast<int>(mat.step),
-                   QImage::Format_BGR888);
+                   QImage::Format_RGB888);
       return image.copy();  // 创建QImage副本
     }
     // 8-bit, 4 channels

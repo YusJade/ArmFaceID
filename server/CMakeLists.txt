@@ -46,7 +46,10 @@ set(QT_LIBS
     Qt6::Widgets 
     Qt6::Concurrent)
 if(${Qt5_FOUND})
-set(QT_LIBS "Qt5::Core Qt5::Widgets Qt5::Concurrent")
+set(QT_LIBS 
+    Qt5::Core
+    Qt5::Widgets 
+    Qt5::Concurrent)
 endif()
 
 
