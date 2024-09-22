@@ -14,6 +14,7 @@
 #include <qtoolbar.h>
 #include <qwidget.h>
 
+#include <QFileDialog>
 #include <QGroupBox>
 #include <QTextEdit>
 #include <functional>
@@ -58,8 +59,14 @@ QWidget* arm_face_id::GUI::Get() {
   QObject::connect(register_action, &QAction::triggered, [&] {
     stacked_widget_->setCurrentWidget(register_widget_);
   });
-  // QObject::connect(rpc_action, &QAction::toggle,
-  //                  [&] { stacked_widget_->setCurrentWidget(rpc_widget_); });
+  QObject::connect(save_action, &QAction::triggered, [&] {
+    std::string file_path = QFileDialog::getSaveFileName().toStdString();
+    engine_ptr_->Save(file_path);
+  });
+  QObject::connect(load_action, &QAction::triggered, [&] {
+    std::string file_path = QFileDialog::getOpenFileName().toStdString();
+    engine_ptr_->Load(file_path);
+  });
 
   return main_widget_;
 }

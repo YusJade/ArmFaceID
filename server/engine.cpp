@@ -144,3 +144,29 @@ int64_t arm_face_id::Engine::RegisterFace(const cv::Mat& frame) {
   }
   return id;
 }
+
+bool arm_face_id::Engine::Save(std::string path) {
+  bool is_success = false;
+  is_success = face_engine_->Save(path.c_str());
+
+  if (is_success) {
+    spdlog::info("Saved seetaface database: {}", path);
+  } else {
+    spdlog::error("Failed to save seetaface database: {}", path);
+  }
+
+  return is_success;
+}
+
+bool arm_face_id::Engine::Load(std::string path) {
+  bool is_success = false;
+  is_success = face_engine_->Load(path.c_str());
+
+  if (is_success) {
+    spdlog::info("Loaded seetaface database: {}", path);
+  } else {
+    spdlog::error("Failed to load seetaface database: {}", path);
+  }
+
+  return is_success;
+}

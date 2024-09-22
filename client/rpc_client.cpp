@@ -1,5 +1,7 @@
 #include "rpc_client.h"
 
+#include <spdlog/spdlog.h>
+
 #include "utils.h"
 
 arm_face_id::RpcClient::RpcClient(std::shared_ptr<::grpc::Channel> channel)
@@ -25,7 +27,7 @@ arm_face_id::RecognizeResult arm_face_id::RpcClient::RecognizeFace(
     // TODO: face_img 为空报错？
     // utils::DecodeMat(result.face_img(), decoded_img);
   } else {
-    ABSL_LOG(INFO) << "Fail to complete a rpc request!\n";
+    spdlog::warn("Failed RPC: {}", status.error_message());
   }
   return result;
 }

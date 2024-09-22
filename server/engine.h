@@ -60,14 +60,17 @@ class Engine {
   int64_t RecognizeFace(const cv::Mat &);
   int64_t RegisterFace(const cv::Mat &);
 
+  bool Save(std::string path);
+  bool Load(std::string path);
+
   // use cv::CascadeClassifier
   void DetectFace(std::vector<cv::Rect> &, const cv::Mat &);
 
-  inline void RegisterICamera(std::shared_ptr<ICamera> icamera) {
+  void RegisterICamera(std::shared_ptr<ICamera> icamera) {
     icameras_.push_back(icamera);
   }
 
-  inline void RegisterIListener(std::shared_ptr<IEngineListener> ilistener) {
+  void RegisterIListener(std::shared_ptr<IEngineListener> ilistener) {
     ilisteners_.push_back(ilistener);
   }
 
