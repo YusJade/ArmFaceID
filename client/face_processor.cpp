@@ -1,6 +1,7 @@
 #include "face_processor.h"
 
 #include <QtConcurrent>
+#include <memory>
 #include <thread>
 #include <vector>
 
@@ -8,6 +9,7 @@
 #include <absl/strings/str_format.h>
 #include <opencv2/core/types.hpp>
 #include <opencv2/opencv.hpp>
+#include <spdlog/spdlog.h>
 
 #include "utils.h"
 
@@ -26,7 +28,6 @@ void arm_face_id::FaceProcessor::Start() {
   //     if (frame.empty()) {
   //       continue;
   //     }
-
   //     // opencv 实现人脸检测
   //     std::vector<cv::Rect> faces;
   //     cv::Mat frame_gray;
@@ -114,7 +115,7 @@ void arm_face_id::FaceProcessor::OnFrameCaptured(cv::Mat frame) {
   if (!faces.empty() && is_face_once) {
     std::thread thread([=] {
       auto response = rpc_client_ptr_->RecognizeFace(frame(faces.front()));
-      ABSL_LOG(INFO) << "Recieved response: id=" << response.id();
+      spdlog::info("Recieved response: id={}", response.id());
     });
     thread.detach();
     is_face_once = false;

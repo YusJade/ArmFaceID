@@ -20,7 +20,7 @@ cmake --build ./build/
 
 ## Cross Compile
 
-  - [ ] Qt5.12
+  - [x] Qt5.12
   - [ ] Opencv
   - [ ] SeetaFace2
   - [ ] spdlog

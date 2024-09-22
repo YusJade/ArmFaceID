@@ -39,6 +39,7 @@ target_link_libraries(
           ${OpenCV_LIBS}
           ${FFMPEG_LIBS}
           ${x264_LIBS}
+          spdlog::spdlog
           absl::flags
           absl::log
           absl::flags_parse

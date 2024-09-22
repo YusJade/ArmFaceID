@@ -22,7 +22,8 @@ grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
   const std::string img_byte_seq = request->face_img();
   cv::Mat decoded_mat;
   utils::DecodeMat(img_byte_seq, decoded_mat);
-  int64_t id = engine_ptr_->RecognizeFace(decoded_mat);
+  int64_t id = -2;
+  id = engine_ptr_->RecognizeFace(decoded_mat);
 
   response->set_id(id);
   return grpc::Status::OK;

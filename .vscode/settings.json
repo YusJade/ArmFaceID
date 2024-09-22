@@ -1,4 +1,8 @@
 {
+  "clangd.arguments": [
+    "--query-driver=D:/mingw64/bin/*",
+    "--compile-commands-dir=./build",
+  ],
   "files.associations": {
     "vector": "cpp",
     "xstring": "cpp",

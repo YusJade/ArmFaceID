@@ -38,9 +38,11 @@ if(WIN32)
   set(absl_DIR D:/cmake-install-modules/lib/cmake/absl)
   set(spdlog_DIR D:/cmake-install-modules/spdlog/lib/cmake/spdlog)
   set(fmt_DIR D:/cmake-install-modules/fmt/lib/cmake/fmt/)
-
-  set(SeetaFace_INCLUDE_DIRS D:/cmake-install-modules/SeetaFace/include)
+  set(c-ares_DIR D:/cmake-install-modules/lib/cmake/c-ares)
+  set(SeetaFac_INCLUDE_DIRS D:/cmake-install-modules/SeetaFace/include)
   set(fmt_INCLUDE_DIRS D:/cmake-install-modules/spdlog/include/spdlog)
+
+  find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent)
 elseif(UNIX AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
   message(STATUS "Configuring for AMD64 Linux")
   set(CMAKE_PREFIX_PATH /home/yu/Qt/6.5.3/gcc_64/lib/cmake/)

@@ -86,35 +86,43 @@ void arm_face_id::Engine::DetectFace(std::vector<cv::Rect>& faces,
 
 int64_t arm_face_id::Engine::RecognizeFace(const cv::Mat& frame) {
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
-  auto id = face_engine_->Query(img_date);
+  float similarity = .0;
+  auto id = face_engine_->Query(img_date, &similarity);
   if (id == -1) {
-    spdlog::debug(
+    spdlog::info(
         "Failed to recognize any faces from image :< \n"
         "\t > image: width-{}, height-{}, channels-{}",
         img_date.width, img_date.height, img_date.channels);
-  } else {
-    spdlog::debug(
-        "Recognize face (id: {}) from image :> \n"
+  } else if (similarity > 0.5) {
+    spdlog::info(
+        "Recognize face (id={}, similarity={}) from image :> \n"
         "\t > image: width-{}, height-{}, channels-{}",
-        id, img_date.width, img_date.height, img_date.channels);
+        id, similarity, img_date.width, img_date.height, img_date.channels);
+  } else {
+    spdlog::info(
+        "Failed to recognize a properly face (id={}, similarity={}) from image "
+        ":< \n"
+        "\t > image: width-{}, height-{}, channels-{}",
+        id, similarity, img_date.width, img_date.height, img_date.channels);
   }
   return id;
 }
 
 int64_t arm_face_id::Engine::RegisterFace(const cv::Mat& frame) {
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
-  auto id = face_engine_->Query(img_date);
-  if (id != -1) {
+  float similarity = .0;
+  auto id = face_engine_->Query(img_date, &similarity);
+  if (id != -1 && similarity > 0.5) {
     spdlog::info(
-        "This face has been registered.(id={})\n"
-        "\t > image: width-{}, height-{}, channels-{}",
-        id, img_date.width, img_date.height, img_date.channels);
+        "Register Failed: Already Exist :< (id={}, similarity={})\n"
+        "\t > image: width={}, height={}, channels={}",
+        id, similarity, img_date.width, img_date.height, img_date.channels);
     return id;
   }
   id = face_engine_->Register(img_date);
   if (id == -1) {
     spdlog::info(
-        "Failed to register face via this image :< \n"
+        "Register Failed: Face Not Found :< \n"
         "\t > image: width-{}, height-{}, channels-{}",
         img_date.width, img_date.height, img_date.channels);
   } else {
