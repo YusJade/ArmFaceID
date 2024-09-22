@@ -69,6 +69,10 @@ int main(int argc, char* argv[]) {
   server_builder.AddListeningPort(kServerAddrInfo,
                                   grpc::InsecureServerCredentials());
   server_builder.RegisterService(&rpc_service);
+  server_builder.SetSyncServerOption(
+      grpc::ServerBuilder::SyncServerOption::MAX_POLLERS, 20);
+  server_builder.SetSyncServerOption(
+      grpc::ServerBuilder::SyncServerOption::MIN_POLLERS, 5);
   const std::unique_ptr rpc_server(server_builder.BuildAndStart());
 
   // arm_face_id::RpcManagerImpl rpc_service;

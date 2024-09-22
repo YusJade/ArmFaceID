@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -77,6 +78,7 @@ class Engine {
   std::vector<std::shared_ptr<IEngineListener>> ilisteners_;
   cv::CascadeClassifier classifier_;
   cv::VideoCapture camera_;
+  std::mutex mutex_;
 
   inline void InvokeAllICamera(const cv::Mat &frame) {
     for (auto i : icameras_) {

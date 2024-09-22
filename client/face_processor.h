@@ -61,6 +61,8 @@ class FaceProcessor : public ICamera {
   ::std::unique_ptr<std::thread> work_thread_;
   ::cv::CascadeClassifier classifier_;
   bool is_face_once = true;
+  bool is_last_frame_contains_face = false;
+  bool is_cur_frame_contains_face = false;
   // ::cv::VideoCapture video_capture_;
   std::shared_ptr<RpcClient> rpc_client_ptr_;
 

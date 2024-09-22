@@ -112,14 +112,16 @@ void arm_face_id::FaceProcessor::OnFrameCaptured(cv::Mat frame) {
       listener_ptr_->OnFaceDetected(frame, faces[0]);
     }
   }
-  if (!faces.empty() && is_face_once) {
+
+  is_last_frame_contains_face = is_cur_frame_contains_face;
+  is_cur_frame_contains_face = !faces.empty();
+
+  if (!faces.empty() && !is_last_frame_contains_face &&
+      is_cur_frame_contains_face) {
     std::thread thread([=] {
-      auto response = rpc_client_ptr_->RecognizeFace(frame(faces.front()));
+      auto response = rpc_client_ptr_->RecognizeFace(frame);
       spdlog::info("Recieved response: id={}", response.id());
     });
     thread.detach();
-    is_face_once = false;
-  } else {
-    is_face_once = true;
   }
 }

@@ -23,6 +23,7 @@
 #include <absl/strings/str_format.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "utils.h"
@@ -38,6 +39,7 @@ arm_face_id::GUI::GUI(const std::string& rpc_server_addr,
 
 void arm_face_id::GUI::OnFrameCaptured(cv::Mat frame) {
   if (camera_frame_lbl_) {
+    cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
     camera_frame_lbl_->setPixmap(QPixmap::fromImage(utils::MatToQImage(frame)));
   }
 }
@@ -49,6 +51,7 @@ void arm_face_id::GUI::OnImageCaptured(cv::Mat captureed_image) {
 void arm_face_id::GUI::OnFaceDetected(cv::Mat detected_image,
                                       cv::Rect face_rect) {
   // face_img_ = detected_image;
+  cv::cvtColor(detected_image, detected_image, cv::COLOR_BGR2RGB);
   cv::rectangle(detected_image, face_rect, cv::Scalar(255, 0, 255));
   camera_frame_lbl_->setPixmap(
       QPixmap::fromImage(utils::MatToQImage(detected_image)));

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -85,9 +86,19 @@ void arm_face_id::Engine::DetectFace(std::vector<cv::Rect>& faces,
 }
 
 int64_t arm_face_id::Engine::RecognizeFace(const cv::Mat& frame) {
+  std::lock_guard<std::mutex> lock_guard(mutex_);
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
   float similarity = .0;
-  auto id = face_engine_->Query(img_date, &similarity);
+  int64_t id = -2;
+  id = face_engine_->Query(img_date, &similarity);
+  if (id == -2) {
+    spdlog::error(
+        "Inner Error! :< \n"
+        "\t > image: width-{}, height-{}, channels-{}",
+        img_date.width, img_date.height, img_date.channels);
+    return -2;
+  }
+
   if (id == -1) {
     spdlog::info(
         "Failed to recognize any faces from image :< \n"

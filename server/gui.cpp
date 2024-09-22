@@ -10,6 +10,7 @@
 #include <qpushbutton.h>
 #include <qstackedwidget.h>
 #include <qtextedit.h>
+#include <qtextformat.h>
 #include <qtoolbar.h>
 #include <qwidget.h>
 
@@ -19,6 +20,7 @@
 #include <memory>
 
 #include <opencv2/core/mat.hpp>
+#include <opencv2/imgproc.hpp>
 #include <spdlog/spdlog.h>
 
 #include "engine.h"
@@ -140,6 +142,7 @@ QWidget* arm_face_id::GUI::InitRegisterWidget() {
   on_frame_captured_callback_ =
       std::function<void(cv::Mat)>([img_label, this](cv::Mat frame) {
         captured_face_mat_ = frame;
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
         QPixmap pixmap = QPixmap::fromImage(utils::MatToQImage(frame));
         pixmap = pixmap.scaled(img_label->size(), Qt::KeepAspectRatio,
                                Qt::SmoothTransformation);
