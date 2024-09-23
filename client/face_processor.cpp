@@ -1,6 +1,7 @@
 #include "face_processor.h"
 
 #include <QtConcurrent>
+#include <chrono>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -16,6 +17,13 @@
 int arm_face_id::FaceProcessor::max_process_cnter_ = 100;
 
 void arm_face_id::FaceProcessor::Start() {
+  rpc_cnter_ = std::thread([&] {
+    while (true) {
+      send_rpc = true;
+      std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+  });
+  rpc_cnter_.detach();
   // if (!listener_ptr_) {
   //   std::cerr << "fail to find listener, the service will not be started.";
   //   return;
@@ -113,11 +121,11 @@ void arm_face_id::FaceProcessor::OnFrameCaptured(cv::Mat frame) {
     }
   }
 
-  is_last_frame_contains_face = is_cur_frame_contains_face;
-  is_cur_frame_contains_face = !faces.empty();
+  // is_last_frame_contains_face = is_cur_frame_contains_face;
+  // is_cur_frame_contains_face = !faces.empty();
 
-  if (!faces.empty() && !is_last_frame_contains_face &&
-      is_cur_frame_contains_face) {
+  if (!faces.empty() && send_rpc) {
+    send_rpc = false;
     std::thread thread([=] {
       auto response = rpc_client_ptr_->RecognizeFace(frame);
       spdlog::info("Recieved response: id={}", response.id());
