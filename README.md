@@ -24,7 +24,7 @@ cmake --build ./build/
 
 ## 交叉编译待办
 
-  - [ ] `Qt6.5.2` ☠️ （编译时报错似乎与`Protobuf`版本不一致有关）
+  - [ ] `Qt6.5.2`: `qgrpc` 模块使用了 `v26` 版本以前的 `Protobuf` `API` ，注意本机的 `Protobuf` 版本。
   - [x] `Qt5.12`
   - [x] `Opencv4.10`
   - [ ] `SeetaFace2` （暂不考虑）
