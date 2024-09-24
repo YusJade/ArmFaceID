@@ -24,7 +24,7 @@ cmake --build ./build/
 
 ## 交叉编译待办
 
-  - [ ] `Qt6.5.2`: `qgrpc` 模块使用了 `v26` 版本以前的 `Protobuf` `API` ，注意本机的 `Protobuf` 版本。
+  - [x] `Qt6.5.2`: `qgrpc` 模块使用了 `v26` 版本以前的 `Protobuf` `API` ，注意本机的 `Protobuf` 版本。
   - [x] `Qt5.12`
   - [x] `Opencv4.10`
   - [ ] `SeetaFace2` （暂不考虑）
@@ -40,7 +40,6 @@ cmake --build ./build/
 未来会尝试在开发板上部署模型，可能涉及模型的转换（`pytorch`?`onnx`?`ncnn` ?），以及运行他们所需的依赖库。
 
 ### 集成更美观的 Qt-GUI：ElaWidgetTools
-
 
 <a href="https://github.com/Liniyous/ElaWidgetTools?tab=readme-ov-file">
   <img src="https://github-readme-stats.vercel.app/api/pin/?username=Liniyous&repo=ElaWidgetTools&theme=default" alt="Repo A" />

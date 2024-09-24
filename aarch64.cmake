@@ -2,6 +2,9 @@
 set(CMAKE_C_COMPILER "/opt/gcc-aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc")
 set(CMAKE_CXX_COMPILER "/opt/gcc-aarch64-linux-gnu/bin/aarch64-linux-gnu-g++")
 
+set(CMAKE_CXX_COMPILER /opt/gcc-aarch64-linux-gnu/bin/aarch64-linux-gnu-g++)
+set(CMAKE_C_COMPILER /opt/gcc-aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc)
+
 set(CMAKE_IGNORE_PATH /usr/include/ /usr/local/include/)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
