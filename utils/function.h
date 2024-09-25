@@ -19,9 +19,9 @@ QImage mat_to_qimage(const cv::Mat& mat);
 
 cv::Mat qimage_to_mat(const QImage& qimage);
 
-void bytes_to_mat(cv::Mat& mat, std::string ext, std::vector<uchar>& bytes);
+void mat_to_bytes(cv::Mat& mat, std::string ext, std::vector<uchar>& bytes);
 
-void mat_to_bytes(std::string bytes_str, cv::Mat& res);
+void bytes_to_mat(std::string bytes_str, cv::Mat& res);
 }  // namespace utils
 
 }  // namespace arm_face_id

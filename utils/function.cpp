@@ -38,7 +38,7 @@ QImage arm_face_id::utils::mat_to_qimage(const cv::Mat& mat) {
 }
 
 // 转换出Mat为四通道，无法被Seetaface识别
-cv::Mat arm_face_id::utils::mat_to_qimage(const QImage& qimage) {
+cv::Mat arm_face_id::utils::qimage_to_mat(const QImage& qimage) {
   cv::Mat mat;
   switch (qimage.format()) {
     case QImage::Format_RGB32: {
@@ -66,7 +66,7 @@ cv::Mat arm_face_id::utils::mat_to_qimage(const QImage& qimage) {
   return mat;
 }
 
-void arm_face_id::utils::bytes_to_mat(cv::Mat& mat, std::string ext,
+void arm_face_id::utils::mat_to_bytes(cv::Mat& mat, std::string ext,
                                       std::vector<uchar>& bytes) {
   std::vector<uchar> image_encoded;
   cv::imencode(ext, mat, image_encoded);
