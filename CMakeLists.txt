@@ -5,9 +5,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE DEBUG)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(PREWORK_CROSS_COMPILE
-       "Only Generate *.pb.cc *.pb.h *.grpc.cc *.grpc.h via proto subjecet."
+option(USE_ELA_GUI
+       "Set to On to use ElaWidgetTools"
        OFF)
+
+
 
 # Define a function to find and check a package
 function(find_and_check_package package_name)

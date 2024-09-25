@@ -21,7 +21,7 @@
 # CONFIG REQUIRED)
 
 # 设置源文件
-set(SOURCES main.cpp rpc_manager.cpp utils/utils.cpp gui.cpp engine.cpp)
+set(SOURCES main.cpp rpc_manager.cpp utils/utils.cpp gui.cpp engine.cpp ela_gui.cpp)
 
 set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Concurrent)
 if(${Qt5_FOUND})
@@ -30,6 +30,12 @@ endif()
 
 # 创建可执行文件
 add_executable(server ${SOURCES})
+
+
+if(USE_ELA_GUI)
+target_compile_definitions(server PUBLIC ELA_GUI)
+endif()
+
 # 链接 gRPC 库
 target_link_libraries(
   server

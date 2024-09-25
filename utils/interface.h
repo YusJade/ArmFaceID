@@ -52,7 +52,7 @@ class CameraObserver {
   CameraObserver() = default;
 
   virtual void OnFrameCaptured(cv::Mat frame) = 0;
-  virtual void OnCameraShutDown(){};
+  virtual void OnCameraShutDown() {};
 };
 
 class Camera {
@@ -71,6 +71,13 @@ class Camera {
       if (postion != observers_.end()) {
         observers_.erase(postion);
       }
+    }
+  }
+
+ protected:
+  inline void NotifyAllOnFrameCaptured(cv::Mat frame) {
+    for (auto iter : observers_) {
+      iter->OnFrameCaptured(frame);
     }
   }
 

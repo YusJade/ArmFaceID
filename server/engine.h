@@ -15,6 +15,7 @@
 #include <seeta/Struct.h>
 
 #include "face_engine.h"
+#include "interface.h"
 
 namespace arm_face_id {
 
@@ -48,7 +49,7 @@ class IEngineListener {
  * persistence of related data, which will be injected into the objects depend
  * the engine.
  */
-class Engine {
+class Engine : public arm_face_id::interface::FaceDetector {
  public:
   explicit Engine(const EngineConfig &);
   Engine() = delete;

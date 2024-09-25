@@ -1,3 +1,5 @@
+#include <ElaApplication.h>
+
 #include <QApplication>
 #include <QWidget>
 #include <memory>
@@ -15,7 +17,9 @@
 #include <seeta/Struct.h>
 #include <spdlog/spdlog.h>
 
+#include "ela_gui.h"
 #include "engine.h"
+#include "face_camera.h"
 #include "gui.h"
 #include "rpc_manager.h"
 
@@ -55,14 +59,41 @@ int main(int argc, char* argv[]) {
   engine_config.native_camera_index = absl::GetFlag(FLAGS_native_camera_index);
   engine_config.network_camera_url = absl::GetFlag(FLAGS_network_camera_url);
 
-  QApplication app(argc, argv);
-  std::shared_ptr<arm_face_id::Engine> engine_ptr =
-      std::make_shared<arm_face_id::Engine>(engine_config);
-
-  // QApplication app(argc, argv);
-
   absl::InitializeLog();
   SetStderrThreshold(absl::LogSeverity::kInfo);
+
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+  QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+  QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+  QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
+      Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#else
+  // 根据实际屏幕缩放比例更改
+  qputenv("QT_SCALE_FACTOR", "1.5");
+#endif
+#endif
+  QApplication app(argc, argv);
+
+#ifdef ELA_GUI
+  arm_face_id::FaceCamera::Settings settings;
+  settings.cam_index = 1;
+  arm_face_id::FaceCamera face_cam(settings);
+
+  std::shared_ptr<arm_face_id::ElaGUI> ela_gui =
+      std::make_shared<arm_face_id::ElaGUI>();
+  face_cam.AddObserver(ela_gui);
+
+  spdlog::info("Running Ela GUI~ :>");
+
+  eApp->init();
+  ela_gui->show();
+  face_cam.OpenAndStart();
+  return app.exec();
+#endif
+
+  std::shared_ptr<arm_face_id::Engine> engine_ptr =
+      std::make_shared<arm_face_id::Engine>(engine_config);
 
   arm_face_id::RpcManagerImpl rpc_service(engine_ptr);
   grpc::ServerBuilder server_builder;
@@ -80,6 +111,7 @@ int main(int argc, char* argv[]) {
   std::shared_ptr<arm_face_id::GUI> gui_ptr =
       std::make_shared<arm_face_id::GUI>(engine_ptr);
   gui_ptr->Get()->show();
+
   engine_ptr->RegisterICamera(gui_ptr);
   engine_ptr->RegisterIListener(gui_ptr);
   engine_ptr->Start();
