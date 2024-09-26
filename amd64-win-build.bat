@@ -1,0 +1,1 @@
+cmake . -B ./build -G "MinGW Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
