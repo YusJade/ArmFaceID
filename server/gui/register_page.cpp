@@ -5,13 +5,20 @@
 #include <ElaPromotionCard.h>
 #include <ElaText.h>
 #include <qboxlayout.h>
+#include <qgridlayout.h>
 #include <qimage.h>
 #include <qlabel.h>
+#include <qlayoutitem.h>
+#include <qnamespace.h>
+#include <qpainter.h>
 #include <qpixmap.h>
 #include <qsize.h>
+#include <qtransform.h>
 #include <qwidget.h>
 
 #include <QLineEdit>
+#include <QPainter>
+#include <QPainterPath>
 
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -28,10 +35,9 @@ RegisterPage::RegisterPage() { InitPage(); }
 void RegisterPage::InitPage() {
   setPageTitleSpacing(1);
   setTitleVisible(false);
-
   // cv::Mat mat = cv::imread("./server/assets/test.png");
   // QVBoxLayout* left_card_layout = new QVBoxLayout;
-  // ElaPromotionCard* image_card = new ElaPromotionCard();
+  ElaPromotionCard *image_card = new ElaPromotionCard();
   // // image_card->setFixedSize(QSize(100, 100));
   // image_card->setCardPixmap(QPixmap::fromImage(utils::mat_to_qimage(mat)));
   // left_card_layout->addWidget(new ElaText("保持人脸在画面正中央 :O"), 0);
@@ -45,85 +51,102 @@ void RegisterPage::InitPage() {
   // right_op_layout->addWidget(test_btn);
 
   QWidget *central_widget = new QWidget;
-  // QHBoxLayout* central_layout = new QHBoxLayout(central_widget);
-  // central_layout->addLayout(left_card_layout, 5);
-  // central_layout->addLayout(right_op_layout, 2);
-
-  // addCentralWidget(central_widget);
-  // 设置窗口布局
-  QHBoxLayout *mainLayout = new QHBoxLayout(central_widget);
-
+  QGridLayout *main_layout = new QGridLayout(central_widget);
+  main_layout->setContentsMargins(0, 0, 0, 0);
+  main_layout->setAlignment(Qt::AlignLeft);
+  central_widget->setContentsMargins(0, 0, 0, 0);
   // 摄像头捕捉区域
 
-  QWidget *cameraWidget = new QWidget(this);
-  QVBoxLayout *cameraLayout = new QVBoxLayout(cameraWidget);
+  QWidget *camera_widget = new QWidget(this);
+  QVBoxLayout *cameraLayout = new QVBoxLayout(camera_widget);
+  cameraLayout->setContentsMargins(0, 0, 0, 0);
+  camera_widget->setContentsMargins(0, 0, 0, 0);
 
-  QLabel *cameraLabel = new QLabel("摄像头捕获", cameraWidget);
-  cameraLabel->setStyleSheet(
-      "background-color: #f3f4f6;"
-      " color: #1f2937;"
-      " font-size: 16px;"
-      " padding: 10px;");
-  cameraLabel->setAlignment(Qt::AlignCenter);
-  cameraLabel->setFixedSize(800, 600);
-
+  QLabel *camera_label = new QLabel(camera_widget);
+  camera_label->setStyleSheet(
+      "border-radius: 20px; "
+      "background-position: center;");
+  // cameraLabel->setStyleSheet(
+  //     "background-color: #f3f4f6;"
+  //     "color: #1f2937;"
+  //     "font-size: 16px;"
+  //     "padding: 2px;");
+  // cameraLabel->setFixedSize();
+  // cameraLabel->setFixedSize(600, 450);
+  cam_frame_lbl_ = camera_label;
   //   ElaPushButton *captureButton = new ElaPushButton("Capture",
   //   cameraWidget); captureButton->setStyleSheet(
   //       "background-color: #3b82f6; color: #ffffff; padding: 10px 20px; "
   //       "border-radius: 8px;");
 
-  cameraLayout->addWidget(cameraLabel);
+  // cameraLayout->addWidget(cameraLabel);
   //   cameraLayout->addWidget(captureButton, 0, Qt::AlignCenter);
 
   // 用户注册表单
-  QWidget *formWidget = new QWidget(this);
-  QVBoxLayout *formLayout = new QVBoxLayout(formWidget);
+  // QWidget *form_widget = new QWidget(this);
+  QVBoxLayout *form_layout = new QVBoxLayout();
 
-  QLabel *titleLabel = new QLabel("----------------------------", formWidget);
-  titleLabel->setStyleSheet(
-      "font-size: 24px;"
-      " font-weight: 600;"
-      " color: #1f2937;"
-      " margin-bottom: 20px;");
+  // form_layout->setContentsMargins(2, 0, 2, 0);
+  // form_widget->setContentsMargins(0, 0, 0, 0);
+  // form_layout->setAlignment(Qt::AlignCenter);
 
-  ElaLineEdit *nameInput = new ElaLineEdit(formWidget);
-  nameInput->setPlaceholderText("输入你的昵称");
-  nameInput->setStyleSheet(
-      //   "background-color: #e5e7eb; "
-      //   "color: #1f2937; padding: 10px; "
-      "height: 39;"
-      "border-radius: 4px; "
-      "margin-bottom: 10px;");
+  // QHBoxLayout *mid_layout_in_form = new QHBoxLayout(form_widget);
+  // mid_layout_in_form->addSpacing(2);
+  // mid_layout_in_form->addWidget(cap_frame_card_);
+  // mid_layout_in_form->addSpacing(2);
 
-  ElaLineEdit *emailInput = new ElaLineEdit(formWidget);
-  emailInput->setPlaceholderText("输入你的邮箱");
-  emailInput->setStyleSheet(
-      //   "background-color: #e5e7eb; "
-      //   "color: #1f2937; padding: 10px; "
-      "height: 30px;"
-      "border-radius: 4px; "
-      "margin-bottom: 10px;");
+  // cap_frame_card_ = new ElaPromotionCard(form_widget);
+  // cap_frame_card_->setFixedSize(250, 250);
+  ElaLineEdit *name_input = new ElaLineEdit;
+  name_input->setPlaceholderText("输入你的昵称");
+  name_input->setFixedHeight(40);
+  name_input->setMinimumSize(120, 30);
+  ElaLineEdit *email_input = new ElaLineEdit;
+  email_input->setPlaceholderText("输入你的邮箱");
+  email_input->setFixedHeight(40);
+  name_input->setMinimumSize(120, 30);
+  ElaPushButton *register_button = new ElaPushButton("注册");
 
-  ElaPushButton *registerButton = new ElaPushButton("注册", formWidget);
-  registerButton->setStyleSheet(
-      // "background-color: #3b82f6;"
-      // " color: #ffffff;"
-      "width: 120px;"
-      " padding: 20px; "
-      "border-radius: 8px;");
+  form_layout->addWidget(name_input);
+  form_layout->addWidget(email_input);
+  form_layout->addWidget(register_button);
 
-  formLayout->addWidget(titleLabel);
-  formLayout->addWidget(nameInput);
-  formLayout->addWidget(emailInput);
-  formLayout->addWidget(registerButton);
+  main_layout->setContentsMargins(5, 5, 5, 5);
+  main_layout->addWidget(cam_frame_lbl_, 0, 0, 2, 1);
+  main_layout->addWidget(image_card, 0, 2, 0, 0);
+  main_layout->addLayout(form_layout, 1, 2);
+  // main_layout->addWidget(image_card, 0, 2);
+
+  // formLayout->addWidget(cap_frame_card_);
+  // form_layout->addSpacerItem(new QSpacerItem(10, 10));
+  // form_layout->addWidget(name_input);
+  // form_layout->addWidget(email_input);
+  // form_layout->addWidget(register_button);
+  // form_layout->addLayout(mid_layout_in_form);
 
   // 添加到主布局
-  mainLayout->addWidget(cameraWidget, 5);
-  mainLayout->addWidget(formWidget, 3);
+  // main_layout->addWidget(camera_widget, 2);
+  // main_layout->addWidget(form_widget, 1);
+  // main_layout->setSpacing(0);
 
   // 设置窗口属性
   this->setCustomWidget(central_widget);
   // setLayout(mainLayout);
   //   setWindowTitle("Face Registration");
   //   setStyleSheet("background-color: #ffffff;");
+}
+
+void RegisterPage::setCameraFrame(const QImage &img) {
+  if (cam_frame_lbl_) {
+    QPixmap dest_pixmap(img.size());
+    dest_pixmap.fill(Qt::transparent);
+    QPainterPath path;
+    path.addRoundedRect(img.rect(), 15, 15);
+    QPainter painter(&dest_pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+    painter.setClipPath(path);
+    painter.drawPixmap(img.rect(), QPixmap::fromImage(img));
+    cam_frame_lbl_->setPixmap(dest_pixmap);
+  }
 }

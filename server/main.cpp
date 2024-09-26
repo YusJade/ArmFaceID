@@ -84,11 +84,14 @@ int main(int argc, char* argv[]) {
       std::make_shared<arm_face_id::ElaGUI>();
   face_cam.AddObserver(ela_gui);
 
-  spdlog::info("Running Ela GUI~ :>");
+  spdlog::info("正在启动 Ela GUI~ :>");
 
   eApp->init();
   ela_gui->show();
-  face_cam.OpenAndStart();
+  ela_gui->adjustSize();
+  if (!face_cam.OpenAndStart()) {
+    spdlog::warn("无法启动摄像头子进程！:<");
+  }
   return app.exec();
 #endif
 

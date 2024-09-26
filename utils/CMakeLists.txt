@@ -11,6 +11,6 @@ set(HEAD_FILES ./function.h ./interface.h ./face_camera.h)
 file(COPY ${HEAD_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(utils ${UTILS_FILES})
-target_link_libraries(utils PUBLIC ${OpenCV_LIBS} ${Qt_LIBS})
+target_link_libraries(utils PUBLIC ${OpenCV_LIBS} ${Qt_LIBS} spdlog::spdlog)
 target_include_directories(
   utils PUBLIC ${OpenCV_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})

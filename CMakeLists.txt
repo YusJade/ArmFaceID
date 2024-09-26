@@ -7,7 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(USE_ELA_GUI
        "Set to On to use ElaWidgetTools"
-       OFF)
+       ON)
 
 
 
@@ -43,6 +43,9 @@ if(WIN32)
   set(c-ares_DIR D:/cmake-install-modules/lib/cmake/c-ares)
   set(SeetaFac_INCLUDE_DIRS D:/cmake-install-modules/SeetaFace/include)
   set(fmt_INCLUDE_DIRS D:/cmake-install-modules/spdlog/include/spdlog)
+
+  set(ElaWidgets_LIBS E:/Documents/CodeField/ElaWidgetTools/build/libelawidgettools.a)
+  set(ElaWidgets_INCLUDE_DIRS E:/Documents/CodeField/ElaWidgetTools/src/include)
 
   find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent)
 elseif(UNIX AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
