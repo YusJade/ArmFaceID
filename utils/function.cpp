@@ -20,8 +20,8 @@ QImage arm_face_id::utils::mat_to_qimage(const cv::Mat& mat) {
     case CV_8UC3: {
       cv::Mat mat_tmp;
       cv::cvtColor(mat, mat_tmp, cv::COLOR_BGR2RGB);
-      QImage image(mat.data, mat.cols, mat.rows, static_cast<int>(mat.step),
-                   QImage::Format_RGB888);
+      QImage image(mat_tmp.data, mat_tmp.cols, mat_tmp.rows,
+                   static_cast<int>(mat_tmp.step), QImage::Format_RGB888);
       return image.copy();  // 创建QImage副本
     }
     // 8-bit, 4 channels

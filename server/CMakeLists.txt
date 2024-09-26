@@ -21,7 +21,7 @@
 # CONFIG REQUIRED)
 
 # 设置源文件
-set(SOURCES main.cpp rpc_manager.cpp utils/utils.cpp gui.cpp engine.cpp ela_gui.cpp)
+set(SOURCES main.cpp rpc_manager.cpp utils/utils.cpp gui.cpp engine.cpp ela_gui.cpp gui/register_page.cpp)
 
 set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Concurrent)
 if(${Qt5_FOUND})
