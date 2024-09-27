@@ -51,9 +51,10 @@ jobs:
       - name: Install Dependency
         run: |
           sudo apt update
-          sudo apt install qt6-base-dev qt6-base-dev-tools qt6-tools-dev-tools
-          sudo apt install libgrpc++-dev libgrpc-dev
-          sudo apt install libspdlog-dev
+          sudo apt install -y qt6-base-dev qt6-base-dev-tools qt6-tools-dev-tools
+          sudo apt install -y libgrpc++-dev libgrpc-dev
+          sudo apt install -y libspdlog-dev
+          sudo apt install -y libopencv-dev python3-opencv
           git clone https://github.com/seetafaceengine/SeetaFace2.git
           cd ./SeetaFace2
           cmake . -B ./build
