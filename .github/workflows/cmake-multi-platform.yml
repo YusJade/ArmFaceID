@@ -23,9 +23,9 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         build_type: [Release]
-        c_compiler: [gcc, clang, cl]
+        c_compiler: [gcc]
         include:
           - os: ubuntu-latest
             c_compiler: gcc
@@ -49,15 +49,16 @@ jobs:
           echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
       - name: Install Dependency
-      - run: sudo apt update
-      - run: sudo apt install qt6-base-dev qt6-base-dev-tools qt6-tools-dev-tools
-      - run: sudo apt install libgrpc++-dev libgrpc-dev
-      - run: sudo apt install libspdlog-dev
-      - run: git clone https://github.com/seetafaceengine/SeetaFace2.git
-      - run: cd ./SeetaFace2
-      - run: cmake . -B ./build
-      - run: cd ./build
-      - run: make install
+      - run: |
+        sudo apt update
+        sudo apt install qt6-base-dev qt6-base-dev-tools qt6-tools-dev-tools
+        sudo apt install libgrpc++-dev libgrpc-dev
+        sudo apt install libspdlog-dev
+        git clone https://github.com/seetafaceengine/SeetaFace2.git
+        cd ./SeetaFace2
+        cmake . -B ./build
+        cd ./build
+        make install
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
