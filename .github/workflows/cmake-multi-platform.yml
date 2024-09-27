@@ -49,7 +49,7 @@ jobs:
           echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
       - name: Install Dependency
-      - run: |
+        run: |
         sudo apt update
         sudo apt install qt6-base-dev qt6-base-dev-tools qt6-tools-dev-tools
         sudo apt install libgrpc++-dev libgrpc-dev
