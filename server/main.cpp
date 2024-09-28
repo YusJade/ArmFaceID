@@ -75,8 +75,11 @@ int main(int argc, char* argv[]) {
 #endif
   QApplication app(argc, argv);
 
+  // std::shared_ptr<arm_face_id::FaceDetectorServer> face_detector =
+  //     std::make_shared<arm_face_id::FaceDetectorServer>(detector_settings);
+
   std::shared_ptr<arm_face_id::FaceDetectorServer> face_detector =
-      std::make_shared<arm_face_id::FaceDetectorServer>(detector_settings);
+      arm_face_id::FaceDetectorServer::BuildAndReturn(detector_settings);
 
   arm_face_id::RpcManagerImpl rpc_service(face_detector);
   grpc::ServerBuilder server_builder;
@@ -99,6 +102,7 @@ int main(int argc, char* argv[]) {
 #ifdef ELA_GUI
   std::shared_ptr<arm_face_id::ElaGUI> ela_gui =
       std::make_shared<arm_face_id::ElaGUI>();
+  face_detector->AddObserver(ela_gui);
 
   face_cam.AddObserver(ela_gui);
   if (!face_cam.OpenAndStart()) {

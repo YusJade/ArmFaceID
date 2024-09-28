@@ -25,7 +25,6 @@
 #include <spdlog/spdlog.h>
 
 #include "engine.h"
-#include "utils/utils.h"
 
 arm_face_id::GUI::GUI(
     std::shared_ptr<arm_face_id::FaceDetectorServer> engine_ptr)

@@ -1,18 +1,13 @@
 #ifndef RPC_MANAGER_H
 #define RPC_MANAGER_H
 
-#include <QLabel>
-#include <QStackedWidget>
-#include <QWidget>
 #include <memory>
 #include <mutex>
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/support/status.h>
-#include <opencv2/opencv.hpp>
 
 #include "engine.h"
-#include "face_engine.h"
 
 #include "face_network.grpc.pb.h"
 #include "face_network.pb.h"

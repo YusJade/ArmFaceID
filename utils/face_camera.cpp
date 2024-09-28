@@ -34,7 +34,6 @@ bool FaceCamera::FaceCamera::OpenAndStart() {
 
   if (cap_.isOpened()) {
     spdlog::info("成功打开网络摄像头 :) [url:{}]", settings_.cam_url);
-    return true;
   }
 
   if (cap_.open(settings_.cam_index)) {
@@ -57,7 +56,7 @@ bool FaceCamera::FaceCamera::OpenAndStart() {
         iter->OnFrameCaptured(frame);
       }
 
-      cv::imshow("cap", frame);
+      // cv::imshow("cap", frame);
 
       std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }

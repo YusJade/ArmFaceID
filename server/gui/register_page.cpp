@@ -24,9 +24,6 @@
 #include <opencv2/imgcodecs.hpp>
 
 #include "ElaPushButton.h"
-#include "ElaScrollPage.h"
-#include "ElaWidget.h"
-#include "function.h"
 
 using namespace arm_face_id;
 
@@ -35,20 +32,7 @@ RegisterPage::RegisterPage() { InitPage(); }
 void RegisterPage::InitPage() {
   setPageTitleSpacing(1);
   setTitleVisible(false);
-  // cv::Mat mat = cv::imread("./server/assets/test.png");
-  // QVBoxLayout* left_card_layout = new QVBoxLayout;
   ElaPromotionCard *image_card = new ElaPromotionCard();
-  // // image_card->setFixedSize(QSize(100, 100));
-  // image_card->setCardPixmap(QPixmap::fromImage(utils::mat_to_qimage(mat)));
-  // left_card_layout->addWidget(new ElaText("保持人脸在画面正中央 :O"), 0);
-  // left_card_layout->addWidget(image_card, 10);
-
-  // QVBoxLayout* right_op_layout = new QVBoxLayout;
-  // ElaPushButton* register_btn = new ElaPushButton("register");
-  // ElaPushButton* test_btn = new ElaPushButton("register");
-
-  // right_op_layout->addWidget(register_btn);
-  // right_op_layout->addWidget(test_btn);
 
   QWidget *central_widget = new QWidget;
   QGridLayout *main_layout = new QGridLayout(central_widget);
@@ -63,55 +47,35 @@ void RegisterPage::InitPage() {
   camera_widget->setContentsMargins(0, 0, 0, 0);
 
   QLabel *camera_label = new QLabel(camera_widget);
-  // cameraLabel->setStyleSheet(
-  //     "background-color: #f3f4f6;"
-  //     "color: #1f2937;"
-  //     "font-size: 16px;"
-  //     "padding: 2px;");
-  // cameraLabel->setFixedSize();
-  camera_label->setMinimumSize(600, 450);
+  camera_label->setMinimumSize(300, 225);
   cam_frame_lbl_ = camera_label;
-  //   ElaPushButton *captureButton = new ElaPushButton("Capture",
-  //   cameraWidget); captureButton->setStyleSheet(
-  //       "background-color: #3b82f6; color: #ffffff; padding: 10px 20px; "
-  //       "border-radius: 8px;");
-
-  // cameraLayout->addWidget(cameraLabel);
-  //   cameraLayout->addWidget(captureButton, 0, Qt::AlignCenter);
 
   // 用户注册表单
   // QWidget *form_widget = new QWidget(this);
   QVBoxLayout *form_layout = new QVBoxLayout();
 
-  // form_layout->setContentsMargins(2, 0, 2, 0);
-  // form_widget->setContentsMargins(0, 0, 0, 0);
-  // form_layout->setAlignment(Qt::AlignCenter);
-
-  // QHBoxLayout *mid_layout_in_form = new QHBoxLayout(form_widget);
-  // mid_layout_in_form->addSpacing(2);
-  // mid_layout_in_form->addWidget(cap_frame_card_);
-  // mid_layout_in_form->addSpacing(2);
-
-  // cap_frame_card_ = new ElaPromotionCard(form_widget);
+  cap_frame_card_ = image_card;
   // cap_frame_card_->setFixedSize(250, 250);
   ElaLineEdit *name_input = new ElaLineEdit;
   name_input->setPlaceholderText("输入你的昵称");
-  name_input->setFixedHeight(40);
+  name_input->setFixedHeight(30);
   name_input->setMinimumSize(120, 30);
+  // name_input->setMaximumSize(120, 30);
   ElaLineEdit *email_input = new ElaLineEdit;
   email_input->setPlaceholderText("输入你的邮箱");
-  email_input->setFixedHeight(40);
-  name_input->setMinimumSize(120, 30);
+  email_input->setFixedHeight(30);
+  // name_input->setFixedSize(120, 30);
   ElaPushButton *register_button = new ElaPushButton("注册");
+  register_button->setObjectName("register_btn");
 
   form_layout->addWidget(name_input);
   form_layout->addWidget(email_input);
   form_layout->addWidget(register_button);
 
-  main_layout->setContentsMargins(5, 5, 5, 5);
+  main_layout->setContentsMargins(2, 2, 2, 2);
   main_layout->addWidget(cam_frame_lbl_, 0, 0, 2, 1);
-  main_layout->addWidget(image_card, 0, 2, 0, 0);
-  main_layout->addLayout(form_layout, 1, 2);
+  // main_layout->addWidget(image_card, 0, 2);
+  main_layout->addLayout(form_layout, 2, 0, 2, 2);
 
   // 设置窗口属性
   this->setCustomWidget(central_widget);
@@ -131,7 +95,7 @@ void RegisterPage::setCameraFrame(const QImage &img) {
     QPixmap dest_pixmap(img.size());
     dest_pixmap.fill(Qt::transparent);
     QPainterPath path;
-    path.addRoundedRect(img.rect(), 15, 15);
+    path.addRoundedRect(img.rect(), 40, 40);
     QPainter painter(&dest_pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);

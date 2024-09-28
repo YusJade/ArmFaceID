@@ -1,6 +1,8 @@
 #pragma once
 
+#include <ElaMessageBar.h>
 #include <ElaWindow.h>
+#include <qtmetamacros.h>
 
 #include "gui/register_page.h"
 #include "interface.h"
@@ -22,6 +24,8 @@ class ElaGUI : public ElaWindow,
 
  private:
   RegisterPage* register_page_ = nullptr;
+  QString msg_bar_title_ = "null";
+  QString msg_bar_content_ = "null";
 };
 
 }  // namespace arm_face_id

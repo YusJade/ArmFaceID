@@ -50,10 +50,18 @@ class FaceDetectorServer : public interface::FaceDetector,
     // OpenCV 级联分类器在路径
     std::string classifier_path;
   };
+
+  static shared_ptr<FaceDetectorServer> BuildAndReturn(
+      const Settings &settings);
+  static shared_ptr<FaceDetectorServer> GetInstance();
+
+ private:
   explicit FaceDetectorServer(const Settings &);
   FaceDetectorServer() = delete;
   FaceDetectorServer(const FaceDetectorServer &) = delete;
 
+ public:
+  [[deprecated]]
   void Start();
 
   // use seeta::FaceEngine
@@ -64,6 +72,8 @@ class FaceDetectorServer : public interface::FaceDetector,
 
   bool Save(std::string path);
   bool Load(std::string path);
+
+  inline void NeedRegisterFace() { need_register_ = true; }
 
   virtual void OnCameraShutDown() override;
   virtual void OnFrameCaptured(cv::Mat frame) override;
@@ -78,10 +88,13 @@ class FaceDetectorServer : public interface::FaceDetector,
   }
 
  private:
+  bool need_register_ = false;
   std::unique_ptr<seeta::FaceEngine> face_engine_;
   std::unique_ptr<std::thread> worker_thread_;
   cv::CascadeClassifier classifier_;
   std::mutex mutex_;
+
+  static std::shared_ptr<FaceDetectorServer> _instance;
 
   [[deprecated]]
   cv::VideoCapture camera_;

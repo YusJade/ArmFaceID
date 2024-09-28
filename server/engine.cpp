@@ -21,6 +21,21 @@
 
 using namespace arm_face_id;
 
+std::shared_ptr<FaceDetectorServer> FaceDetectorServer::_instance;
+
+std::shared_ptr<FaceDetectorServer> FaceDetectorServer::GetInstance() {
+  ASSERET_WITH_LOG("不存在一个人脸检测识别实例！", _instance);
+  return _instance;
+}
+
+std::shared_ptr<FaceDetectorServer> FaceDetectorServer::BuildAndReturn(
+    const Settings& settings) {
+  ASSERET_WITH_LOG("已存在一个人脸检测识别实例！", !_instance);
+  _instance =
+      std::shared_ptr<FaceDetectorServer>(new FaceDetectorServer(settings));
+  return _instance;
+}
+
 FaceDetectorServer::FaceDetectorServer(const Settings& config)
     : face_engine_(std::make_unique<seeta::FaceEngine>(
           config.fd_setting, config.pd_setting, config.fr_setting)) {
@@ -32,7 +47,7 @@ FaceDetectorServer::FaceDetectorServer(const Settings& config)
 
 void FaceDetectorServer::Start() {
   if (worker_thread_ != nullptr) {
-    spdlog::warn("Engine thread has been started~");
+    spdlog::warn("已存在一个完成初始化的人脸检测识别模块~");
     return;
   }
   worker_thread_ = std::make_unique<std::thread>([&, this] {
@@ -166,5 +181,11 @@ void FaceDetectorServer::OnFrameCaptured(cv::Mat frame) {
   for (auto iter : this->observers_) {
     iter->OnFaceDetected(frame, faces);
   }
+
+  if (need_register_) {
+    RegisterFace(frame);
+    need_register_ = false;
+  }
+
   return;
 }
