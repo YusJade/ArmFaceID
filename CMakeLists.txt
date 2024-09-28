@@ -4,6 +4,8 @@ project(arm_face_id LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_BUILD_TYPE DEBUG)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# Qt 信号/槽机制
+set(CMAKE_AUTOMOC ON)
 
 option(USE_ELA_GUI
        "Set to On to use ElaWidgetTools"

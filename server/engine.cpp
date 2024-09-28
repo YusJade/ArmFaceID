@@ -19,36 +19,18 @@
 #include "face_engine.h"
 #include "utils/utils.h"
 
-arm_face_id::Engine::Engine(const EngineConfig& config)
+using namespace arm_face_id;
+
+FaceDetectorServer::FaceDetectorServer(const Settings& config)
     : face_engine_(std::make_unique<seeta::FaceEngine>(
           config.fd_setting, config.pd_setting, config.fr_setting)) {
-  ASSERET_WITH_LOG("Failed to load model of Calssifier.",
+  ASSERET_WITH_LOG("无法加载级联分类器！",
                    classifier_.load(config.classifier_path));
-  spdlog::info("Initialized the Engine.");
-
-  spdlog::info(cv::getBuildInformation());
-
-  if (!config.network_camera_url.empty())
-    camera_.open(config.network_camera_url);
-  if (camera_.isOpened()) {
-    spdlog::info("Opened network camera at {}", config.network_camera_url);
-    return;
-  }
-  spdlog::warn("Failed to open network camera at {}, please check:<",
-               config.network_camera_url);
-  camera_.open(config.native_camera_index);
-  if (camera_.isOpened()) {
-    spdlog::info("Open native camera device {}", config.native_camera_index);
-    return;
-  }
-  ASSERET_WITH_LOG(
-      fmt::format(fmt::format_string<int>(
-                      "Failed to open native camera at {}, please check:<"),
-                  config.native_camera_index),
-      camera_.isOpened())
+  spdlog::info("已初始化人脸检测识别模块 ~");
+  // spdlog::info(cv::getBuildInformation());
 }
 
-void arm_face_id::Engine::Start() {
+void FaceDetectorServer::Start() {
   if (worker_thread_ != nullptr) {
     spdlog::warn("Engine thread has been started~");
     return;
@@ -77,15 +59,15 @@ void arm_face_id::Engine::Start() {
   spdlog::info("Engine thread is started.");
 }
 
-void arm_face_id::Engine::DetectFace(std::vector<cv::Rect>& faces,
-                                     const cv::Mat& frame) {
+void arm_face_id::FaceDetectorServer::DetectFace(std::vector<cv::Rect>& faces,
+                                                 const cv::Mat& frame) {
   cv::Mat gray_frame;
   cv::cvtColor(frame, gray_frame, cv::COLOR_BGR2GRAY);
   cv::equalizeHist(gray_frame, gray_frame);
   classifier_.detectMultiScale(frame, faces);
 }
 
-int64_t arm_face_id::Engine::RecognizeFace(const cv::Mat& frame) {
+int64_t arm_face_id::FaceDetectorServer::RecognizeFace(const cv::Mat& frame) {
   std::lock_guard<std::mutex> lock_guard(mutex_);
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
   float similarity = .0;
@@ -119,7 +101,7 @@ int64_t arm_face_id::Engine::RecognizeFace(const cv::Mat& frame) {
   return id;
 }
 
-int64_t arm_face_id::Engine::RegisterFace(const cv::Mat& frame) {
+int64_t arm_face_id::FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
   float similarity = .0;
   auto id = face_engine_->Query(img_date, &similarity);
@@ -145,7 +127,7 @@ int64_t arm_face_id::Engine::RegisterFace(const cv::Mat& frame) {
   return id;
 }
 
-bool arm_face_id::Engine::Save(std::string path) {
+bool arm_face_id::FaceDetectorServer::Save(std::string path) {
   bool is_success = false;
   is_success = face_engine_->Save(path.c_str());
 
@@ -158,7 +140,7 @@ bool arm_face_id::Engine::Save(std::string path) {
   return is_success;
 }
 
-bool arm_face_id::Engine::Load(std::string path) {
+bool arm_face_id::FaceDetectorServer::Load(std::string path) {
   bool is_success = false;
   is_success = face_engine_->Load(path.c_str());
 
@@ -169,4 +151,20 @@ bool arm_face_id::Engine::Load(std::string path) {
   }
 
   return is_success;
+}
+
+void FaceDetectorServer::OnCameraShutDown() {}
+
+void FaceDetectorServer::OnFrameCaptured(cv::Mat frame) {
+  std::vector<cv::Rect> faces;
+  DetectFace(faces, frame);
+  if (faces.empty()) {
+    return;
+  }
+
+  spdlog::info("检测到 {} 张人脸 :O", faces.size());
+  for (auto iter : this->observers_) {
+    iter->OnFaceDetected(frame, faces);
+  }
+  return;
 }

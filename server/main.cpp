@@ -41,6 +41,8 @@ ABSL_FLAG(std::string, network_camera_url, " ",
 constexpr char kServerAddrInfo[] = "localhost:50051";
 
 int main(int argc, char* argv[]) {
+  absl::InitializeLog();
+  SetStderrThreshold(absl::LogSeverity::kInfo);
   absl::SetProgramUsageMessage(
       "There are the availiable flags for this program:");
   absl::ParseCommandLine(argc, argv);
@@ -51,16 +53,14 @@ int main(int argc, char* argv[]) {
                                        seeta::ModelSetting::Device::CPU);
   seeta::ModelSetting FR_model_setting("fr_2_10.dat",
                                        seeta::ModelSetting::Device::CPU);
-  arm_face_id::EngineConfig engine_config;
-  engine_config.fd_setting = FD_model_setting;
-  engine_config.fr_setting = FR_model_setting;
-  engine_config.pd_setting = PD_model_setting;
-  engine_config.classifier_path = absl::GetFlag(FLAGS_classifier_path);
-  engine_config.native_camera_index = absl::GetFlag(FLAGS_native_camera_index);
-  engine_config.network_camera_url = absl::GetFlag(FLAGS_network_camera_url);
-
-  absl::InitializeLog();
-  SetStderrThreshold(absl::LogSeverity::kInfo);
+  arm_face_id::FaceDetectorServer::Settings detector_settings;
+  detector_settings.fd_setting = FD_model_setting;
+  detector_settings.fr_setting = FR_model_setting;
+  detector_settings.pd_setting = PD_model_setting;
+  detector_settings.classifier_path = absl::GetFlag(FLAGS_classifier_path);
+  // engine_config.native_camera_index =
+  // absl::GetFlag(FLAGS_native_camera_index); engine_config.network_camera_url
+  // = absl::GetFlag(FLAGS_network_camera_url);
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
   QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -75,55 +75,59 @@ int main(int argc, char* argv[]) {
 #endif
   QApplication app(argc, argv);
 
-#ifdef ELA_GUI
-  arm_face_id::FaceCamera::Settings settings;
-  settings.cam_index = 1;
-  arm_face_id::FaceCamera face_cam(settings);
+  std::shared_ptr<arm_face_id::FaceDetectorServer> face_detector =
+      std::make_shared<arm_face_id::FaceDetectorServer>(detector_settings);
 
+  arm_face_id::RpcManagerImpl rpc_service(face_detector);
+  grpc::ServerBuilder server_builder;
+  server_builder
+      .AddListeningPort(kServerAddrInfo, grpc::InsecureServerCredentials())
+      .RegisterService(&rpc_service)
+      .SetSyncServerOption(grpc::ServerBuilder::SyncServerOption::MAX_POLLERS,
+                           20)
+      .SetSyncServerOption(grpc::ServerBuilder::SyncServerOption::MIN_POLLERS,
+                           5);
+
+  std::unique_ptr rpc_server(server_builder.BuildAndStart());
+
+  arm_face_id::FaceCamera::Settings cam_settings;
+  cam_settings.cam_index = absl::GetFlag(FLAGS_native_camera_index);
+  cam_settings.cam_url = absl::GetFlag(FLAGS_network_camera_url);
+
+  arm_face_id::FaceCamera face_cam(cam_settings);
+  face_cam.AddObserver(face_detector);
+#ifdef ELA_GUI
   std::shared_ptr<arm_face_id::ElaGUI> ela_gui =
       std::make_shared<arm_face_id::ElaGUI>();
+
   face_cam.AddObserver(ela_gui);
-
-  spdlog::info("正在启动 Ela GUI~ :>");
-
-  eApp->init();
-  ela_gui->show();
-  ela_gui->adjustSize();
   if (!face_cam.OpenAndStart()) {
     spdlog::warn("无法启动摄像头子进程！:<");
   }
-  return app.exec();
-#endif
 
-  std::shared_ptr<arm_face_id::Engine> engine_ptr =
-      std::make_shared<arm_face_id::Engine>(engine_config);
-
-  arm_face_id::RpcManagerImpl rpc_service(engine_ptr);
-  grpc::ServerBuilder server_builder;
-  server_builder.AddListeningPort(kServerAddrInfo,
-                                  grpc::InsecureServerCredentials());
-  server_builder.RegisterService(&rpc_service);
-  server_builder.SetSyncServerOption(
-      grpc::ServerBuilder::SyncServerOption::MAX_POLLERS, 20);
-  server_builder.SetSyncServerOption(
-      grpc::ServerBuilder::SyncServerOption::MIN_POLLERS, 5);
-  const std::unique_ptr rpc_server(server_builder.BuildAndStart());
-
-  // arm_face_id::RpcManagerImpl rpc_service;
-
-  std::shared_ptr<arm_face_id::GUI> gui_ptr =
-      std::make_shared<arm_face_id::GUI>(engine_ptr);
-  gui_ptr->Get()->show();
-
-  engine_ptr->RegisterICamera(gui_ptr);
-  engine_ptr->RegisterIListener(gui_ptr);
-  engine_ptr->Start();
+  spdlog::info("正在启动 Ela GUI~ :>");
+  eApp->init();
+  ela_gui->show();
+  ela_gui->adjustSize();
 
   std::thread rpc_thread([&] {
-    spdlog::info("Started gRPC server.");
+    spdlog::info("已启动 gRPC 服务器");
     rpc_server->Wait();
   });
   rpc_thread.detach();
+
+  return app.exec();
+#endif
+
+  // arm_face_id::RpcManagerImpl rpc_service;
+
+  // std::shared_ptr<arm_face_id::GUI> gui_ptr =
+  //     std::make_shared<arm_face_id::GUI>(engine_ptr);
+  // gui_ptr->Get()->show();
+
+  // engine_ptr->RegisterICamera(gui_ptr);
+  // engine_ptr->RegisterIListener(gui_ptr);
+  // engine_ptr->Start();
 
   return app.exec();
 }

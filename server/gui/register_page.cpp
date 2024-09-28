@@ -63,16 +63,13 @@ void RegisterPage::InitPage() {
   camera_widget->setContentsMargins(0, 0, 0, 0);
 
   QLabel *camera_label = new QLabel(camera_widget);
-  camera_label->setStyleSheet(
-      "border-radius: 20px; "
-      "background-position: center;");
   // cameraLabel->setStyleSheet(
   //     "background-color: #f3f4f6;"
   //     "color: #1f2937;"
   //     "font-size: 16px;"
   //     "padding: 2px;");
   // cameraLabel->setFixedSize();
-  // cameraLabel->setFixedSize(600, 450);
+  camera_label->setMinimumSize(600, 450);
   cam_frame_lbl_ = camera_label;
   //   ElaPushButton *captureButton = new ElaPushButton("Capture",
   //   cameraWidget); captureButton->setStyleSheet(
@@ -115,25 +112,18 @@ void RegisterPage::InitPage() {
   main_layout->addWidget(cam_frame_lbl_, 0, 0, 2, 1);
   main_layout->addWidget(image_card, 0, 2, 0, 0);
   main_layout->addLayout(form_layout, 1, 2);
-  // main_layout->addWidget(image_card, 0, 2);
-
-  // formLayout->addWidget(cap_frame_card_);
-  // form_layout->addSpacerItem(new QSpacerItem(10, 10));
-  // form_layout->addWidget(name_input);
-  // form_layout->addWidget(email_input);
-  // form_layout->addWidget(register_button);
-  // form_layout->addLayout(mid_layout_in_form);
-
-  // 添加到主布局
-  // main_layout->addWidget(camera_widget, 2);
-  // main_layout->addWidget(form_widget, 1);
-  // main_layout->setSpacing(0);
 
   // 设置窗口属性
   this->setCustomWidget(central_widget);
-  // setLayout(mainLayout);
-  //   setWindowTitle("Face Registration");
-  //   setStyleSheet("background-color: #ffffff;");
+
+  connect(register_button, &ElaPushButton::clicked,
+          [this] { emit register_btn_clicked(); });
+}
+
+void RegisterPage::setCaptureFrame(const QPixmap &img) {
+  if (cap_frame_card_) {
+    cap_frame_card_->setCardPixmap(img);
+  }
 }
 
 void RegisterPage::setCameraFrame(const QImage &img) {

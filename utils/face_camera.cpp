@@ -5,6 +5,7 @@
 #include <thread>
 
 #include <opencv2/core/mat.hpp>
+#include <opencv2/highgui.hpp>
 #include <spdlog/spdlog.h>
 
 using namespace arm_face_id;
@@ -52,7 +53,12 @@ bool FaceCamera::FaceCamera::OpenAndStart() {
       cap_ >> frame;
       if (frame.empty()) continue;
 
-      NotifyAllOnFrameCaptured(frame);
+      for (auto iter : observers_) {
+        iter->OnFrameCaptured(frame);
+      }
+
+      cv::imshow("cap", frame);
+
       std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
   });

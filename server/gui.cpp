@@ -27,7 +27,8 @@
 #include "engine.h"
 #include "utils/utils.h"
 
-arm_face_id::GUI::GUI(std::shared_ptr<arm_face_id::Engine> engine_ptr)
+arm_face_id::GUI::GUI(
+    std::shared_ptr<arm_face_id::FaceDetectorServer> engine_ptr)
     : engine_ptr_(engine_ptr), on_frame_captured_callback_([](cv::Mat) {}) {}
 
 void arm_face_id::GUI::Init() {}

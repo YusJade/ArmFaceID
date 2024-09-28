@@ -21,7 +21,7 @@ namespace arm_face_id {
 
 class RpcManagerImpl final : public RpcManager::Service {
  public:
-  RpcManagerImpl(std::shared_ptr<Engine> engine_ptr);
+  RpcManagerImpl(std::shared_ptr<FaceDetectorServer> engine_ptr);
   RpcManagerImpl() = delete;
   ~RpcManagerImpl();
 
@@ -34,7 +34,7 @@ class RpcManagerImpl final : public RpcManager::Service {
                         RegisterResult* response) override;
 
  private:
-  std::shared_ptr<Engine> engine_ptr_;
+  std::shared_ptr<FaceDetectorServer> engine_ptr_;
   std::mutex mutex_;
 };
 

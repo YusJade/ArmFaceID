@@ -10,7 +10,7 @@
 constexpr float kThrehold = 0.8;
 
 arm_face_id::RpcManagerImpl::RpcManagerImpl(
-    std::shared_ptr<arm_face_id::Engine> engine_ptr)
+    std::shared_ptr<arm_face_id::FaceDetectorServer> engine_ptr)
     : engine_ptr_(engine_ptr) {}
 
 arm_face_id::RpcManagerImpl::~RpcManagerImpl() {}

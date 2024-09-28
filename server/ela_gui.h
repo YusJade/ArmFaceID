@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ElaWindow.h>
 
 #include "gui/register_page.h"
@@ -12,7 +14,7 @@ class ElaGUI : public ElaWindow,
 
   void InitWindow();
 
-  virtual void OnFaceDetected(cv::Mat img, vector<cv::Rect> faces) {}
+  virtual void OnFaceDetected(cv::Mat img, vector<cv::Rect> faces);
   virtual void OnFaceRecognized(cv::Mat img, cv::Rect face, int64_t id) {}
 
   virtual void OnFrameCaptured(cv::Mat frame);

@@ -17,7 +17,7 @@ namespace arm_face_id {
 
 class GUI : public ICamera, public IEngineListener {
  public:
-  explicit GUI(std::shared_ptr<Engine> engine_ptr);
+  explicit GUI(std::shared_ptr<FaceDetectorServer> engine_ptr);
 
   void Init();
   QWidget* Get();
@@ -28,7 +28,7 @@ class GUI : public ICamera, public IEngineListener {
   void OnFaceRecognized(int64_t, const cv::Mat&) override;
 
  private:
-  std::shared_ptr<Engine> engine_ptr_;
+  std::shared_ptr<FaceDetectorServer> engine_ptr_;
   cv::Mat captured_face_mat_;
   QWidget* main_widget_ = nullptr;
   QStackedWidget* stacked_widget_ = nullptr;

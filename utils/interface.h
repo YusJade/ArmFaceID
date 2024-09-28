@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include <algorithm>
 #include <cstdint>
@@ -43,7 +43,7 @@ class FaceDetector {
     }
   }
 
- private:
+ protected:
   vector<shared_ptr<FaceDetectorObserver>> observers_;
 };
 
@@ -75,13 +75,6 @@ class Camera {
   }
 
  protected:
-  inline void NotifyAllOnFrameCaptured(cv::Mat frame) {
-    for (auto iter : observers_) {
-      iter->OnFrameCaptured(frame);
-    }
-  }
-
- private:
   vector<shared_ptr<CameraObserver>> observers_;
 };
 

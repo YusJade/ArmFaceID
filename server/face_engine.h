@@ -5,6 +5,7 @@
 #include <seeta/FaceLandmarker.h>
 
 namespace seeta {
+
 class FaceEngine {
  public:
   FaceEngine(const SeetaModelSetting &FD_model,

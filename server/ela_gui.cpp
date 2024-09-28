@@ -5,6 +5,7 @@
 #include <ElaWidget.h>
 #include <qboxlayout.h>
 #include <qlabel.h>
+#include <qpixmap.h>
 
 #include <opencv2/core/mat.hpp>
 #include <spdlog/spdlog.h>
@@ -12,6 +13,8 @@
 #include "Def.h"
 #include "function.h"
 #include "gui/register_page.h"
+
+using namespace arm_face_id;
 
 arm_face_id::ElaGUI::ElaGUI() {
   this->setUserInfoCardVisible(false);
@@ -40,5 +43,12 @@ void arm_face_id::ElaGUI::InitWindow() {
 void arm_face_id::ElaGUI::OnFrameCaptured(cv::Mat frame) {
   if (register_page_) {
     register_page_->setCameraFrame(arm_face_id::utils::mat_to_qimage(frame));
+  }
+}
+
+void ElaGUI::OnFaceDetected(cv::Mat img, vector<cv::Rect> faces) {
+  if (register_page_) {
+    register_page_->setCaptureFrame(
+        QPixmap::fromImage(utils::mat_to_qimage(img)));
   }
 }
