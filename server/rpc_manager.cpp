@@ -5,7 +5,7 @@
 #include <grpcpp/support/status.h>
 #include <spdlog/spdlog.h>
 
-#include "utils/utils.h"
+#include "function.h"
 
 constexpr float kThrehold = 0.8;
 
@@ -21,7 +21,7 @@ grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
   spdlog::info("Recieve a request");
   const std::string img_byte_seq = request->face_img();
   cv::Mat decoded_mat;
-  utils::DecodeMat(img_byte_seq, decoded_mat);
+  utils::bytes_to_mat(img_byte_seq, decoded_mat);
   int64_t id = -2;
   id = engine_ptr_->RecognizeFace(decoded_mat);
 
@@ -34,7 +34,7 @@ grpc::Status arm_face_id::RpcManagerImpl::Register(
     arm_face_id::RegisterResult* response) {
   const std::string img_byte_seq = request->face_img();
   cv::Mat decoded_mat;
-  utils::DecodeMat(img_byte_seq, decoded_mat);
+  utils::bytes_to_mat(img_byte_seq, decoded_mat);
   int64_t id = engine_ptr_->RegisterFace(decoded_mat);
   if (id == -1) {
     return grpc::Status(grpc::StatusCode::OUT_OF_RANGE, "face not found.");

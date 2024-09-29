@@ -25,6 +25,7 @@
 #include <spdlog/spdlog.h>
 
 #include "engine.h"
+#include "function.h"
 
 arm_face_id::GUI::GUI(
     std::shared_ptr<arm_face_id::FaceDetectorServer> engine_ptr)
@@ -150,7 +151,7 @@ QWidget* arm_face_id::GUI::InitRegisterWidget() {
       std::function<void(cv::Mat)>([img_label, this](cv::Mat frame) {
         captured_face_mat_ = frame;
         cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
-        QPixmap pixmap = QPixmap::fromImage(utils::MatToQImage(frame));
+        QPixmap pixmap = QPixmap::fromImage(utils::mat_to_qimage(frame));
         pixmap = pixmap.scaled(img_label->size(), Qt::KeepAspectRatio,
                                Qt::SmoothTransformation);
         img_label->setPixmap(pixmap);
