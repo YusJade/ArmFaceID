@@ -120,6 +120,8 @@ int main(int argc, char* argv[]) {
   });
   rpc_thread.detach();
 
+  face_detector->Start();
+
   return app.exec();
 #endif
 

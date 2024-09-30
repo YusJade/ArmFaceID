@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <string>
 #include <thread>
 #include <vector>
@@ -61,8 +62,8 @@ class FaceDetectorServer : public interface::FaceDetector,
   FaceDetectorServer(const FaceDetectorServer &) = delete;
 
  public:
-  [[deprecated]]
   void Start();
+  inline void Stop() { is_thread_running_ = false; }
 
   // use seeta::FaceEngine
   int64_t RecognizeFace(const cv::Mat &);
@@ -91,8 +92,10 @@ class FaceDetectorServer : public interface::FaceDetector,
   bool need_register_ = false;
   std::unique_ptr<seeta::FaceEngine> face_engine_;
   std::unique_ptr<std::thread> worker_thread_;
+  bool is_thread_running_ = false;
   cv::CascadeClassifier classifier_;
   std::mutex mutex_;
+  std::queue<cv::Mat> frame_queue_;
 
   static std::shared_ptr<FaceDetectorServer> _instance;
 

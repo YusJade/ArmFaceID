@@ -18,6 +18,7 @@
 
 #include "face_engine.h"
 #include "function.h"
+#include "interface.h"
 
 using namespace arm_face_id;
 
@@ -47,31 +48,36 @@ FaceDetectorServer::FaceDetectorServer(const Settings& config)
 
 void FaceDetectorServer::Start() {
   if (worker_thread_ != nullptr) {
-    spdlog::warn("已存在一个完成初始化的人脸检测识别模块~");
+    spdlog::warn("当前人脸检测识别实例已存在一个进程~");
     return;
   }
+  is_thread_running_ = true;
   worker_thread_ = std::make_unique<std::thread>([&, this] {
-    cv::Mat frame;
-    std::vector<cv::Rect> faces;
-    bool accessible = false;
-    while (true) {
-      camera_ >> frame;
-      InvokeAllICamera(frame);
-      accessible = faces.empty() ? true : false;
-      faces.clear();
-      DetectFace(faces, frame);
-      // current frame contains face will try to be recognized when last frame
-      // contains no face.
-      if (!faces.empty()) {
-        // spdlog::info("Detected {} faces.", faces.size());
-        InvokeAllOnFaceDetected(faces, frame);
-        // int64_t id = RecognizeFace(frame);
+    cv::Mat cur_frame;
+    while (is_thread_running_) {
+      if (frame_queue_.empty()) continue;
+      cur_frame = frame_queue_.front();
+      frame_queue_.pop();
+      std::vector<cv::Rect> faces;
+      DetectFace(faces, cur_frame);
+      if (faces.empty()) {
+        continue;
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+      spdlog::info("检测到 {} 张人脸 :O", faces.size());
+      for (auto iter : this->observers_) {
+        iter->OnFaceDetected(cur_frame, faces);
+      }
+
+      if (need_register_) {
+        RegisterFace(cur_frame);
+        need_register_ = false;
+      }
     }
+    spdlog::info("人脸检测识别进程已退出 ~");
   });
   worker_thread_->detach();
-  spdlog::info("Engine thread is started.");
+  spdlog::info("人脸检测识别进程已启动");
 }
 
 void arm_face_id::FaceDetectorServer::DetectFace(std::vector<cv::Rect>& faces,
@@ -121,23 +127,29 @@ int64_t arm_face_id::FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
   float similarity = .0;
   auto id = face_engine_->Query(img_date, &similarity);
   if (id != -1 && similarity > 0.5) {
-    spdlog::info(
-        "Register Failed: Already Exist :< (id={}, similarity={})\n"
-        "\t > image: width={}, height={}, channels={}",
-        id, similarity, img_date.width, img_date.height, img_date.channels);
+    spdlog::info("注册失败: 人脸的注册信息已经存在 :< (id={}, similarity={})",
+                 id, similarity);
+
+    for (auto iter : observers_) {
+      iter->OnFaceRegistered(
+          frame, cv::Rect(),
+          interface::FaceDetectorObserver::kFaceAlreadyExisted);
+    }
+
     return id;
   }
   id = face_engine_->Register(img_date);
   if (id == -1) {
-    spdlog::info(
-        "Register Failed: Face Not Found :< \n"
-        "\t > image: width-{}, height-{}, channels-{}",
-        img_date.width, img_date.height, img_date.channels);
+    spdlog::info("注册失败: 检测不到人脸 :< \n");
+    for (auto iter : observers_) {
+      iter->OnFaceRegistered(frame, cv::Rect(),
+                             interface::FaceDetectorObserver::kFaceNotDetected);
+    }
   } else {
-    spdlog::info(
-        "Registered face (id: {}) via this image :> \n"
-        "\t > image: width-{}, height-{}, channels-{}",
-        id, img_date.width, img_date.height, img_date.channels);
+    spdlog::info("注册成功: id= {} :> \n", id);
+    for (auto iter : observers_) {
+      iter->OnFaceRegistered(frame, cv::Rect(), id);
+    }
   }
   return id;
 }
@@ -171,21 +183,6 @@ bool arm_face_id::FaceDetectorServer::Load(std::string path) {
 void FaceDetectorServer::OnCameraShutDown() {}
 
 void FaceDetectorServer::OnFrameCaptured(cv::Mat frame) {
-  std::vector<cv::Rect> faces;
-  DetectFace(faces, frame);
-  if (faces.empty()) {
-    return;
-  }
-
-  spdlog::info("检测到 {} 张人脸 :O", faces.size());
-  for (auto iter : this->observers_) {
-    iter->OnFaceDetected(frame, faces);
-  }
-
-  if (need_register_) {
-    RegisterFace(frame);
-    need_register_ = false;
-  }
-
+  frame_queue_.push(frame);
   return;
 }

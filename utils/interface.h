@@ -1,10 +1,13 @@
 #pragma once
 
+#include <_mingw_stat64.h>
+
 #include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <vector>
 
+#include <opencv2/core/hal/interface.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 
@@ -16,10 +19,15 @@ namespace interface {
 
 class FaceDetectorObserver {
  public:
+  static const int64_t kFaceNotDetected = -1;
+  static const int64_t kFaceAlreadyExisted = -2;
+
   FaceDetectorObserver() = default;
 
   virtual void OnFaceDetected(cv::Mat img, vector<cv::Rect> faces) = 0;
   virtual void OnFaceRecognized(cv::Mat img, cv::Rect face, int64_t id) = 0;
+
+  virtual void OnFaceRegistered(cv::Mat img, cv::Rect face, int64_t id) {}
 
  private:
 };
