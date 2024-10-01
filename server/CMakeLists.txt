@@ -21,11 +21,11 @@
 # CONFIG REQUIRED)
 
 # 设置源文件
-set(SOURCES main.cpp rpc_manager.cpp gui.cpp engine.cpp ela_gui.cpp gui/register_page.cpp gui/recognition_page.cpp)
+set(SOURCES main.cpp rpc_manager.cpp gui.cpp engine.cpp ela_gui.cpp gui/register_page.cpp gui/recognition_page.cpp face_database.cpp)
 
-set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Concurrent)
+set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Concurrent Qt6::Sql)
 if(${Qt5_FOUND})
-  set(QT_LIBS Qt5::Core Qt5::Widgets Qt5::Concurrent)
+  set(QT_LIBS Qt5::Core Qt5::Widgets Qt5::Concurrent Qt5::Sql)
 endif()
 
 # 创建可执行文件

@@ -36,6 +36,10 @@ cmake --build ./build/
 
 ## 继续开发计划
 
+### 编写数据库模块，实现人脸特征与个人信息的绑定
+
+
+
 ### 在开发板上部署深度学习模型
 
 未来会尝试在开发板上部署模型，可能涉及模型的转换（`pytorch`?`onnx`?`ncnn` ?），以及运行他们所需的依赖库。
@@ -43,7 +47,7 @@ cmake --build ./build/
 ### 集成更美观的 Qt-GUI：ElaWidgetTools
 
 <a href="https://github.com/Liniyous/ElaWidgetTools?tab=readme-ov-file">
-  <img src="https://github-readme-stats.vercel.app/api/pin/?username=Liniyous&repo=ElaWidgetTools&theme=default" alt="Repo A" />
+  <img src="https://github-readme-stats.vercel.app/api/pin/?username=Liniyous&repo=ElaWidgetTools&theme=default" alt="Liniyous/ElaWidgetTools" />
 </a>
 
 根据 `repo` 介绍，该 `UI` 库对 `Qt6` 支持良好，交叉编译 `Qt6` 成功后考虑纳入计划~

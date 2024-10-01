@@ -2,6 +2,7 @@
 
 #include <ElaImageCard.h>
 #include <ElaLineEdit.h>
+#include <ElaProgressBar.h>
 #include <ElaPromotionCard.h>
 #include <ElaText.h>
 #include <qboxlayout.h>
@@ -77,19 +78,29 @@ void RegisterPage::InitPage() {
   ElaPushButton *register_button = new ElaPushButton("注册");
   register_button->setObjectName("register_btn");
 
+  ElaProgressBar *progress_bar = new ElaProgressBar(this);
+  progress_bar->setMinimumWidth(320);
+  progress_bar->setMinimum(0);
+  progress_bar->setMaximum(100);
+
   form_layout->addWidget(name_text, 0, 0);
   form_layout->addWidget(email_text, 1, 0);
   form_layout->addWidget(name_input, 0, 1);
   form_layout->addWidget(email_input, 1, 1);
   form_layout->addWidget(register_button, 2, 0, 1, 2);
   form_layout->setContentsMargins(10, 10, 10, 0);
+
   form_layout->setColumnStretch(0, 1);
   form_layout->setColumnStretch(1, 8);
   form_layout->setColumnStretch(2, 8);
+  // form_layout->setRowStretch(0, 3);
+  // form_layout->setRowStretch(1, 3);
+  // form_layout->setRowStretch(2, 3);
+  // form_layout->setRowStretch(3, 1);
 
   main_layout->setContentsMargins(2, 2, 2, 2);
   main_layout->addWidget(cam_frame_lbl_, 0, 3, 2, 1);
-  // main_layout->addWidget(image_card, 0, 2);
+  main_layout->addWidget(progress_bar, 2, 0, 1, 4);
   main_layout->addLayout(form_layout, 0, 0, 2, 2);
 
   // 设置窗口属性

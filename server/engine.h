@@ -75,6 +75,7 @@ class FaceDetectorServer : public interface::FaceDetector,
   bool Load(std::string path);
 
   inline void NeedRegisterFace() { need_register_ = true; }
+  inline void NeedRecognizeFace(bool toggled) { need_recognize_ = toggled; }
 
   virtual void OnCameraShutDown() override;
   virtual void OnFrameCaptured(cv::Mat frame) override;
@@ -90,6 +91,7 @@ class FaceDetectorServer : public interface::FaceDetector,
 
  private:
   bool need_register_ = false;
+  bool need_recognize_ = false;
   std::unique_ptr<seeta::FaceEngine> face_engine_;
   std::unique_ptr<std::thread> worker_thread_;
   bool is_thread_running_ = false;

@@ -21,7 +21,7 @@ class ElaGUI : public ElaWindow,
   void InitWindow();
 
   virtual void OnFaceDetected(cv::Mat img, vector<cv::Rect> faces);
-  virtual void OnFaceRecognized(cv::Mat img, cv::Rect face, int64_t id) {}
+  virtual void OnFaceRecognized(cv::Mat img, cv::Rect face, int64_t id);
 
   virtual void OnFaceRegistered(cv::Mat img, cv::Rect face, int64_t id);
 
@@ -29,7 +29,8 @@ class ElaGUI : public ElaWindow,
   virtual void OnCameraShutDown() {};
 
  signals:
-  void face_detector_event(int64_t id);
+  void face_registered(int64_t id);
+  void face_recognized(int64_t id);
 
  private:
   RegisterPage* register_page_ = nullptr;

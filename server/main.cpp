@@ -20,6 +20,7 @@
 #include "ela_gui.h"
 #include "engine.h"
 #include "face_camera.h"
+#include "face_database.h"
 #include "gui.h"
 #include "rpc_manager.h"
 
@@ -99,6 +100,10 @@ int main(int argc, char* argv[]) {
 
   arm_face_id::FaceCamera face_cam(cam_settings);
   face_cam.AddObserver(face_detector);
+
+  arm_face_id::FaceDataBase face_db;
+  face_db.InitDb();
+
 #ifdef ELA_GUI
   std::shared_ptr<arm_face_id::ElaGUI> ela_gui =
       std::make_shared<arm_face_id::ElaGUI>();

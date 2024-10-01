@@ -73,6 +73,10 @@ void FaceDetectorServer::Start() {
         RegisterFace(cur_frame);
         need_register_ = false;
       }
+
+      if (need_recognize_) {
+        RecognizeFace(cur_frame);
+      }
     }
     spdlog::info("人脸检测识别进程已退出 ~");
   });
@@ -95,29 +99,18 @@ int64_t arm_face_id::FaceDetectorServer::RecognizeFace(const cv::Mat& frame) {
   int64_t id = -2;
   id = face_engine_->Query(img_date, &similarity);
   if (id == -2) {
-    spdlog::error(
-        "Inner Error! :< \n"
-        "\t > image: width-{}, height-{}, channels-{}",
-        img_date.width, img_date.height, img_date.channels);
+    spdlog::error("发生内部错误！ :< ");
     return -2;
   }
-
   if (id == -1) {
-    spdlog::info(
-        "Failed to recognize any faces from image :< \n"
-        "\t > image: width-{}, height-{}, channels-{}",
-        img_date.width, img_date.height, img_date.channels);
+    spdlog::info("无法识别到人脸 :< ");
   } else if (similarity > 0.5) {
-    spdlog::info(
-        "Recognize face (id={}, similarity={}) from image :> \n"
-        "\t > image: width-{}, height-{}, channels-{}",
-        id, similarity, img_date.width, img_date.height, img_date.channels);
+    spdlog::info("识别到人脸: id={}, similarity={} :>", id, similarity);
   } else {
-    spdlog::info(
-        "Failed to recognize a properly face (id={}, similarity={}) from image "
-        ":< \n"
-        "\t > image: width-{}, height-{}, channels-{}",
-        id, similarity, img_date.width, img_date.height, img_date.channels);
+    spdlog::info("无法断定人脸: id={}, similarity={} :P", id, similarity);
+  }
+  for (auto iter : observers_) {
+    iter->OnFaceRecognized(frame, cv::Rect(), id);
   }
   return id;
 }

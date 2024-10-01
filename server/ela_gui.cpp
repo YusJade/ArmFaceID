@@ -16,7 +16,9 @@
 #include <spdlog/spdlog.h>
 
 #include "Def.h"
+#include "ElaProgressBar.h"
 #include "engine.h"
+#include "fmt/bundled/format.h"
 #include "function.h"
 #include "gui/recognition_page.h"
 #include "gui/register_page.h"
@@ -48,9 +50,10 @@ void arm_face_id::ElaGUI::InitWindow() {
 
   auto detector = FaceDetectorServer::GetInstance();
   auto register_btn = register_page_->findChild<ElaPushButton*>("register_btn");
+  auto register_progress_bar = register_page_->findChild<ElaProgressBar*>();
   if (register_btn) {
     QObject::connect(register_btn, &ElaPushButton::clicked,
-                     [&, detector, register_btn]() {
+                     [&, detector, register_btn, register_progress_bar]() {
                        msg_bar_content_ = "注册中，稍后~";
                        msg_bar_title_ = "注册";
                        ElaMessageBar::information(
@@ -58,12 +61,21 @@ void arm_face_id::ElaGUI::InitWindow() {
                            msg_bar_title_, msg_bar_content_, 3000);
                        detector->NeedRegisterFace();
                        register_btn->setDisabled(true);
+                       if (register_progress_bar) {
+                         register_progress_bar->setMaximum(0);
+                         register_progress_bar->setMinimum(0);
+                       }
                      });
   }
   QObject::connect(
-      this, &ElaGUI::face_detector_event, this, [&, register_btn](int64_t id) {
+      this, &ElaGUI::face_registered, this,
+      [&, register_btn, register_progress_bar](int64_t id) {
         if (register_btn) {
-          register_btn->setDisabled(false);
+          register_btn->setEnabled(true);
+        }
+        if (register_progress_bar) {
+          register_progress_bar->setValue(0);
+          register_progress_bar->setMaximum(100);
         }
         switch (id) {
           case interface::FaceDetectorObserver::kFaceNotDetected:
@@ -85,6 +97,34 @@ void arm_face_id::ElaGUI::InitWindow() {
                                    msg_bar_title_, msg_bar_content_, 3000);
         }
       });
+
+  QObject::connect(this, &ElaGUI::face_recognized, this, [&](int64_t id) {
+    switch (id) {
+      case interface::FaceDetectorObserver::kFaceNotDetected:
+        msg_bar_content_ = "识别失败:(";
+        msg_bar_title_ = "错误";
+        ElaMessageBar::error(ElaMessageBarType::PositionPolicy::TopRight,
+                             msg_bar_title_, msg_bar_content_, 3000);
+        break;
+      case interface::FaceDetectorObserver::kFaceAlreadyExisted:
+        msg_bar_content_ = "请保持人脸在检测区域中:P";
+        msg_bar_title_ = "注意";
+        ElaMessageBar::warning(ElaMessageBarType::PositionPolicy::TopRight,
+                               msg_bar_title_, msg_bar_content_, 3000);
+        break;
+      default:
+        msg_bar_content_ =
+            QString::fromStdString(fmt::format("{}，你好！:>", id));
+        msg_bar_title_ = "完成";
+        ElaMessageBar::success(ElaMessageBarType::PositionPolicy::TopRight,
+                               msg_bar_title_, msg_bar_content_, 3000);
+    }
+  });
+
+  QObject::connect(
+      recognition_page_, &RecognitionPage::toggle_recognition_btn_switched,
+      this,
+      [this, detector](bool toggled) { detector->NeedRecognizeFace(toggled); });
 }
 
 void arm_face_id::ElaGUI::OnFrameCaptured(cv::Mat frame) {
@@ -104,6 +144,10 @@ void ElaGUI::OnFaceDetected(cv::Mat img, vector<cv::Rect> faces) {
   }
 }
 
+void ElaGUI::OnFaceRecognized(cv::Mat img, cv::Rect face, int64_t id) {
+  emit face_recognized(id);
+}
+
 void ElaGUI::OnFaceRegistered(cv::Mat img, cv::Rect face, int64_t id) {
-  emit face_detector_event(id);
+  emit face_registered(id);
 }
