@@ -8,7 +8,13 @@ else()
 endif()
 
 set(HEAD_FILES ./function.h ./interface.h ./face_camera.h)
-file(COPY ${HEAD_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# 定义一个自定义目标，每次构建时复制头文件
+add_custom_target(copy_headers ALL
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${HEAD_FILES} ${CMAKE_CURRENT_BINARY_DIR}
+  DEPENDS ${HEAD_FILES}
+)
+
 
 add_library(utils ${UTILS_FILES})
 target_link_libraries(utils PUBLIC ${OpenCV_LIBS} ${Qt_LIBS} spdlog::spdlog)

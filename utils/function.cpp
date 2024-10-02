@@ -1,7 +1,17 @@
 #include "function.h"
 
+#include <algorithm>
+
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
+#include <spdlog/fmt/bundled/format.h>
+
+auto fmt::formatter<QString>::format(const QString& qstr, format_context& ctx)
+    const -> format_context::iterator {
+  std::string str = qstr.toStdString();
+  // ctx.out() = std::copy(str.begin(), str.end(), ctx.out());
+  return formatter<string_view>::format(str, ctx);
+}
 
 QImage arm_face_id::utils::mat_to_qimage(const cv::Mat& mat) {
   // 检查cv::Mat是否为空

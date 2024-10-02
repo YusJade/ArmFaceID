@@ -101,8 +101,9 @@ int main(int argc, char* argv[]) {
   arm_face_id::FaceCamera face_cam(cam_settings);
   face_cam.AddObserver(face_detector);
 
-  arm_face_id::FaceDataBase face_db;
+  arm_face_id::data::FaceDataBase face_db;
   face_db.InitDb();
+  face_db.LoadToCache();
 
 #ifdef ELA_GUI
   std::shared_ptr<arm_face_id::ElaGUI> ela_gui =

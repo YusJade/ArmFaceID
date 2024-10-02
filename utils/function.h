@@ -1,10 +1,24 @@
 #pragma once
 
+#include <qobjectdefs.h>
+
 #include <QImage>
+#include <QString>
+#include <string>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
+#include <spdlog/fmt/core.h>
 #include <spdlog/spdlog.h>
+
+
+auto format_as(QString s) { return s.toStdString(); }
+
+template <>
+struct fmt::formatter<QString> : formatter<string_view> {
+  auto format(const QString& qstr,
+              format_context& ctx) const -> format_context::iterator;
+};
 
 #define ASSERET_WITH_LOG(msg, expr) \
   if (!expr) {                      \
