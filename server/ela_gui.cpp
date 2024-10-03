@@ -18,6 +18,7 @@
 #include "Def.h"
 #include "ElaProgressBar.h"
 #include "engine.h"
+#include "face_database.h"
 #include "fmt/bundled/format.h"
 #include "function.h"
 #include "gui/recognition_page.h"
@@ -59,7 +60,7 @@ void arm_face_id::ElaGUI::InitWindow() {
                        ElaMessageBar::information(
                            ElaMessageBarType::PositionPolicy::TopRight,
                            msg_bar_title_, msg_bar_content_, 3000);
-                       detector->NeedRegisterFace();
+                       //  detector->NeedRegisterFace();
                        register_btn->setDisabled(true);
                        if (register_progress_bar) {
                          register_progress_bar->setMaximum(0);
@@ -113,8 +114,9 @@ void arm_face_id::ElaGUI::InitWindow() {
                                msg_bar_title_, msg_bar_content_, 3000);
         break;
       default:
+        auto user = data::FaceDataBase::GetInstance().GetUserById(id);
         msg_bar_content_ =
-            QString::fromStdString(fmt::format("{}，你好！:>", id));
+            QString::fromStdString(fmt::format("{}，你好！:>", user.nick_name));
         msg_bar_title_ = "完成";
         ElaMessageBar::success(ElaMessageBarType::PositionPolicy::TopRight,
                                msg_bar_title_, msg_bar_content_, 3000);

@@ -25,6 +25,8 @@
 #include <opencv2/imgcodecs.hpp>
 
 #include "ElaPushButton.h"
+#include "engine.h"
+#include "face_database.h"
 #include "spdlog.h"
 
 using namespace arm_face_id;
@@ -107,7 +109,12 @@ void RegisterPage::InitPage() {
   this->setCustomWidget(central_widget);
 
   connect(register_button, &ElaPushButton::clicked,
-          [this] { emit register_btn_clicked(); });
+          [this, name_input, email_input] {
+            FaceDetectorServer::GetInstance()->NeedRegisterFace(
+                data::User{-1, name_input->text().toStdString(),
+                           email_input->text().toStdString()});
+            // emit register_btn_clicked();
+          });
 }
 
 void RegisterPage::setCaptureFrame(const QPixmap &img) {

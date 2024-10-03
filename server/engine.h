@@ -15,10 +15,15 @@
 #include <opencv2/videoio.hpp>
 #include <seeta/Struct.h>
 
+#include "face_database.h"
 #include "face_engine.h"
 #include "interface.h"
 
 namespace arm_face_id {
+
+namespace data {
+struct User;
+}
 
 class [[deprecated]] ICamera {
  public:
@@ -65,16 +70,21 @@ class FaceDetectorServer : public interface::FaceDetector,
   void Start();
   inline void Stop() { is_thread_running_ = false; }
 
-  // use seeta::FaceEngine
   int64_t RecognizeFace(const cv::Mat &);
+  int64_t RecognizeFaceFromDb(const cv::Mat &);
+
   int64_t RegisterFace(const cv::Mat &);
-  // use cv::CascadeClassifier
+  int64_t RegisterFace(const cv::Mat &, const data::User &);
+
   void DetectFace(std::vector<cv::Rect> &, const cv::Mat &);
 
   bool Save(std::string path);
   bool Load(std::string path);
 
-  inline void NeedRegisterFace() { need_register_ = true; }
+  inline void NeedRegisterFace(const data::User &user) {
+    need_register_ = true;
+    next_register_user_ = user;
+  }
   inline void NeedRecognizeFace(bool toggled) { need_recognize_ = toggled; }
 
   virtual void OnCameraShutDown() override;
@@ -98,7 +108,7 @@ class FaceDetectorServer : public interface::FaceDetector,
   cv::CascadeClassifier classifier_;
   std::mutex mutex_;
   std::queue<cv::Mat> frame_queue_;
-
+  data::User next_register_user_;
   static std::shared_ptr<FaceDetectorServer> _instance;
 
   [[deprecated]]

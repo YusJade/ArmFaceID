@@ -14,6 +14,8 @@
 
 #include "ElaScrollPage.h"
 #include "ElaText.h"
+#include "engine.h"
+#include "face_database.h"
 #include "spdlog.h"
 
 using namespace arm_face_id;
@@ -43,7 +45,11 @@ void RecognitionPage::InitPage() {
 
   QObject::connect(
       toggle_recognition_btn, &ElaToggleSwitch::toggled, this,
-      [this](bool toggled) { emit toggle_recognition_btn_switched(toggled); });
+      [this](bool toggled) {
+        data::User res;
+        FaceDetectorServer::GetInstance()->NeedRecognizeFace(toggled);
+        // emit toggle_recognition_btn_switched(toggled);
+      });
 }
 
 void RecognitionPage::setCameraFrame(const QImage& img) {

@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
   arm_face_id::FaceCamera face_cam(cam_settings);
   face_cam.AddObserver(face_detector);
 
-  arm_face_id::data::FaceDataBase face_db;
+  auto& face_db = arm_face_id::data::FaceDataBase::BuildAndReturn();
   face_db.InitDb();
   face_db.LoadToCache();
 

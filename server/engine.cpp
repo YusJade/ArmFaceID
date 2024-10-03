@@ -1,7 +1,6 @@
 
 #include "engine.h"
 
-#include <chrono>
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -12,10 +11,12 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/core/utility.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <seeta/CStruct.h>
 #include <spdlog/spdlog.h>
 
+#include "face_database.h"
 #include "face_engine.h"
 #include "function.h"
 #include "interface.h"
@@ -70,12 +71,13 @@ void FaceDetectorServer::Start() {
       }
 
       if (need_register_) {
-        RegisterFace(cur_frame);
+        RegisterFace(cur_frame, next_register_user_);
         need_register_ = false;
       }
 
       if (need_recognize_) {
-        RecognizeFace(cur_frame);
+        RecognizeFaceFromDb(cur_frame);
+        // RecognizeFace(cur_frame);
       }
     }
     spdlog::info("人脸检测识别进程已退出 ~");
@@ -84,15 +86,15 @@ void FaceDetectorServer::Start() {
   spdlog::info("人脸检测识别进程已启动");
 }
 
-void arm_face_id::FaceDetectorServer::DetectFace(std::vector<cv::Rect>& faces,
-                                                 const cv::Mat& frame) {
+void FaceDetectorServer::DetectFace(std::vector<cv::Rect>& faces,
+                                    const cv::Mat& frame) {
   cv::Mat gray_frame;
   cv::cvtColor(frame, gray_frame, cv::COLOR_BGR2GRAY);
   cv::equalizeHist(gray_frame, gray_frame);
   classifier_.detectMultiScale(frame, faces);
 }
 
-int64_t arm_face_id::FaceDetectorServer::RecognizeFace(const cv::Mat& frame) {
+int64_t FaceDetectorServer::RecognizeFace(const cv::Mat& frame) {
   std::lock_guard<std::mutex> lock_guard(mutex_);
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
   float similarity = .0;
@@ -115,7 +117,7 @@ int64_t arm_face_id::FaceDetectorServer::RecognizeFace(const cv::Mat& frame) {
   return id;
 }
 
-int64_t arm_face_id::FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
+int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
   SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
   float similarity = .0;
   auto id = face_engine_->Query(img_date, &similarity);
@@ -140,6 +142,7 @@ int64_t arm_face_id::FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
     }
   } else {
     spdlog::info("注册成功: id= {} :> \n", id);
+
     for (auto iter : observers_) {
       iter->OnFaceRegistered(frame, cv::Rect(), id);
     }
@@ -147,7 +150,50 @@ int64_t arm_face_id::FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
   return id;
 }
 
-bool arm_face_id::FaceDetectorServer::Save(std::string path) {
+int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img) {
+  float top_similarity = 0.0;
+  data::User user;
+
+  float similarity = 0.0;
+  SeetaImageData target_img{img.cols, img.rows, img.channels(), img.data};
+  cv::Mat decoded_mat;
+  auto& db = data::FaceDataBase::GetInstance();
+  for (auto& iter : db.Users()) {
+    decoded_mat =
+        cv::imdecode(cv::Mat(iter.face_img_bytes), cv::IMREAD_UNCHANGED);
+    SeetaImageData db_img{decoded_mat.cols, decoded_mat.rows,
+                          decoded_mat.channels(), decoded_mat.data};
+    similarity = face_engine_->Compare(target_img, db_img);
+    if (similarity > top_similarity) {
+      top_similarity = similarity;
+      user = iter;
+    }
+  }
+
+  if (top_similarity < 0.6) {
+    return -1;
+  } else {
+    for (auto iter : observers_) {
+      iter->OnFaceRecognized(img, cv::Rect(), user.id);
+    }
+  }
+
+  return user.id;
+}
+
+int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame,
+                                         const data::User& user) {
+  auto id = RegisterFace(frame);
+  if (id >= 0) {
+    data::FaceDataBase::GetInstance().AddUser(user.nick_name, user.email,
+                                              utils::mat_to_qimage(frame));
+    // 刷新内存中的用户信息
+    data::FaceDataBase::GetInstance().LoadToCache();
+  }
+  return id;
+}
+
+bool FaceDetectorServer::Save(std::string path) {
   bool is_success = false;
   is_success = face_engine_->Save(path.c_str());
 
@@ -160,7 +206,7 @@ bool arm_face_id::FaceDetectorServer::Save(std::string path) {
   return is_success;
 }
 
-bool arm_face_id::FaceDetectorServer::Load(std::string path) {
+bool FaceDetectorServer::Load(std::string path) {
   bool is_success = false;
   is_success = face_engine_->Load(path.c_str());
 
