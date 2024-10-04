@@ -14,17 +14,18 @@ set(MY_SYSROOT /home/yu/rk3566-sysroot)
 
 set(QT_DIR /usr/local/Qt-6.5.3/lib/cmake/Qt6/)
 set(Qt6_DIR /usr/local/Qt-6.5.3/lib/cmake/Qt6/)
+
 # set(Qt5_DIR /home/yu/aarch64/qt5.12.10-arm/lib/cmake/Qt5/)
 
 set(x264_LIBS /home/yu/aarch64/x264/lib/libx264.so)
 
 set(OPENGL_opengl_LIBRARY
-${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libEGL.so
-${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libGLdispatch.so
-${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libGLESv1_CM.so
-${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libGLESv2.so
-${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libGL.so
-${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libOpenGL.so)
+    ${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libEGL.so
+    ${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libGLdispatch.so
+    ${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libGLESv1_CM.so
+    ${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libGLESv2.so
+    ${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libGL.so
+    ${MY_SYSROOT}/usr/lib/aarch64-linux-gnu/libOpenGL.so)
 
 set(OPENGL_glx_LIBRARY /usr/lib/aarch64-linux-gnu/libGLX.so)
 
@@ -41,7 +42,7 @@ set(FFMPEG_LIBS
     /home/yu/aarch64/ffmpeg/lib/libavformat.so)
 
 set(CMAKE_FIND_ROOT_PATH
-	${MY_SYSROOT}
+    ${MY_SYSROOT}
     /home/yu/aarch64/grpc/lib/cmake/grpc/
     /home/yu/aarch64/grpc/lib/cmake/absl/
     /home/yu/aarch64/grpc/lib/cmake/protobuf/
