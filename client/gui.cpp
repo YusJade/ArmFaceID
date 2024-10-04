@@ -1,6 +1,7 @@
 #include "gui.h"
 
 #include <qboxlayout.h>
+#include <qgridlayout.h>
 #include <qgroupbox.h>
 #include <qlabel.h>
 #include <qpixmap.h>
@@ -27,6 +28,30 @@
 #include <opencv2/opencv.hpp>
 
 #include "utils.h"
+
+using namespace arm_face_id;
+
+arm_face_id::GUI::GUI() {
+  QGridLayout* main_layout = new QGridLayout;
+  QLabel* cap_label = new QLabel;
+  cap_label->setMinimumSize(640, 320);
+
+  QGroupBox* info_box = new QGroupBox;
+  info_box->setTitle("识别结果");
+  QGridLayout* info_layout = new QGridLayout(info_box);
+
+  QLabel* nick_name_label = new QLabel("昵称");
+  QLabel* nick_name_val_label = new QLabel;
+
+  QLabel* email_label = new QLabel("邮箱");
+  QLabel* email_val_label = new QLabel;
+
+  main_layout->addWidget(cap_label, 1, 0);
+  main_layout->addWidget(info_box, 1, 1);
+  main_layout->setColumnStretch(0, 3);
+  main_layout->setColumnStretch(1, 3);
+  setLayout(main_layout);
+}
 
 arm_face_id::GUI::GUI(std::shared_ptr<RpcClient> rpc_client_ptr)
     : rpc_client_(rpc_client_ptr) {}

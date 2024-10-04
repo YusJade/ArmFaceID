@@ -23,6 +23,7 @@
 #include "function.h"
 #include "gui/recognition_page.h"
 #include "gui/register_page.h"
+#include "gui/tableview_page.h"
 #include "interface.h"
 
 using namespace arm_face_id;
@@ -40,12 +41,14 @@ void arm_face_id::ElaGUI::InitWindow() {
 
   register_page_ = new RegisterPage;
   recognition_page_ = new RecognitionPage;
+  table_page_ = new TableViewPage;
 
   auto res = addPageNode("注册", register_page_, 0, ElaIconType::Book);
-  setNavigationBarDisplayMode(
-      ElaNavigationType::NavigationDisplayMode::Compact);
 
   res = addPageNode("识别", recognition_page_, 0, ElaIconType::FaceWorried);
+
+  res = addPageNode("数据库", table_page_, 0, ElaIconType::BookOpenCover);
+
   setNavigationBarDisplayMode(
       ElaNavigationType::NavigationDisplayMode::Compact);
 

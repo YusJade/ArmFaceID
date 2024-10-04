@@ -8,6 +8,7 @@
 
 #include "gui/recognition_page.h"
 #include "gui/register_page.h"
+#include "gui/tableview_page.h"
 #include "interface.h"
 
 namespace arm_face_id {
@@ -35,6 +36,7 @@ class ElaGUI : public ElaWindow,
  private:
   RegisterPage* register_page_ = nullptr;
   RecognitionPage* recognition_page_ = nullptr;
+  TableViewPage* table_page_ = nullptr;
   QString msg_bar_title_ = "null";
   QString msg_bar_content_ = "null";
 };

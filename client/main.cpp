@@ -45,18 +45,18 @@ int main(int argc, char* argv[]) {
 
   std::shared_ptr<arm_face_id::FaceProcessor> face_processor_ptr =
       std::make_shared<arm_face_id::FaceProcessor>(rpc_client, model_path);
-  arm_face_id::Camera camera;
-  if (camera_device_id == -1) {
-    camera.Open(network_camera_url);
-  } else {
-    camera.Open(camera_device_id);
-  }
-  std::thread camera_thread([&] { camera.Start(); });
-  camera_thread.detach();
+  // arm_face_id::Camera camera;
+  // if (camera_device_id == -1) {
+  //   camera.Open(network_camera_url);
+  // } else {
+  //   camera.Open(camera_device_id);
+  // }
+  // std::thread camera_thread([&] { camera.Start(); });
+  // camera_thread.detach();
   std::shared_ptr<arm_face_id::GUI> widget =
       std::make_shared<arm_face_id::GUI>(rpc_client);
-  camera.RegisterListener(widget);
-  camera.RegisterListener(face_processor_ptr);
+  // camera.RegisterListener(widget);
+  // camera.RegisterListener(face_processor_ptr);
   face_processor_ptr->SetListener(widget);
   //   face_processor.SetListener(widget);
   QWidget* w = widget->Get();

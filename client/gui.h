@@ -1,6 +1,8 @@
 #ifndef DISPLAY_WIDGET_H
 #define DISPLAY_WIDGET_H
 
+#include <qmainwindow.h>
+
 #include <QLabel>
 #include <QWidget>
 #include <memory>
@@ -14,18 +16,21 @@
 
 namespace arm_face_id {
 
-class GUI : public ICamera, public FaceProcessorListener {
+class GUI : public QMainWindow, public ICamera, public FaceProcessorListener {
  public:
-  GUI() = delete;
+  GUI();
   GUI(std::shared_ptr<RpcClient> rpc_client_ptr);
 
   [[deprecated]]
   GUI(const std::string& rpc_server_addr, FaceProcessor* processor);
-
+  [[deprecated]]
   void OnFrameCaptured(cv::Mat frame) override;
 
+  [[deprecated]]
   void OnImageCaptured(cv::Mat captureed_image) override;
+  [[deprecated]]
   void OnFaceDetected(cv::Mat detected_image, cv::Rect face_rect) override;
+  [[deprecated]]
   void OnFaceRecognized(RecognitionResult result) override;
 
   QWidget* Get();

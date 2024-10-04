@@ -21,7 +21,7 @@
 # CONFIG REQUIRED)
 
 # 设置源文件
-set(SOURCES main.cpp rpc_manager.cpp gui.cpp engine.cpp ela_gui.cpp gui/register_page.cpp gui/recognition_page.cpp face_database.cpp)
+set(SOURCES main.cpp rpc_manager.cpp gui.cpp engine.cpp ela_gui.cpp gui/register_page.cpp gui/recognition_page.cpp face_database.cpp gui/tableview_page.cpp gui/table_model/user_table_model.cpp)
 
 set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Concurrent Qt6::Sql)
 if(${Qt5_FOUND})
