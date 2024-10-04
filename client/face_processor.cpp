@@ -14,16 +14,42 @@
 
 #include "utils.h"
 
-int arm_face_id::FaceProcessor::max_process_cnter_ = 100;
-
 void arm_face_id::FaceProcessor::Start() {
-  rpc_cnter_ = std::thread([&] {
-    while (true) {
-      send_rpc = true;
-      std::this_thread::sleep_for(std::chrono::seconds(2));
+  work_thread_ = std::thread([&] {
+    std::vector<cv::Rect> faces;
+    int none_face_counter = 0;
+    bool enable_rpc = true;
+    while (!is_pause_) {
+      if (frame_queue_.empty()) continue;
+      auto frame = frame_queue_.front();
+      frame_queue_.pop();
+
+      faces.clear();
+      classifier_.detectMultiScale(frame, faces);
+      if (!faces.empty()) {
+        none_face_counter = 0;
+        if (enable_rpc) {
+          // 向 RPC 服务端发送识别请求
+          auto res = rpc_client_ptr_->RecognizeFace(frame);
+          spdlog::info("接收到 RPC 服务器的识别结果：{}", res.id());
+          // 等待下次人脸进入检测范围
+          enable_rpc = false;
+        }
+      } else {
+        ++none_face_counter;
+      }
+      spdlog::info("none_face_counter:{}", none_face_counter);
+      // 无人脸帧计数器达到阈值，确认上次人脸已经离开
+      if (none_face_counter == threshold) {
+        spdlog::info("人脸已离开检测范围~");
+        enable_rpc = true;
+      }
+      // std::this_thread::sleep_for(std::chrono::seconds(2));
     }
   });
-  rpc_cnter_.detach();
+  is_pause_ = false;
+  work_thread_.detach();
+  // rpc_cnter_.detach();
   // if (!listener_ptr_) {
   //   std::cerr << "fail to find listener, the service will not be started.";
   //   return;
@@ -70,7 +96,7 @@ void arm_face_id::FaceProcessor::Start() {
 
 void arm_face_id::FaceProcessor::SetListener(
     std::shared_ptr<FaceProcessorListener>&& listener) {
-  listener_ptr_ = listener;
+  // listener_ptr_ = listener;
 }
 
 arm_face_id::FaceProcessor::FaceProcessor(const FaceProcessorSetting& setting) {
@@ -113,23 +139,17 @@ arm_face_id::FaceProcessor::FaceProcessor(
 }
 
 void arm_face_id::FaceProcessor::OnFrameCaptured(cv::Mat frame) {
-  std::vector<cv::Rect> faces;
-  classifier_.detectMultiScale(frame, faces);
-  if (!faces.empty()) {
-    if (listener_ptr_) {
-      listener_ptr_->OnFaceDetected(frame, faces[0]);
-    }
-  }
+  frame_queue_.push(frame);
 
   // is_last_frame_contains_face = is_cur_frame_contains_face;
   // is_cur_frame_contains_face = !faces.empty();
 
-  if (!faces.empty() && send_rpc) {
-    send_rpc = false;
-    std::thread thread([=] {
-      auto response = rpc_client_ptr_->RecognizeFace(frame);
-      spdlog::info("Recieved response: id={}", response.id());
-    });
-    thread.detach();
-  }
+  // if (!faces.empty() && send_rpc) {
+  //   send_rpc = false;
+  //   std::thread thread([=] {
+  //     auto response = rpc_client_ptr_->RecognizeFace(frame);
+  //     spdlog::info("Recieved response: id={}", response.id());
+  //   });
+  //   thread.detach();
+  // }
 }

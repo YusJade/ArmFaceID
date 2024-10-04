@@ -4,6 +4,7 @@
 #include <qgridlayout.h>
 #include <qgroupbox.h>
 #include <qlabel.h>
+#include <qnamespace.h>
 #include <qpixmap.h>
 #include <qpushbutton.h>
 #include <qwidget.h>
@@ -32,13 +33,18 @@
 using namespace arm_face_id;
 
 arm_face_id::GUI::GUI() {
-  QGridLayout* main_layout = new QGridLayout;
+  QWidget* main_widget = new QWidget;
+  main_widget->setMinimumSize(1920 * 0.3, 1080 * 0.3);
+  QGridLayout* main_layout = new QGridLayout(main_widget);
   QLabel* cap_label = new QLabel;
   cap_label->setMinimumSize(640, 320);
+  camera_frame_lbl_ = cap_label;
 
   QGroupBox* info_box = new QGroupBox;
   info_box->setTitle("识别结果");
-  QGridLayout* info_layout = new QGridLayout(info_box);
+  info_box->setMinimumWidth(240);
+  QGridLayout* info_layout = new QGridLayout;
+  info_box->setLayout(info_layout);
 
   QLabel* nick_name_label = new QLabel("昵称");
   QLabel* nick_name_val_label = new QLabel;
@@ -46,11 +52,21 @@ arm_face_id::GUI::GUI() {
   QLabel* email_label = new QLabel("邮箱");
   QLabel* email_val_label = new QLabel;
 
+  info_layout->addWidget(nick_name_label, 1, 0);
+  info_layout->addWidget(nick_name_val_label, 1, 1);
+  info_layout->addWidget(email_label, 2, 0);
+  info_layout->addWidget(email_val_label, 2, 1);
+  info_layout->setColumnStretch(0, 1);
+  info_layout->setColumnStretch(1, 3);
+
   main_layout->addWidget(cap_label, 1, 0);
   main_layout->addWidget(info_box, 1, 1);
   main_layout->setColumnStretch(0, 3);
   main_layout->setColumnStretch(1, 3);
-  setLayout(main_layout);
+
+  setCentralWidget(main_widget);
+  adjustSize();
+  // setMinimumSize(1920 * 0.3, 1080 * 0.3);
 }
 
 arm_face_id::GUI::GUI(std::shared_ptr<RpcClient> rpc_client_ptr)
@@ -65,27 +81,36 @@ arm_face_id::GUI::GUI(const std::string& rpc_server_addr,
 void arm_face_id::GUI::OnFrameCaptured(cv::Mat frame) {
   if (camera_frame_lbl_) {
     cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
-    camera_frame_lbl_->setPixmap(QPixmap::fromImage(utils::MatToQImage(frame)));
+    auto img = QPixmap::fromImage(utils::MatToQImage(frame));
+    img = img.scaled(camera_frame_lbl_->size(), Qt::KeepAspectRatio);
+    camera_frame_lbl_->setPixmap(img);
+
+    if (img.size() != camera_frame_lbl_->size()) {
+      camera_frame_lbl_->setMinimumSize(img.size());
+      camera_frame_lbl_->setFixedSize(img.size());
+    }
   }
 }
-void arm_face_id::GUI::OnImageCaptured(cv::Mat captureed_image) {
-  // capture_lbl_->setPixmap(
-  //     QPixmap::fromImage(utils::MatToQImage(captureed_image)));
-}
 
-void arm_face_id::GUI::OnFaceDetected(cv::Mat detected_image,
-                                      cv::Rect face_rect) {
-  // face_img_ = detected_image;
-  cv::cvtColor(detected_image, detected_image, cv::COLOR_BGR2RGB);
-  cv::rectangle(detected_image, face_rect, cv::Scalar(255, 0, 255));
-  camera_frame_lbl_->setPixmap(
-      QPixmap::fromImage(utils::MatToQImage(detected_image)));
-}
+// void arm_face_id::GUI::OnImageCaptured(cv::Mat captureed_image) {
+//   // capture_lbl_->setPixmap(
+//   //     QPixmap::fromImage(utils::MatToQImage(captureed_image)));
+// }
 
-void arm_face_id::GUI::OnFaceRecognized(RecognitionResult result) {
-  // ABSL_LOG(INFO) << absl::StrFormat("regonition result: %d, %s", result.id,
-  //                                   result.name);
-}
+// void arm_face_id::GUI::OnFaceDetected(cv::Mat detected_image,
+//                                       cv::Rect face_rect) {
+//   // face_img_ = detected_image;
+//   cv::cvtColor(detected_image, detected_image, cv::COLOR_BGR2RGB);
+//   cv::rectangle(detected_image, face_rect, cv::Scalar(255, 0, 255));
+//   camera_frame_lbl_->setPixmap(
+//       QPixmap::fromImage(utils::MatToQImage(detected_image)));
+// }
+
+// void arm_face_id::GUI::OnFaceRecognized(RecognitionResult result) {
+//   // ABSL_LOG(INFO) << absl::StrFormat("regonition result: %d, %s",
+//   result.id,
+//   //                                   result.name);
+// }
 
 QWidget* arm_face_id::GUI::Get() {
   if (main_widget_) return main_widget_;

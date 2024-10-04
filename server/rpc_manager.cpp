@@ -23,7 +23,7 @@ grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
   cv::Mat decoded_mat;
   utils::bytes_to_mat(img_byte_seq, decoded_mat);
   int64_t id = -2;
-  id = engine_ptr_->RecognizeFace(decoded_mat);
+  id = engine_ptr_->RecognizeFaceFromDb(decoded_mat);
 
   response->set_id(id);
   return grpc::Status::OK;

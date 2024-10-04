@@ -12,26 +12,29 @@
 #include "camera.h"
 #include "face_processor.h"
 #include "face_processor_listener.h"
+#include "interface.h"
 #include "rpc_client.h"
 
 namespace arm_face_id {
 
-class GUI : public QMainWindow, public ICamera, public FaceProcessorListener {
+class GUI : public QMainWindow, public interface::CameraObserver {
  public:
   GUI();
   GUI(std::shared_ptr<RpcClient> rpc_client_ptr);
 
-  [[deprecated]]
-  GUI(const std::string& rpc_server_addr, FaceProcessor* processor);
-  [[deprecated]]
-  void OnFrameCaptured(cv::Mat frame) override;
+  void OnFrameCaptured(cv::Mat) override;
 
   [[deprecated]]
-  void OnImageCaptured(cv::Mat captureed_image) override;
-  [[deprecated]]
-  void OnFaceDetected(cv::Mat detected_image, cv::Rect face_rect) override;
-  [[deprecated]]
-  void OnFaceRecognized(RecognitionResult result) override;
+  GUI(const std::string& rpc_server_addr, FaceProcessor* processor);
+  // [[deprecated]]
+  // void OnFrameCaptured(cv::Mat frame) override;
+
+  // [[deprecated]]
+  // void OnImageCaptured(cv::Mat captureed_image) override;
+  // [[deprecated]]
+  // void OnFaceDetected(cv::Mat detected_image, cv::Rect face_rect) override;
+  // [[deprecated]]
+  // void OnFaceRecognized(RecognitionResult result) override;
 
   QWidget* Get();
 

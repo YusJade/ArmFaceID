@@ -1,7 +1,11 @@
 
 #include "engine.h"
 
+#include <qdatetime.h>
+
+#include <chrono>
 #include <cstdint>
+#include <ctime>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -114,6 +118,11 @@ int64_t FaceDetectorServer::RecognizeFace(const cv::Mat& frame) {
   for (auto iter : observers_) {
     iter->OnFaceRecognized(frame, cv::Rect(), id);
   }
+
+  cv::imwrite(fmt::format(".log_imgs/{}_face_recog.png",
+                          QDateTime::currentDateTime().toString()),
+              frame);
+
   return id;
 }
 

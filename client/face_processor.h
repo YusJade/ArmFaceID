@@ -2,12 +2,14 @@
 #define FACE_PROCESSOR_H
 
 #include <memory>
+#include <queue>
 #include <thread>
 
 #include <opencv2/opencv.hpp>
 
 #include "camera.h"
 #include "face_processor_listener.h"
+#include "interface.h"
 #include "rpc_client.h"
 
 namespace arm_face_id {
@@ -40,7 +42,8 @@ class FaceProcessorSetting {
  * @brief FaceProcessor 主要实现人脸检测、识别，并提供相应回调的注册。
  *
  */
-class FaceProcessor : public ICamera {
+class FaceProcessor : public interface::CameraObserver,
+                      public interface::FaceDetector {
  public:
   FaceProcessor(std::shared_ptr<RpcClient> rpc_client_ptr,
                 std::string model_path);
@@ -53,24 +56,18 @@ class FaceProcessor : public ICamera {
   inline void Continue() { is_pause_ = false; }
   inline void Stop() { is_pause_ = true; }
   void Start();
+
+  [[deprecated]]
   void SetListener(std::shared_ptr<FaceProcessorListener>&& listener);
 
  private:
   bool is_pause_ = false;
-  ::std::shared_ptr<FaceProcessorListener> listener_ptr_;
-  ::std::unique_ptr<std::thread> work_thread_;
-  ::cv::CascadeClassifier classifier_;
-  bool send_rpc = true;
-  std::thread rpc_cnter_;
+  std::thread work_thread_;
+  cv::CascadeClassifier classifier_;
 
-  bool is_last_frame_contains_face = false;
-  bool is_cur_frame_contains_face = false;
-  // ::cv::VideoCapture video_capture_;
+  std::queue<cv::Mat> frame_queue_;
   std::shared_ptr<RpcClient> rpc_client_ptr_;
-
-  int process_cnter_ = 0;
-
-  static int max_process_cnter_;
+  int threshold = 20;
 };
 
 }  // namespace arm_face_id
