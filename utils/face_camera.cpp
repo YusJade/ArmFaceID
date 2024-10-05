@@ -34,9 +34,7 @@ bool FaceCamera::FaceCamera::OpenAndStart() {
 
   if (cap_.isOpened()) {
     spdlog::info("成功打开网络摄像头 :) [url:{}]", settings_.cam_url);
-  }
-
-  if (cap_.open(settings_.cam_index)) {
+  } else if (cap_.open(settings_.cam_index)) {
     spdlog::info("成功打开本地摄像头 :) [index:{}]", settings_.cam_index);
   } else {
     spdlog::error("无法打开摄像头 :( [index:{}]", settings_.cam_index);
