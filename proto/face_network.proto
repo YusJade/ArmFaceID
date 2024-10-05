@@ -24,6 +24,7 @@ message RecognizeResult {
   string name = 2;
   int64 id = 3;
   string last_recognized_date = 4;
+  string email = 5;
 }
 
 service RpcManager {

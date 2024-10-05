@@ -5,6 +5,7 @@
 #include <qgroupbox.h>
 #include <qlabel.h>
 #include <qnamespace.h>
+#include <qobject.h>
 #include <qpixmap.h>
 #include <qpushbutton.h>
 #include <qwidget.h>
@@ -32,7 +33,7 @@
 
 using namespace arm_face_id;
 
-arm_face_id::GUI::GUI() {
+GUI::GUI() {
   QWidget* main_widget = new QWidget;
   main_widget->setMinimumSize(1920 * 0.3, 1080 * 0.3);
   QGridLayout* main_layout = new QGridLayout(main_widget);
@@ -47,15 +48,18 @@ arm_face_id::GUI::GUI() {
   info_box->setLayout(info_layout);
 
   QLabel* nick_name_label = new QLabel("昵称");
-  QLabel* nick_name_val_label = new QLabel;
+  nick_name_val_label_ = new QLabel;
 
   QLabel* email_label = new QLabel("邮箱");
-  QLabel* email_val_label = new QLabel;
+  email_val_label_ = new QLabel;
 
   info_layout->addWidget(nick_name_label, 1, 0);
-  info_layout->addWidget(nick_name_val_label, 1, 1);
+  info_layout->addWidget(nick_name_val_label_, 1, 1);
   info_layout->addWidget(email_label, 2, 0);
-  info_layout->addWidget(email_val_label, 2, 1);
+  info_layout->addWidget(email_val_label_, 2, 1);
+  info_layout->setRowStretch(0, 4);
+  info_layout->setRowStretch(1, 1);
+  info_layout->setRowStretch(2, 1);
   info_layout->setColumnStretch(0, 1);
   info_layout->setColumnStretch(1, 3);
 
@@ -69,16 +73,15 @@ arm_face_id::GUI::GUI() {
   // setMinimumSize(1920 * 0.3, 1080 * 0.3);
 }
 
-arm_face_id::GUI::GUI(std::shared_ptr<RpcClient> rpc_client_ptr)
+GUI::GUI(std::shared_ptr<RpcClient> rpc_client_ptr)
     : rpc_client_(rpc_client_ptr) {}
 
-arm_face_id::GUI::GUI(const std::string& rpc_server_addr,
-                      FaceProcessor* processor)
+GUI::GUI(const std::string& rpc_server_addr, FaceProcessor* processor)
     : rpc_client_(std::make_shared<arm_face_id::RpcClient>(grpc::CreateChannel(
           rpc_server_addr, grpc::InsecureChannelCredentials()))),
       processor_(processor) {}
 
-void arm_face_id::GUI::OnFrameCaptured(cv::Mat frame) {
+void GUI::OnFrameCaptured(cv::Mat frame) {
   if (camera_frame_lbl_) {
     cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
     auto img = QPixmap::fromImage(utils::MatToQImage(frame));
@@ -92,27 +95,21 @@ void arm_face_id::GUI::OnFrameCaptured(cv::Mat frame) {
   }
 }
 
-// void arm_face_id::GUI::OnImageCaptured(cv::Mat captureed_image) {
-//   // capture_lbl_->setPixmap(
-//   //     QPixmap::fromImage(utils::MatToQImage(captureed_image)));
-// }
+void GUI::OnFaceDetected(cv::Mat img, vector<cv::Rect> faces) {}
 
-// void arm_face_id::GUI::OnFaceDetected(cv::Mat detected_image,
-//                                       cv::Rect face_rect) {
-//   // face_img_ = detected_image;
-//   cv::cvtColor(detected_image, detected_image, cv::COLOR_BGR2RGB);
-//   cv::rectangle(detected_image, face_rect, cv::Scalar(255, 0, 255));
-//   camera_frame_lbl_->setPixmap(
-//       QPixmap::fromImage(utils::MatToQImage(detected_image)));
-// }
+void GUI::OnFaceRecognized(cv::Mat img, cv::Rect face, int64_t id) {
+  if (nick_name_val_label_) {
+    // nick_name_val_label_->setText();
+  }
+}
 
-// void arm_face_id::GUI::OnFaceRecognized(RecognitionResult result) {
-//   // ABSL_LOG(INFO) << absl::StrFormat("regonition result: %d, %s",
-//   result.id,
-//   //                                   result.name);
-// }
+void GUI::OnFaceRecognized(cv::Mat img, cv::Rect face, RecognizeResult* res) {
+  if (nick_name_val_label_) {
+    nick_name_val_label_->setText(QString::fromStdString(res->name()));
+  }
+}
 
-QWidget* arm_face_id::GUI::Get() {
+QWidget* GUI::Get() {
   if (main_widget_) return main_widget_;
   main_widget_ = new QWidget;
   QHBoxLayout* main_layout = new QHBoxLayout(main_widget_);

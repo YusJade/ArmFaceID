@@ -5,6 +5,7 @@
 #include <grpcpp/support/status.h>
 #include <spdlog/spdlog.h>
 
+#include "face_database.h"
 #include "function.h"
 
 constexpr float kThrehold = 0.8;
@@ -18,14 +19,16 @@ arm_face_id::RpcManagerImpl::~RpcManagerImpl() {}
 grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
     grpc::ServerContext* context, const arm_face_id::RecognizeRequest* request,
     RecognizeResult* response) {
-  spdlog::info("Recieve a request");
+  // spdlog::info("Recieve a request");
   const std::string img_byte_seq = request->face_img();
   cv::Mat decoded_mat;
   utils::bytes_to_mat(img_byte_seq, decoded_mat);
   int64_t id = -2;
-  id = engine_ptr_->RecognizeFaceFromDb(decoded_mat);
+  data::User user_info;
+  id = engine_ptr_->RecognizeFaceFromDb(decoded_mat, &user_info);
 
   response->set_id(id);
+  response->set_name(user_info.nick_name);
   return grpc::Status::OK;
 }
 

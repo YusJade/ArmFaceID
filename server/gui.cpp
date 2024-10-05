@@ -27,13 +27,14 @@
 #include "engine.h"
 #include "function.h"
 
-arm_face_id::GUI::GUI(
-    std::shared_ptr<arm_face_id::FaceDetectorServer> engine_ptr)
+using namespace arm_face_id;
+
+GUI::GUI(std::shared_ptr<arm_face_id::FaceDetectorServer> engine_ptr)
     : engine_ptr_(engine_ptr), on_frame_captured_callback_([](cv::Mat) {}) {}
 
-void arm_face_id::GUI::Init() {}
+void GUI::Init() {}
 
-QWidget* arm_face_id::GUI::Get() {
+QWidget* GUI::Get() {
   if (main_widget_) return main_widget_;
   spdlog::info("Initializing Qt GUI...");
   main_widget_ = new QWidget;
@@ -72,7 +73,7 @@ QWidget* arm_face_id::GUI::Get() {
   return main_widget_;
 }
 
-QWidget* arm_face_id::GUI::InitRpcWidget() {
+QWidget* GUI::InitRpcWidget() {
   QWidget* main_widget = new QWidget;
   QGroupBox* log_groupbox = new QGroupBox(main_widget);
   log_groupbox->setTitle("rpc log");
@@ -108,7 +109,7 @@ QWidget* arm_face_id::GUI::InitRpcWidget() {
   return main_widget;
 }
 
-QWidget* arm_face_id::GUI::InitRegisterWidget() {
+QWidget* GUI::InitRegisterWidget() {
   QWidget* main_widget = new QWidget;
   QGroupBox* log_groupbox = new QGroupBox(main_widget);
   log_groupbox->setTitle("register log");
@@ -160,12 +161,11 @@ QWidget* arm_face_id::GUI::InitRegisterWidget() {
   return main_widget;
 }
 
-void arm_face_id::GUI::OnFrameCaptured(cv::Mat frame) {
+void GUI::OnFrameCaptured(cv::Mat frame) {
   // spdlog::info("GUI: OnFrameCaptured");
   on_frame_captured_callback_(frame);
 }
 
-void arm_face_id::GUI::OnFaceDetected(const std::vector<cv::Rect>&,
-                                      const cv::Mat&) {}
+void GUI::OnFaceDetected(const std::vector<cv::Rect>&, const cv::Mat&) {}
 
-void arm_face_id::GUI::OnFaceRecognized(int64_t, const cv::Mat&) {}
+void GUI::OnFaceRecognized(int64_t, const cv::Mat&) {}

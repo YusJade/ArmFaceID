@@ -19,7 +19,6 @@
 #include "ElaProgressBar.h"
 #include "engine.h"
 #include "face_database.h"
-#include "fmt/bundled/format.h"
 #include "function.h"
 #include "gui/recognition_page.h"
 #include "gui/register_page.h"
@@ -82,13 +81,13 @@ void arm_face_id::ElaGUI::InitWindow() {
           register_progress_bar->setMaximum(100);
         }
         switch (id) {
-          case interface::FaceDetectorObserver::kFaceNotDetected:
+          case interface::FaceDetectorObserver<int64_t>::kFaceNotDetected:
             msg_bar_content_ = "请确保人脸在摄像区域内！:(";
             msg_bar_title_ = "错误";
             ElaMessageBar::error(ElaMessageBarType::PositionPolicy::TopRight,
                                  msg_bar_title_, msg_bar_content_, 3000);
             break;
-          case interface::FaceDetectorObserver::kFaceAlreadyExisted:
+          case interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted:
             msg_bar_content_ = "人脸已存在！:P";
             msg_bar_title_ = "错误";
             ElaMessageBar::error(ElaMessageBarType::PositionPolicy::TopRight,
@@ -104,13 +103,13 @@ void arm_face_id::ElaGUI::InitWindow() {
 
   QObject::connect(this, &ElaGUI::face_recognized, this, [&](int64_t id) {
     switch (id) {
-      case interface::FaceDetectorObserver::kFaceNotDetected:
+      case interface::FaceDetectorObserver<int64_t>::kFaceNotDetected:
         msg_bar_content_ = "识别失败:(";
         msg_bar_title_ = "错误";
         ElaMessageBar::error(ElaMessageBarType::PositionPolicy::TopRight,
                              msg_bar_title_, msg_bar_content_, 3000);
         break;
-      case interface::FaceDetectorObserver::kFaceAlreadyExisted:
+      case interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted:
         msg_bar_content_ = "请保持人脸在检测区域中:P";
         msg_bar_title_ = "注意";
         ElaMessageBar::warning(ElaMessageBarType::PositionPolicy::TopRight,

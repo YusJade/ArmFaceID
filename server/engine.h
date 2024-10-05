@@ -42,7 +42,7 @@ class [[deprecated]] IEngineListener {
  * persistence of related data, which will be injected into the objects depend
  * the engine.
  */
-class FaceDetectorServer : public interface::FaceDetector,
+class FaceDetectorServer : public interface::FaceDetector<int64_t>,
                            public interface::CameraObserver {
  public:
   struct Settings {
@@ -71,7 +71,7 @@ class FaceDetectorServer : public interface::FaceDetector,
   inline void Stop() { is_thread_running_ = false; }
 
   int64_t RecognizeFace(const cv::Mat &);
-  int64_t RecognizeFaceFromDb(const cv::Mat &);
+  int64_t RecognizeFaceFromDb(const cv::Mat &, data::User *user = nullptr);
 
   int64_t RegisterFace(const cv::Mat &);
   int64_t RegisterFace(const cv::Mat &, const data::User &);

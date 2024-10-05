@@ -12,11 +12,12 @@
 
 #include <QHBoxLayout>
 
+#include <spdlog/spdlog.h>
+
 #include "ElaScrollPage.h"
 #include "ElaText.h"
 #include "engine.h"
 #include "face_database.h"
-#include "spdlog.h"
 
 using namespace arm_face_id;
 

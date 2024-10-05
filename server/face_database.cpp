@@ -19,10 +19,10 @@
 #include <utility>
 
 #include <QtSql/QSqlError>
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/spdlog.h>
 
-#include "fmt/bundled/core.h"
 #include "function.h"
-#include "spdlog.h"
 
 using namespace arm_face_id::data;
 

@@ -5,12 +5,15 @@
 #include <queue>
 #include <thread>
 
+#include <opencv2/core/hal/interface.h>
 #include <opencv2/opencv.hpp>
 
 #include "camera.h"
 #include "face_processor_listener.h"
 #include "interface.h"
 #include "rpc_client.h"
+
+#include "face_network.pb.h"
 
 namespace arm_face_id {
 
@@ -43,7 +46,8 @@ class FaceProcessorSetting {
  *
  */
 class FaceProcessor : public interface::CameraObserver,
-                      public interface::FaceDetector {
+                      public interface::FaceDetector<int64_t>,
+                      public interface::FaceDetector<RecognizeResult> {
  public:
   FaceProcessor(std::shared_ptr<RpcClient> rpc_client_ptr,
                 std::string model_path);
@@ -53,6 +57,7 @@ class FaceProcessor : public interface::CameraObserver,
 
   void OnFrameCaptured(cv::Mat frame) override;
 
+  void Run();
   inline void Continue() { is_pause_ = false; }
   inline void Stop() { is_pause_ = true; }
   void Start();

@@ -137,7 +137,7 @@ int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
     for (auto iter : observers_) {
       iter->OnFaceRegistered(
           frame, cv::Rect(),
-          interface::FaceDetectorObserver::kFaceAlreadyExisted);
+          interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted);
     }
 
     return id;
@@ -146,8 +146,9 @@ int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
   if (id == -1) {
     spdlog::info("注册失败: 检测不到人脸 :< \n");
     for (auto iter : observers_) {
-      iter->OnFaceRegistered(frame, cv::Rect(),
-                             interface::FaceDetectorObserver::kFaceNotDetected);
+      iter->OnFaceRegistered(
+          frame, cv::Rect(),
+          interface::FaceDetectorObserver<int64_t>::kFaceNotDetected);
     }
   } else {
     spdlog::info("注册成功: id= {} :> \n", id);
@@ -159,7 +160,8 @@ int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
   return id;
 }
 
-int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img) {
+int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img,
+                                                data::User* info) {
   float top_similarity = 0.0;
   data::User user;
 
@@ -182,6 +184,7 @@ int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img) {
   if (top_similarity < 0.6) {
     return -1;
   } else {
+    *info = user;
     for (auto iter : observers_) {
       iter->OnFaceRecognized(img, cv::Rect(), user.id);
     }

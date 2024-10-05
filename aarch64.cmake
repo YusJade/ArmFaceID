@@ -14,7 +14,8 @@ set(MY_SYSROOT /home/yu/rk3566-sysroot)
 
 set(QT_DIR /usr/local/Qt-6.5.3/lib/cmake/Qt6/)
 set(Qt6_DIR /usr/local/Qt-6.5.3/lib/cmake/Qt6/)
-
+set(Qt6CoreTools_DIR /usr/local/Qt-6.5.3/lib/cmake/Qt6CoreTools/)
+set(Qt6GuiTools_DIR /usr/local/Qt-6.5.3/lib/cmake/Qt6GuiTools/)
 # set(Qt5_DIR /home/yu/aarch64/qt5.12.10-arm/lib/cmake/Qt5/)
 
 set(x264_LIBS /home/yu/aarch64/x264/lib/libx264.so)
@@ -43,6 +44,7 @@ set(FFMPEG_LIBS
 
 set(CMAKE_FIND_ROOT_PATH
     ${MY_SYSROOT}
+    /home/yu/aarch64/SeetaFace2/lib/cmake/spdlog
     /home/yu/aarch64/grpc/lib/cmake/grpc/
     /home/yu/aarch64/grpc/lib/cmake/absl/
     /home/yu/aarch64/grpc/lib/cmake/protobuf/

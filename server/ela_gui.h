@@ -13,7 +13,7 @@
 
 namespace arm_face_id {
 class ElaGUI : public ElaWindow,
-               public interface::FaceDetectorObserver,
+               public interface::FaceDetectorObserver<int64_t>,
                public interface::CameraObserver {
   Q_OBJECT
  public:

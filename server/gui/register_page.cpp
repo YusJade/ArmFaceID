@@ -23,11 +23,11 @@
 
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <spdlog/spdlog.h>
 
 #include "ElaPushButton.h"
 #include "engine.h"
 #include "face_database.h"
-#include "spdlog.h"
 
 using namespace arm_face_id;
 

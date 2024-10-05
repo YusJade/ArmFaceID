@@ -12,6 +12,9 @@
 #include "face_camera.h"
 #include "face_processor.h"
 #include "gui.h"
+#include "interface.h"
+
+#include "face_network.pb.h"
 
 ABSL_FLAG(std::string, model_path, ".",
           "[Required] set the path of cascade classifer model `s path.");
@@ -20,6 +23,9 @@ ABSL_FLAG(std::string, network_camera_url, "",
           "[Optional] set the url of network camera.");
 ABSL_FLAG(std::string, rpc_server_addr, "",
           "[Required] set the addr of rpc server.");
+
+using arm_face_id::RecognizeResult;
+using arm_face_id::interface::FaceDetector;
 
 // "localhost:50051" "http://192.168.11.182:4747/video"
 // "E:\\Downloads\\lbpcascade_frontalface_improved.xml"
@@ -49,6 +55,8 @@ int main(int argc, char* argv[]) {
       std::make_shared<arm_face_id::FaceProcessor>(rpc_client, model_path);
   face_processor_ptr->Start();
   shared_ptr<arm_face_id::GUI> gui = std::make_shared<arm_face_id::GUI>();
+
+  face_processor_ptr->FaceDetector<RecognizeResult>::AddObserver(gui);
   // arm_face_id::Camera camera;
   // if (camera_device_id == -1) {
   //   camera.Open(network_camera_url);
