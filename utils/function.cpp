@@ -2,9 +2,11 @@
 
 #include <algorithm>
 
+#include <fmt/core.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
-#include <spdlog/fmt/bundled/format.h>
+
+// #include <spdlog/fmt/bundled/format.h>
 
 auto fmt::formatter<QString>::format(const QString& qstr, format_context& ctx)
     const -> format_context::iterator {

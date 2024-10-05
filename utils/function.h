@@ -7,10 +7,10 @@
 #include <string>
 #include <vector>
 
+#include <fmt/core.h>
 #include <opencv2/opencv.hpp>
-#include <spdlog/fmt/core.h>
+// #include <spdlog/fmt/bundled/core.h>
 #include <spdlog/spdlog.h>
-
 
 auto format_as(QString s) { return s.toStdString(); }
 
