@@ -13,4 +13,5 @@ pd_2_00_pts5.dat
 /aarch64-build
 .vscode
 db_*
+.*
 

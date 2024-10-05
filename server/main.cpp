@@ -131,15 +131,5 @@ int main(int argc, char* argv[]) {
   return app.exec();
 #endif
 
-  // arm_face_id::RpcManagerImpl rpc_service;
-
-  // std::shared_ptr<arm_face_id::GUI> gui_ptr =
-  //     std::make_shared<arm_face_id::GUI>(engine_ptr);
-  // gui_ptr->Get()->show();
-
-  // engine_ptr->RegisterICamera(gui_ptr);
-  // engine_ptr->RegisterIListener(gui_ptr);
-  // engine_ptr->Start();
-
   return app.exec();
 }

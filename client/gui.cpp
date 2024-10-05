@@ -76,11 +76,6 @@ GUI::GUI() {
 GUI::GUI(std::shared_ptr<RpcClient> rpc_client_ptr)
     : rpc_client_(rpc_client_ptr) {}
 
-GUI::GUI(const std::string& rpc_server_addr, FaceProcessor* processor)
-    : rpc_client_(std::make_shared<arm_face_id::RpcClient>(grpc::CreateChannel(
-          rpc_server_addr, grpc::InsecureChannelCredentials()))),
-      processor_(processor) {}
-
 void GUI::OnFrameCaptured(cv::Mat frame) {
   if (camera_frame_lbl_) {
     cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);

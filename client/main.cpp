@@ -1,14 +1,11 @@
 #include <QApplication>
 #include <QWidget>
-#include <iostream>
 #include <memory>
-#include <thread>
 
 #include <absl/flags/flag.h>
 #include <absl/flags/parse.h>
 #include <absl/flags/usage.h>
 
-#include "camera.h"
 #include "face_camera.h"
 #include "face_processor.h"
 #include "gui.h"
@@ -33,9 +30,6 @@ int main(int argc, char* argv[]) {
   absl::SetProgramUsageMessage(
       "There are the availiable flags for this program:");
   absl::ParseCommandLine(argc, argv);
-  // gflags::SetUsageMessage("There are the availiable flags for this
-  // program:");
-  // gflags::ParseCommandLineFlags(&argc, &argv, false);
 
   QApplication app(argc, argv);
 
@@ -47,38 +41,21 @@ int main(int argc, char* argv[]) {
   std::shared_ptr<arm_face_id::RpcClient> rpc_client =
       std::make_shared<arm_face_id::RpcClient>(grpc::CreateChannel(
           rpc_server_addr, grpc::InsecureChannelCredentials()));
-
-  // arm_face_id::FaceProcessorSetting setting(
-  //     camera_device_id, network_camera_url, model_path, rpc_server_addr);
-
   std::shared_ptr<arm_face_id::FaceProcessor> face_processor_ptr =
       std::make_shared<arm_face_id::FaceProcessor>(rpc_client, model_path);
   face_processor_ptr->Start();
   shared_ptr<arm_face_id::GUI> gui = std::make_shared<arm_face_id::GUI>();
 
   face_processor_ptr->FaceDetector<RecognizeResult>::AddObserver(gui);
-  // arm_face_id::Camera camera;
-  // if (camera_device_id == -1) {
-  //   camera.Open(network_camera_url);
-  // } else {
-  //   camera.Open(camera_device_id);
-  // }
-  // std::thread camera_thread([&] { camera.Start(); });
-  // camera_thread.detach();
   arm_face_id::FaceCamera::Settings cam_settings;
   cam_settings.cam_index = camera_device_id;
   cam_settings.cam_url = network_camera_url;
 
   arm_face_id::FaceCamera camera(cam_settings);
-
   camera.AddObserver(gui);
   camera.AddObserver(face_processor_ptr);
   camera.OpenAndStart();
-  // camera.RegisterListener(widget);
-  // camera.RegisterListener(face_processor_ptr);
-  // face_processor_ptr->SetListener(widget);
-  //   face_processor.SetListener(widget);
-  //   face_processor.Start();
+
   gui->show();
 
   return app.exec();

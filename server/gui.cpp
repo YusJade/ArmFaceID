@@ -160,12 +160,3 @@ QWidget* GUI::InitRegisterWidget() {
 
   return main_widget;
 }
-
-void GUI::OnFrameCaptured(cv::Mat frame) {
-  // spdlog::info("GUI: OnFrameCaptured");
-  on_frame_captured_callback_(frame);
-}
-
-void GUI::OnFaceDetected(const std::vector<cv::Rect>&, const cv::Mat&) {}
-
-void GUI::OnFaceRecognized(int64_t, const cv::Mat&) {}

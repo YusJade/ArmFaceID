@@ -15,8 +15,6 @@
 #include <QImage>
 #include <algorithm>
 #include <string>
-#include <thread>
-#include <utility>
 
 #include <QtSql/QSqlError>
 #include <spdlog/fmt/fmt.h>

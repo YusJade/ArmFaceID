@@ -17,12 +17,10 @@ endif()
 add_executable(
   client
   main.cpp
-  utils.cpp
   rpc_client.cpp
   face_processor.cpp
   face_processor_listener.cpp
-  gui.cpp
-  camera.cpp)
+  gui.cpp)
 
 add_dependencies(client utils_headers)
 

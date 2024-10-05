@@ -55,6 +55,7 @@ jobs:
           sudo apt install -yqq libgrpc++-dev libgrpc-dev
           sudo apt install -yqq libspdlog-dev
           sudo apt install -yqq libopencv-dev python3-opencv
+          sudo apt install -yqq libgl1-mesa-dev
           git clone https://github.com/seetafaceengine/SeetaFace2.git
           cd ./SeetaFace2
           cmake . -B ./build

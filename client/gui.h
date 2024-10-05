@@ -10,7 +10,6 @@
 
 #include <opencv2/imgproc.hpp>
 
-#include "camera.h"
 #include "face_processor.h"
 #include "face_processor_listener.h"
 #include "interface.h"
@@ -35,18 +34,6 @@ class GUI : public QMainWindow,
 
   void OnFaceRecognized(cv::Mat img, cv::Rect face,
                         RecognizeResult* res) override;
-
-  [[deprecated]]
-  GUI(const std::string& rpc_server_addr, FaceProcessor* processor);
-  // [[deprecated]]
-  // void OnFrameCaptured(cv::Mat frame) override;
-
-  // [[deprecated]]
-  // void OnImageCaptured(cv::Mat captureed_image) override;
-  // [[deprecated]]
-  // void OnFaceDetected(cv::Mat detected_image, cv::Rect face_rect) override;
-  // [[deprecated]]
-  // void OnFaceRecognized(RecognitionResult result) override;
 
   QWidget* Get();
 
