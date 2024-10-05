@@ -24,6 +24,8 @@ add_executable(
   gui.cpp
   camera.cpp)
 
+add_dependencies(client utils_headers)
+
 # find_package(OpenCV REQUIRED)
 
 # find_package(absl REQUIRED) find_package(Qt6 REQUIRED COMPONENTS Core Widgets

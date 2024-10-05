@@ -7,10 +7,14 @@ else()
   set(Qt_LIBS Qt5::Core Qt5::Widgets)
 endif()
 
-set(HEAD_FILES ./function.h ./interface.h ./face_camera.h)
+set(HEAD_FILES 
+${CMAKE_CURRENT_SOURCE_DIR}/function.h 
+${CMAKE_CURRENT_SOURCE_DIR}/interface.h 
+${CMAKE_CURRENT_SOURCE_DIR}/face_camera.h)
 
 # 定义一个自定义目标，每次构建时复制头文件
-add_custom_target(copy_headers ALL
+# 该指令会跳转路径
+add_custom_target(utils_headers ALL
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${HEAD_FILES} ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${HEAD_FILES}
 )
