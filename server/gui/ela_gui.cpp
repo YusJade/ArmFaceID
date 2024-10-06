@@ -31,8 +31,8 @@ arm_face_id::ElaGUI::ElaGUI() {
   this->setUserInfoCardVisible(false);
   setContentsMargins(0, 0, 0, 0);
   InitWindow();
-  // setFixedSize(400, 325);
-  adjustSize();
+  setFixedSize(400, 425);
+  // adjustSize();
 }
 
 void arm_face_id::ElaGUI::InitWindow() {

@@ -83,10 +83,12 @@ class FaceDetectorServer : public interface::FaceDetector<int64_t>,
   bool need_recognize_ = false;
   std::unique_ptr<seeta::FaceEngine> face_engine_;
   std::unique_ptr<std::thread> worker_thread_;
+  std::unique_ptr<std::thread> register_thread_;
   bool is_thread_running_ = false;
   cv::CascadeClassifier classifier_;
   std::mutex mutex_;
   std::queue<cv::Mat> frame_queue_;
+  std::queue<cv::Mat> register_queue_;
   data::User next_register_user_;
   static std::shared_ptr<FaceDetectorServer> _instance;
 };

@@ -20,7 +20,7 @@ endif()
 # 创建可执行文件
 add_executable(server ${SOURCES})
 
-add_dependencies(server utils)
+add_dependencies(server utils_headers)
 
 if(USE_ELA_GUI)
 target_compile_definitions(server PUBLIC ELA_GUI)

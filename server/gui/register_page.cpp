@@ -56,7 +56,7 @@ void RegisterPage::InitPage() {
   camera_widget->setContentsMargins(0, 0, 0, 0);
 
   QLabel *camera_label = new QLabel(camera_widget);
-  camera_label->setMinimumSize(300 * 1., 225 * 1.);
+  camera_label->setMinimumSize(300 * 1.2, 225 * 1.2);
   cam_frame_lbl_ = camera_label;
 
   // 用户注册表单
@@ -65,6 +65,7 @@ void RegisterPage::InitPage() {
 
   ElaText *form_title = new ElaText("注册信息");
   form_title->setTextPixelSize(20);
+  form_title->setFixedHeight(20);
 
   ElaText *icon_text = new ElaText("头像");
   icon_text->setTextPixelSize(14);
@@ -105,7 +106,7 @@ void RegisterPage::InitPage() {
   form_layout->addWidget(name_input, 0, 1);
   form_layout->addWidget(email_input, 1, 1);
   form_layout->addWidget(register_button, 2, 0, 1, 2);
-  form_layout->setContentsMargins(10, 10, 10, 0);
+  form_layout->setContentsMargins(0, 0, 0, 0);
 
   form_layout->setColumnStretch(0, 1);
   form_layout->setColumnStretch(1, 5);
@@ -117,23 +118,22 @@ void RegisterPage::InitPage() {
   form_layout->setRowStretch(3, 1);
   form_layout->setVerticalSpacing(20);
 
-  main_layout->setContentsMargins(2, 2, 2, 2);
-  main_layout->addWidget(cam_frame_lbl_, 0, 3, 2, 1);
-
+  main_layout->setContentsMargins(0, 0, 0, 0);
+  main_layout->addWidget(cam_frame_lbl_, 0, 2, 2, 1);
   main_layout->addWidget(form_title, 0, 0, 1, 2);
-
-  main_layout->addWidget(icon_text, 1, 0, 1, 2);
-  main_layout->addWidget(icon_btn, 1, 1, 1, 2);
+  main_layout->addWidget(icon_text, 1, 0, 1, 1);
+  main_layout->addWidget(icon_btn, 1, 1, 1, 1);
   main_layout->addLayout(form_layout, 2, 0, 1, 2);
-  main_layout->addWidget(progress_bar, 2, 0, 1, 4);
+  main_layout->addWidget(progress_bar, 4, 0, 1, 4);
 
   main_layout->setRowStretch(0, 1);
-  main_layout->setRowStretch(1, 2);
-  main_layout->setRowStretch(2, 4);
+  main_layout->setRowStretch(1, 3);
+  main_layout->setRowStretch(2, 3);
+  main_layout->setRowStretch(3, 1);
   main_layout->setColumnStretch(0, 1);
   main_layout->setColumnStretch(1, 3);
 
-  central_widget->setMinimumHeight(400);
+  // central_widget->setMinimumHeight(400);
   // 设置窗口属性
   this->setCustomWidget(central_widget);
 

@@ -41,6 +41,9 @@ void TableViewPage::InitPage() {
   ElaPushButton* delete_btn = new ElaPushButton("删除行");
   delete_btn->setMaximumWidth(100);
   delete_btn->setFixedHeight(30);
+  ElaPushButton* refresh_btn = new ElaPushButton("刷新");
+  refresh_btn->setMaximumWidth(100);
+  refresh_btn->setFixedHeight(30);
   ElaComboBox* search_combox = new ElaComboBox;
   search_combox->setMaximumWidth(100);
   search_combox->setFixedHeight(30);
@@ -49,6 +52,7 @@ void TableViewPage::InitPage() {
   operation_layout->addWidget(search_btn, 0, Qt::AlignLeft);
   // operation_layout->addWidget(search_combox, 1, Qt::AlignLeft);
   operation_layout->addWidget(delete_btn, 0, Qt::AlignLeft);
+  operation_layout->addWidget(refresh_btn, 0, Qt::AlignLeft);
 
   operation_layout->addSpacing(10);
   operation_layout->setContentsMargins(0, 0, 0, 0);
@@ -56,6 +60,9 @@ void TableViewPage::InitPage() {
 
   main_layout->addLayout(operation_layout, 0, 0);
   main_layout->addWidget(table_view_, 1, 0, 1, 4);
+
+  connect(refresh_btn, &ElaPushButton::clicked, this,
+          [&] { table_model_->select(); });
 
   setCustomWidget(main_widget);
 }

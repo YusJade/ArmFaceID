@@ -15,6 +15,7 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/core/utility.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <seeta/CStruct.h>
@@ -66,6 +67,8 @@ void FaceDetectorServer::Start() {
       std::vector<cv::Rect> faces;
       DetectFace(faces, cur_frame);
       if (faces.empty()) {
+        // TODO
+
         continue;
       }
 
@@ -73,20 +76,34 @@ void FaceDetectorServer::Start() {
       for (auto iter : this->observers_) {
         iter->OnFaceDetected(cur_frame, faces);
       }
-
-      if (need_register_) {
-        RegisterFace(cur_frame, next_register_user_);
-        need_register_ = false;
-      }
-
       if (need_recognize_) {
         RecognizeFaceFromDb(cur_frame);
         // RecognizeFace(cur_frame);
       }
     }
-    spdlog::info("人脸检测识别进程已退出 ~");
+    spdlog::info("人脸检测进程已退出 ~");
   });
   worker_thread_->detach();
+
+  register_thread_ = std::make_unique<std::thread>([&, this] {
+    cv::Mat cur_frame;
+    while (is_thread_running_) {
+      if (register_queue_.empty()) continue;
+      cur_frame = register_queue_.front();
+      register_queue_.pop();
+      // std::vector<cv::Rect> faces;
+      // DetectFace(faces, cur_frame);
+      // if (faces.empty()) {
+      //   // TODO
+
+      //   continue;
+      // }
+      RegisterFace(cur_frame, next_register_user_);
+    }
+    spdlog::info("人脸识别进程已退出 ~");
+  });
+  register_thread_->detach();
+
   spdlog::info("人脸检测识别进程已启动");
 }
 
@@ -164,6 +181,7 @@ int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img,
                                                 data::User* info) {
   float top_similarity = 0.0;
   data::User user;
+  user.id = -1;
 
   float similarity = 0.0;
   SeetaImageData target_img{img.cols, img.rows, img.channels(), img.data};
@@ -184,7 +202,7 @@ int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img,
   if (top_similarity < 0.6) {
     return -1;
   } else {
-    *info = user;
+    if (info) *info = user;
     for (auto iter : observers_) {
       iter->OnFaceRecognized(img, cv::Rect(), user.id);
     }
@@ -193,15 +211,43 @@ int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img,
   return user.id;
 }
 
-int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame,
+int64_t FaceDetectorServer::RegisterFace(const cv::Mat& _frame,
                                          const data::User& user) {
-  auto id = RegisterFace(frame);
-  if (id >= 0 &&
-      id != interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted) {
+  cv::Mat frame = _frame.clone();
+  auto faces = face_engine_->DetectFaces(
+      {frame.cols, frame.rows, frame.channels(), frame.data});
+  if (faces.empty()) {
+    spdlog::info("注册失败: 检测不到人脸 :< \n");
+    for (auto iter : observers_) {
+      iter->OnFaceRegistered(
+          frame, cv::Rect(),
+          interface::FaceDetectorObserver<int64_t>::kFaceNotDetected);
+    }
+    return interface::FaceDetectorObserver<int64_t>::kFaceNotDetected;
+  }
+  // frame = cv::imread("./server/assets/test.png");
+  cv::imshow("DB COMP", frame);
+  cv::waitKey();
+  auto id = this->RecognizeFaceFromDb(frame);
+  if (id == -1) {
+    cv::imshow("DB INS", frame);
+    cv::waitKey();
+    // TODO: const cv::Mat& frame 源对象被修改了！！！
     data::FaceDataBase::GetInstance().AddUser(user.nick_name, user.email,
                                               utils::mat_to_qimage(frame));
     // 刷新内存中的用户信息
     data::FaceDataBase::GetInstance().LoadToCache();
+    for (auto iter : observers_) {
+      iter->OnFaceRegistered(frame, cv::Rect(), 999);
+    }
+  } else {
+    spdlog::info("注册失败: 人脸的注册信息已经存在 :< (id={}, similarity={})",
+                 id);
+    for (auto iter : observers_) {
+      iter->OnFaceRegistered(
+          frame, cv::Rect(),
+          interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted);
+    }
   }
   return id;
 }
@@ -236,5 +282,9 @@ void FaceDetectorServer::OnCameraShutDown() {}
 
 void FaceDetectorServer::OnFrameCaptured(cv::Mat frame) {
   frame_queue_.push(frame);
+  if (need_register_) {
+    register_queue_.push(frame);
+    need_register_ = false;
+  }
   return;
 }

@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
           rpc_server_addr, grpc::InsecureChannelCredentials()));
   std::shared_ptr<arm_face_id::FaceProcessor> face_processor_ptr =
       std::make_shared<arm_face_id::FaceProcessor>(rpc_client, model_path);
-  face_processor_ptr->Start();
+
   shared_ptr<arm_face_id::GUI> gui = std::make_shared<arm_face_id::GUI>();
 
   face_processor_ptr->FaceDetector<RecognizeResult>::AddObserver(gui);
@@ -55,6 +55,8 @@ int main(int argc, char* argv[]) {
   camera.AddObserver(gui);
   camera.AddObserver(face_processor_ptr);
   camera.OpenAndStart();
+
+  face_processor_ptr->Start();
 
   gui->show();
 

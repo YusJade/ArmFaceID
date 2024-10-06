@@ -78,7 +78,7 @@ GUI::GUI(std::shared_ptr<RpcClient> rpc_client_ptr)
 
 void GUI::OnFrameCaptured(cv::Mat frame) {
   if (camera_frame_lbl_) {
-    cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+    // cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
     auto img = QPixmap::fromImage(utils::mat_to_qimage(frame));
     img = img.scaled(camera_frame_lbl_->size(), Qt::KeepAspectRatio);
     camera_frame_lbl_->setPixmap(img);
