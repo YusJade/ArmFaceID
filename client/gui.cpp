@@ -29,7 +29,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "utils.h"
+#include "function.h"
 
 using namespace arm_face_id;
 
@@ -79,7 +79,7 @@ GUI::GUI(std::shared_ptr<RpcClient> rpc_client_ptr)
 void GUI::OnFrameCaptured(cv::Mat frame) {
   if (camera_frame_lbl_) {
     cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
-    auto img = QPixmap::fromImage(utils::MatToQImage(frame));
+    auto img = QPixmap::fromImage(utils::mat_to_qimage(frame));
     img = img.scaled(camera_frame_lbl_->size(), Qt::KeepAspectRatio);
     camera_frame_lbl_->setPixmap(img);
 

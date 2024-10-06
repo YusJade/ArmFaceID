@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "utils.h"
+#include "function.h"
 
 arm_face_id::RpcClient::RpcClient(std::shared_ptr<::grpc::Channel> channel)
     : stub(RpcManager::NewStub(channel)) {}
@@ -14,7 +14,7 @@ arm_face_id::RecognizeResult arm_face_id::RpcClient::RecognizeFace(
   grpc::ClientContext context;
 
   std::vector<uchar> bytes;
-  utils::EncodeMat(face_img, ".jpg", bytes);
+  utils::mat_to_bytes(face_img, ".jpg", bytes);
   std::string bytes_str(bytes.begin(), bytes.end());
   request.set_face_img(bytes_str);
 
@@ -38,7 +38,7 @@ int64_t arm_face_id::RpcClient::Register(cv::Mat image, std::string name) {
   grpc::ClientContext context;
 
   std::vector<uchar> bytes;
-  utils::EncodeMat(image, ".jpg", bytes);
+  utils::mat_to_bytes(image, ".jpg", bytes);
 
   request.set_face_img(std::string(bytes.begin(), bytes.end()));
 

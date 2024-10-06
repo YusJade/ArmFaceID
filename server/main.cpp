@@ -17,11 +17,11 @@
 #include <seeta/Struct.h>
 #include <spdlog/spdlog.h>
 
-#include "ela_gui.h"
 #include "engine.h"
 #include "face_camera.h"
 #include "face_database.h"
-#include "gui.h"
+#include "gui/ela_gui.h"
+#include "gui/gui.h"
 #include "rpc_manager.h"
 
 /**
@@ -39,7 +39,7 @@ ABSL_FLAG(std::string, network_camera_url, " ",
 // ABSL_FLAG(int, native_camera_index, -1, "[Optional] set the id of camera
 // device.");
 
-constexpr char kServerAddrInfo[] = "localhost:50051";
+constexpr char kServerAddrInfo[] = "192.168.3.3:50051";
 
 int main(int argc, char* argv[]) {
   absl::InitializeLog();
@@ -49,11 +49,11 @@ int main(int argc, char* argv[]) {
   absl::ParseCommandLine(argc, argv);
 
   seeta::ModelSetting FD_model_setting("fd_2_00.dat",
-                                       seeta::ModelSetting::Device::CPU);
+                                       seeta::ModelSetting::Device::GPU);
   seeta::ModelSetting PD_model_setting("pd_2_00_pts5.dat",
-                                       seeta::ModelSetting::Device::CPU);
+                                       seeta::ModelSetting::Device::GPU);
   seeta::ModelSetting FR_model_setting("fr_2_10.dat",
-                                       seeta::ModelSetting::Device::CPU);
+                                       seeta::ModelSetting::Device::GPU);
   arm_face_id::FaceDetectorServer::Settings detector_settings;
   detector_settings.fd_setting = FD_model_setting;
   detector_settings.fr_setting = FR_model_setting;

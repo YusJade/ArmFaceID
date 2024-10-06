@@ -18,7 +18,7 @@ class RegisterPage : public ElaScrollPage {
   void setCameraFrame(const QImage& img);
 
  signals:
-  void register_btn_clicked();
+  void into_register_state();
 
  public slots:
   void update_capture_card_img(const QPixmap&) {}

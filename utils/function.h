@@ -7,12 +7,12 @@
 #include <string>
 #include <vector>
 
-#include <fmt/core.h>
+// #include <fmt/core.h>
 #include <opencv2/opencv.hpp>
 // #include <spdlog/fmt/bundled/core.h>
 #include <spdlog/spdlog.h>
 
-auto format_as(QString s) { return s.toStdString(); }
+// auto format_as(QString s) { return s.toStdString(); }
 
 template <>
 struct fmt::formatter<QString> : formatter<string_view> {

@@ -1,7 +1,6 @@
 #include "face_processor.h"
 
 #include <QtConcurrent>
-#include <chrono>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -13,7 +12,6 @@
 #include <spdlog/spdlog.h>
 
 #include "interface.h"
-#include "utils.h"
 
 #include "face_network.pb.h"
 

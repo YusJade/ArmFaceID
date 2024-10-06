@@ -8,7 +8,6 @@
 #include <opencv2/core/hal/interface.h>
 #include <opencv2/opencv.hpp>
 
-#include "camera.h"
 #include "face_processor_listener.h"
 #include "interface.h"
 #include "rpc_client.h"

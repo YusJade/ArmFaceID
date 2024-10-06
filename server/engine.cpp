@@ -140,7 +140,7 @@ int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
           interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted);
     }
 
-    return id;
+    return interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted;
   }
   id = face_engine_->Register(img_date);
   if (id == -1) {
@@ -196,7 +196,8 @@ int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img,
 int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame,
                                          const data::User& user) {
   auto id = RegisterFace(frame);
-  if (id >= 0) {
+  if (id >= 0 &&
+      id != interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted) {
     data::FaceDataBase::GetInstance().AddUser(user.nick_name, user.email,
                                               utils::mat_to_qimage(frame));
     // 刷新内存中的用户信息
