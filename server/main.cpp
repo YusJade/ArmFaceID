@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
   spdlog::info("正在启动 Ela GUI~ :>");
   eApp->init();
   ela_gui->show();
-  ela_gui->adjustSize();
+  // ela_gui->adjustSize();
 
   std::thread rpc_thread([&] {
     spdlog::info("已启动 gRPC 服务器");

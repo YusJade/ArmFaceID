@@ -1,13 +1,18 @@
 #include "tableview_page.h"
 
+#include <ElaScrollPageArea.h>
 #include <qboxlayout.h>
 #include <qgridlayout.h>
 #include <qnamespace.h>
 #include <qsqltablemodel.h>
 #include <qwidget.h>
 
+#include <QItemSelectionModel>
+
+#include "Def.h"
 #include "ElaComboBox.h"
 #include "ElaLineEdit.h"
+#include "ElaMessageBar.h"
 #include "ElaPushButton.h"
 #include "ElaTableView.h"
 #include "face_database.h"
@@ -19,8 +24,13 @@ TableViewPage::TableViewPage() : db_conn_("QSQLITE", "db_arm_face_id.db") {
 }
 
 void TableViewPage::InitPage() {
-  QWidget* main_widget = new QWidget;
-  QGridLayout* main_layout = new QGridLayout(main_widget);
+  ElaScrollPageArea* main_area = new ElaScrollPageArea(this);
+  main_area->setContentsMargins(20, 20, 20, 20);
+  main_area->setFixedSize(800, 475);
+  // QWidget* main_widget = new QWidget;
+  QGridLayout* main_layout = new QGridLayout(main_area);
+
+  // setCustomWidget(main_widget);
 
   table_model_ =
       new table_view::UserTableModel(this, db_conn_.GetSqlDatabase());
@@ -64,5 +74,28 @@ void TableViewPage::InitPage() {
   connect(refresh_btn, &ElaPushButton::clicked, this,
           [&] { table_model_->select(); });
 
-  setCustomWidget(main_widget);
+  connect(delete_btn, &ElaPushButton::clicked, this, [&] {
+    QItemSelectionModel* selection_model = table_view_->selectionModel();
+    QModelIndexList selected_indexes = selection_model->selectedIndexes();
+
+    // 创建一个集合来存储选中的行号
+    QSet<int> selected_rows;
+    foreach (const QModelIndex& index, selected_indexes) {
+      selected_rows.insert(index.row());
+    }
+
+    // 删除选中的行（从最后一行开始删除，以避免索引变化）
+    QList<int> sortedRows = selected_rows.values();
+    std::sort(sortedRows.begin(), sortedRows.end(), std::greater<int>());
+    foreach (int row, sortedRows) {
+      table_model_->removeRow(row);
+    }
+
+    // 提交更改到数据库
+    if (!table_model_->submitAll()) {
+      ElaMessageBar::warning(ElaMessageBarType::TopRight, "数据库", "操作失败",
+                             3000);
+    }
+    table_model_->select();
+  });
 }

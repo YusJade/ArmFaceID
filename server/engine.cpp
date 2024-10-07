@@ -176,7 +176,7 @@ int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
   }
   return id;
 }
-
+// TODO: 资源竞争
 int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img,
                                                 data::User* info) {
   float top_similarity = 0.0;
@@ -192,7 +192,11 @@ int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img,
         cv::imdecode(cv::Mat(iter.face_img_bytes), cv::IMREAD_UNCHANGED);
     SeetaImageData db_img{decoded_mat.cols, decoded_mat.rows,
                           decoded_mat.channels(), decoded_mat.data};
-    similarity = face_engine_->Compare(target_img, db_img);
+    {
+      std::lock_guard<std::mutex> guard(mutex_);
+      similarity = face_engine_->Compare(target_img, db_img);
+    }
+
     if (similarity > top_similarity) {
       top_similarity = similarity;
       user = iter;
@@ -226,12 +230,12 @@ int64_t FaceDetectorServer::RegisterFace(const cv::Mat& _frame,
     return interface::FaceDetectorObserver<int64_t>::kFaceNotDetected;
   }
   // frame = cv::imread("./server/assets/test.png");
-  cv::imshow("DB COMP", frame);
-  cv::waitKey();
+  // cv::imshow("DB COMP", frame);
+  // cv::waitKey();
   auto id = this->RecognizeFaceFromDb(frame);
   if (id == -1) {
-    cv::imshow("DB INS", frame);
-    cv::waitKey();
+    // cv::imshow("DB INS", frame);
+    // cv::waitKey();
     // TODO: const cv::Mat& frame 源对象被修改了！！！
     data::FaceDataBase::GetInstance().AddUser(user.nick_name, user.email,
                                               utils::mat_to_qimage(frame));

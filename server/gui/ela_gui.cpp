@@ -1,6 +1,7 @@
 #include "ela_gui.h"
 
 #include <ElaMessageBar.h>
+#include <ElaNavigationBar.h>
 #include <ElaPushButton.h>
 #include <ElaScrollPage.h>
 #include <ElaWidget.h>
@@ -29,10 +30,13 @@ using namespace arm_face_id;
 
 arm_face_id::ElaGUI::ElaGUI() {
   this->setUserInfoCardVisible(false);
-  setContentsMargins(0, 0, 0, 0);
+  // setContentsMargins(20, 20, 20, 20);
   InitWindow();
-  setFixedSize(400, 425);
+  setMaximumSize(800, 450);
+  setIsFixedSize(true);
   // adjustSize();
+  // resize(125, 125);
+  spdlog::warn("win {} {}", width(), height());
 }
 
 void arm_face_id::ElaGUI::InitWindow() {

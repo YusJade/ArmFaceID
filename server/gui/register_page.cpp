@@ -4,7 +4,7 @@
 #include <ElaImageCard.h>
 #include <ElaLineEdit.h>
 #include <ElaProgressBar.h>
-#include <ElaPromotionCard.h>
+#include <ElaScrollPageArea.h>
 #include <ElaText.h>
 #include <qboxlayout.h>
 #include <qfiledialog.h>
@@ -31,32 +31,53 @@
 #include "Def.h"
 #include "ElaMessageBar.h"
 #include "ElaPushButton.h"
+#include "ElaScrollPage.h"
 #include "engine.h"
 #include "face_database.h"
 
 using namespace arm_face_id;
 
-RegisterPage::RegisterPage() { InitPage(); }
+RegisterPage::RegisterPage() {
+  // 在构造函数下调用
+  // setWindowFlags(Qt::FramelessWindowHint);
+  InitPage();
+  // resize(300, 125);
+  // adjustSize();
+}
 
 void RegisterPage::InitPage() {
-  setPageTitleSpacing(1);
-  setTitleVisible(false);
-  ElaPromotionCard *image_card = new ElaPromotionCard();
+  // setPageTitleSpacing(1);
+  // setTitleVisible(false);
+  // ElaPromotionCard *image_card = new ElaPromotionCard();
 
-  QWidget *central_widget = new QWidget;
-  QGridLayout *main_layout = new QGridLayout(central_widget);
+  // setContentsMargins(20, 20, 20, 20);
+  ElaScrollPageArea *main_area = new ElaScrollPageArea(this);
+  main_area->setContentsMargins(20, 20, 20, 20);
+  main_area->setFixedSize(800, 475);
+  // spdlog::warn("register_page: {}*{}", width(), height());
+  // QWidget *central_widget = new QWidget;
+  // central_widget->setFixedSize(500, 300);
+  // central_widget->setContentsMargins(0, 0, 0, 0);
+  // central_widget->setFixedSize(100, 100);
+
+  // setCustomWidget(central_widget);
+
+  QGridLayout *main_layout = new QGridLayout(main_area);
   main_layout->setContentsMargins(0, 0, 0, 0);
-  main_layout->setAlignment(Qt::AlignLeft);
-  central_widget->setContentsMargins(0, 0, 0, 0);
-  // 摄像头捕捉区域
+  // main_layout->setSpacing(10);
+  main_layout->setAlignment(Qt::AlignCenter);
 
+  // 摄像头捕捉区域
   QWidget *camera_widget = new QWidget(this);
   QVBoxLayout *cameraLayout = new QVBoxLayout(camera_widget);
   cameraLayout->setContentsMargins(0, 0, 0, 0);
   camera_widget->setContentsMargins(0, 0, 0, 0);
 
   QLabel *camera_label = new QLabel(camera_widget);
-  camera_label->setMinimumSize(300 * 1.2, 225 * 1.2);
+  camera_label->setMinimumSize(400, 250);
+  QPixmap cam_pixmap(camera_label->size());
+  cam_pixmap.fill(Qt::black);
+  camera_label->setPixmap(cam_pixmap);
   cam_frame_lbl_ = camera_label;
 
   // 用户注册表单
@@ -72,7 +93,7 @@ void RegisterPage::InitPage() {
   icon_text->setMinimumWidth(50);
   icon_text->setMaximumWidth(50);
   ElaIconButton *icon_btn =
-      new ElaIconButton(QPixmap("./server/assets/test.png"));
+      new ElaIconButton(QPixmap("./server/assets/test2.png"));
   icon_btn->setFixedSize(125, 125);
   // cap_frame_card_ = image_card;
   // cap_frame_card_->setFixedSize(250, 250);
@@ -101,11 +122,14 @@ void RegisterPage::InitPage() {
   progress_bar->setMinimum(0);
   progress_bar->setMaximum(100);
 
-  form_layout->addWidget(name_text, 0, 0);
-  form_layout->addWidget(email_text, 1, 0);
-  form_layout->addWidget(name_input, 0, 1);
-  form_layout->addWidget(email_input, 1, 1);
-  form_layout->addWidget(register_button, 2, 0, 1, 2);
+  form_layout->addWidget(form_title, 0, 0);
+  form_layout->addWidget(icon_text, 1, 0);
+  form_layout->addWidget(icon_btn, 1, 1);
+  form_layout->addWidget(name_text, 2, 0);
+  form_layout->addWidget(name_input, 2, 1);
+  form_layout->addWidget(email_text, 3, 0);
+  form_layout->addWidget(email_input, 3, 1);
+  form_layout->addWidget(register_button, 4, 0, 1, 2);
   form_layout->setContentsMargins(0, 0, 0, 0);
 
   form_layout->setColumnStretch(0, 1);
@@ -119,12 +143,9 @@ void RegisterPage::InitPage() {
   form_layout->setVerticalSpacing(20);
 
   main_layout->setContentsMargins(0, 0, 0, 0);
-  main_layout->addWidget(cam_frame_lbl_, 0, 2, 2, 1);
-  main_layout->addWidget(form_title, 0, 0, 1, 2);
-  main_layout->addWidget(icon_text, 1, 0, 1, 1);
-  main_layout->addWidget(icon_btn, 1, 1, 1, 1);
-  main_layout->addLayout(form_layout, 2, 0, 1, 2);
-  main_layout->addWidget(progress_bar, 4, 0, 1, 4);
+  main_layout->addWidget(cam_frame_lbl_, 0, 1);
+  main_layout->addLayout(form_layout, 0, 0);
+  main_layout->addWidget(progress_bar, 1, 0, 1, 4);
 
   main_layout->setRowStretch(0, 1);
   main_layout->setRowStretch(1, 3);
@@ -133,9 +154,10 @@ void RegisterPage::InitPage() {
   main_layout->setColumnStretch(0, 1);
   main_layout->setColumnStretch(1, 3);
 
-  // central_widget->setMinimumHeight(400);
+  // central_widget->setMaximumHeight(200);
   // 设置窗口属性
-  this->setCustomWidget(central_widget);
+  // this->setCustomWidget(central_widget);
+  // setMaximumHeight(300);
 
   connect(register_button, &ElaPushButton::clicked,
           [this, name_input, email_input, register_button] {
