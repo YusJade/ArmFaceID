@@ -14,6 +14,7 @@
 
 #include <QImage>
 #include <algorithm>
+#include <cstring>
 #include <string>
 
 #include <QtSql/QSqlError>
@@ -39,7 +40,6 @@ constexpr const char* sql_insert_tb_usr =
 
 constexpr const char* sql_select_tb_usr =
     "SELECT user_id, nick_name, email, face_img FROM tb_user;";
-
 DBConnection::DBConnection(std::string driver, std::string db_name)
     : db_(QSqlDatabase::addDatabase(
           QString::fromStdString(driver),
@@ -130,6 +130,30 @@ int FaceDataBase::AddUser(std::string nick_name, std::string email,
                 nick_name, email);
 
   return -1;
+}
+
+int FaceDataBase::GetUserById(int id, User& res) {
+  DBConnection db_conn(db_driver, db_name);
+  QSqlQuery& sql_query = db_conn.GetSqlQuery();
+  sql_query.prepare(
+      "SELECT user_id, email, nick_name, face_img FROM tb_user WHERE user_id = "
+      "?");
+  sql_query.bindValue(0, id);
+
+  if (!sql_query.exec(sql_select_tb_usr)) {
+    spdlog::error("无法读取数据库！>_< : {}",
+                  sql_query.lastError().text().toStdString());
+    return -1;
+  }
+  sql_query.next();
+  res.id = sql_query.value(0).toInt();
+  res.email = sql_query.value(1).toString().toStdString();
+  res.nick_name = sql_query.value(2).toString().toStdString();
+  QByteArray img = sql_query.value(3).toByteArray();
+  res.face_img_bytes.clear();
+  std::copy(img.begin(), img.end(), res.face_img_bytes.begin());
+
+  return res.id;
 }
 
 bool FaceDataBase::RemoveUser(int user_id) { return 0; }

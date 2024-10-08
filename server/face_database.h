@@ -46,6 +46,7 @@ class FaceDataBase {
  public:
   bool InitDb();
   int AddUser(std::string nick_name, std::string email, QImage face_img);
+  int GetUserById(int id, User& res);
   bool RemoveUser(int user_id);
 
   void LoadToCache();
