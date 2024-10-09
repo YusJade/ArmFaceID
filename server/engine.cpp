@@ -18,7 +18,9 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+#include <seeta/CFaceInfo.h>
 #include <seeta/CStruct.h>
+#include <seeta/Struct.h>
 #include <spdlog/spdlog.h>
 
 #include "face_database.h"
@@ -98,7 +100,8 @@ void FaceDetectorServer::Start() {
 
       //   continue;
       // }
-      RegisterFace(cur_frame, next_register_user_);
+      this->RegisterFeature(cur_frame);
+      // RegisterFace(cur_frame, next_register_user_);
     }
     spdlog::info("人脸识别进程已退出 ~");
   });
@@ -291,4 +294,90 @@ void FaceDetectorServer::OnFrameCaptured(cv::Mat frame) {
     need_register_ = false;
   }
   return;
+}
+
+int64_t FaceDetectorServer::RegisterFeature(const cv::Mat& img) {
+  vector<SeetaFaceInfo> faces;
+  SeetaImageData seeta_img{img.cols, img.rows, img.channels(), img.data};
+  faces = face_engine_->DetectFaces(seeta_img);
+  if (faces.empty()) {
+    spdlog::warn("SeetaFace 检测不到人脸 :<");
+    return -1;
+  }
+  SeetaFaceInfo top_face = faces.front();
+  spdlog::info("top_face: pos=({},{}),{}*{}, score={}", top_face.pos.x,
+               top_face.pos.y, top_face.pos.width, top_face.pos.height,
+               top_face.score);
+  // if (IsAlreadyExistInDB(img)) {
+
+  // }
+  int feature_size = face_engine_->FR.GetExtractFeatureSize();
+  vector<float> features(feature_size);
+  std::vector<SeetaPointF> points(face_engine_->PD.number());
+
+  auto start = std::chrono::high_resolution_clock::now();
+
+  face_engine_->PD.mark(seeta_img, top_face.pos, points.data());
+  face_engine_->FR.Extract(seeta_img, points.data(), features.data());
+
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> duration = end - start;
+  spdlog::info("特征提取耗时: {}", duration.count());
+
+  float simlarity = 0.0;
+  if (last_features_.size() > 0) {
+    start = std::chrono::high_resolution_clock::now();
+    simlarity = face_engine_->FR.CalculateSimilarity(features.data(),
+                                                     last_features_.data());
+    end = std::chrono::high_resolution_clock::now();
+    duration = end - start;
+    spdlog::info("特征对比耗时: {}", duration.count());
+  }
+
+  spdlog::info("{} 与上一张人脸的相似度 :B", simlarity);
+  last_features_ = features;
+  data::FaceDataBase::GetInstance().features_vec_.push_back(features);
+  for (auto iter : observers_) {
+    iter->OnFaceRegistered(
+        img, cv::Rect(),
+        interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted);
+  }
+  // // 刷新内存中的用户信息
+  // data::FaceDataBase::GetInstance().LoadToCache();
+  // for (auto iter : observers_) {
+  //   iter->OnFaceRegistered(frame, cv::Rect(), 999);
+  // }
+
+  return -1;
+}
+
+// TODO: 尝试使用 SeetaFace 的特征值对比
+bool FaceDetectorServer::IsAlreadyExistInDB(const cv::Mat& img,
+                                            data::User* user) {
+  float similarity = 0.0;
+  float top_similarity = 0.0;
+  data::User matched_user;
+  SeetaImageData seeta_img{img.cols, img.rows, img.channels(), img.data};
+  cv::Mat decoded_mat;
+  data::FaceDataBase& db = data::FaceDataBase::GetInstance();
+  for (auto& iter : db.Users()) {
+    decoded_mat =
+        cv::imdecode(cv::Mat(iter.face_img_bytes), cv::IMREAD_UNCHANGED);
+    SeetaImageData db_img{decoded_mat.cols, decoded_mat.rows,
+                          decoded_mat.channels(), decoded_mat.data};
+    {
+      std::lock_guard<std::mutex> guard(mutex_);
+      similarity = face_engine_->Compare(seeta_img, db_img);
+    }
+
+    if (similarity > top_similarity) {
+      top_similarity = similarity;
+      matched_user = iter;
+    }
+  }
+  if (top_similarity >= 0.6) {
+    if (user) *user = matched_user;
+    return true;
+  }
+  return false;
 }

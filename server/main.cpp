@@ -49,11 +49,11 @@ int main(int argc, char* argv[]) {
   absl::ParseCommandLine(argc, argv);
 
   seeta::ModelSetting FD_model_setting("fd_2_00.dat",
-                                       seeta::ModelSetting::Device::GPU);
+                                       seeta::ModelSetting::Device::AUTO);
   seeta::ModelSetting PD_model_setting("pd_2_00_pts5.dat",
-                                       seeta::ModelSetting::Device::GPU);
+                                       seeta::ModelSetting::Device::AUTO);
   seeta::ModelSetting FR_model_setting("fr_2_10.dat",
-                                       seeta::ModelSetting::Device::GPU);
+                                       seeta::ModelSetting::Device::AUTO);
   arm_face_id::FaceDetectorServer::Settings detector_settings;
   detector_settings.fd_setting = FD_model_setting;
   detector_settings.fr_setting = FR_model_setting;

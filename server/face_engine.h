@@ -3,6 +3,7 @@
 #include <seeta/FaceDatabase.h>
 #include <seeta/FaceDetector.h>
 #include <seeta/FaceLandmarker.h>
+#include <seeta/FaceRecognizer.h>
 
 namespace seeta {
 
@@ -11,7 +12,7 @@ class FaceEngine {
   FaceEngine(const SeetaModelSetting &FD_model,
              const SeetaModelSetting &PD_model,
              const SeetaModelSetting &FR_model)
-      : FD(FD_model), PD(PD_model), FDB(FR_model) {}
+      : FD(FD_model), PD(PD_model), FDB(FR_model), FR(FR_model) {}
   FaceEngine(const SeetaModelSetting &FD_model,
              const SeetaModelSetting &PD_model,
              const SeetaModelSetting &FR_model, int extraction_core_number,
@@ -154,5 +155,6 @@ class FaceEngine {
   FaceDetector FD;
   FaceLandmarker PD;
   FaceDatabase FDB;
+  FaceRecognizer FR;
 };
 }  // namespace seeta

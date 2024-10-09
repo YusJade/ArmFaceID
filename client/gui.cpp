@@ -6,8 +6,10 @@
 #include <qlabel.h>
 #include <qnamespace.h>
 #include <qobject.h>
+#include <qpainter.h>
 #include <qpixmap.h>
 #include <qpushbutton.h>
+#include <qvariant.h>
 #include <qwidget.h>
 
 #include <QHBoxLayout>
@@ -37,8 +39,15 @@ GUI::GUI() {
   QWidget* main_widget = new QWidget;
   main_widget->setMinimumSize(1920 * 0.3, 1080 * 0.3);
   QGridLayout* main_layout = new QGridLayout(main_widget);
+
   QLabel* cap_label = new QLabel;
-  cap_label->setMinimumSize(640, 320);
+  cap_label->setFixedSize(320, 240);
+  QPixmap cap_pixmap(cap_label->size());
+  cap_pixmap.fill(Qt::transparent);
+  QPainter cap_painter(&cap_pixmap);
+  cap_painter.fillRect(QRect(0, 0, cap_label->width(), cap_label->height()),
+                       Qt::black);
+  cap_label->setPixmap(cap_pixmap);
   camera_frame_lbl_ = cap_label;
 
   QGroupBox* info_box = new QGroupBox;
@@ -47,12 +56,23 @@ GUI::GUI() {
   QGridLayout* info_layout = new QGridLayout;
   info_box->setLayout(info_layout);
 
+  QLabel* profile_pic_label = new QLabel;
+  profile_pic_label->setFixedSize(160, 160);
+  QPixmap profile_pic_pixmap(profile_pic_label->size());
+  profile_pic_pixmap.fill(Qt::transparent);
+  QPainter profile_pic_painter(&profile_pic_pixmap);
+  profile_pic_painter.setBrush(Qt::black);
+  profile_pic_painter.drawEllipse(
+      QRect(0, 0, profile_pic_label->width(), profile_pic_label->height()));
+  profile_pic_label->setPixmap(profile_pic_pixmap);
+
   QLabel* nick_name_label = new QLabel("昵称");
   nick_name_val_label_ = new QLabel;
 
   QLabel* email_label = new QLabel("邮箱");
   email_val_label_ = new QLabel;
 
+  info_layout->addWidget(profile_pic_label, 0, 0, 1, 2, Qt::AlignCenter);
   info_layout->addWidget(nick_name_label, 1, 0);
   info_layout->addWidget(nick_name_val_label_, 1, 1);
   info_layout->addWidget(email_label, 2, 0);
@@ -69,7 +89,6 @@ GUI::GUI() {
   main_layout->setColumnStretch(1, 3);
 
   setCentralWidget(main_widget);
-  adjustSize();
   // setMinimumSize(1920 * 0.3, 1080 * 0.3);
 }
 

@@ -64,6 +64,10 @@ class FaceDetectorServer : public interface::FaceDetector<int64_t>,
   int64_t RegisterFace(const cv::Mat &);
   int64_t RegisterFace(const cv::Mat &, const data::User &);
 
+  int64_t RegisterFeature(const cv::Mat &);
+
+  bool IsAlreadyExistInDB(const cv::Mat &, data::User *user = nullptr);
+
   void DetectFace(std::vector<cv::Rect> &, const cv::Mat &);
 
   bool Save(std::string path);
@@ -91,5 +95,7 @@ class FaceDetectorServer : public interface::FaceDetector<int64_t>,
   std::queue<cv::Mat> register_queue_;
   data::User next_register_user_;
   static std::shared_ptr<FaceDetectorServer> _instance;
+
+  vector<float> last_features_;
 };
 }  // namespace arm_face_id

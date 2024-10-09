@@ -32,7 +32,8 @@ constexpr const char* sql_create_tb_usr =
     "CREATE TABLE tb_user(user_id INTEGER PRIMARY KEY AUTOINCREMENT, "
     "nick_name VARCHAR, "
     "face_img BLOB,"
-    "email VARCHAR);";
+    "email VARCHAR,"
+    "face_feature DOUBLE);";
 
 constexpr const char* sql_insert_tb_usr =
     "INSERT INTO tb_user(user_id, nick_name, email, "
@@ -131,6 +132,9 @@ int FaceDataBase::AddUser(std::string nick_name, std::string email,
 
   return -1;
 }
+
+// TODO: need impl
+int AddUser(const User& user) { return -1; }
 
 int FaceDataBase::GetUserById(int id, User& res) {
   DBConnection db_conn(db_driver, db_name);
