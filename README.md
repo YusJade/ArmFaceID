@@ -38,11 +38,27 @@ cmake --build ./build/
 
 ### 编写数据库模块，实现人脸特征与个人信息的绑定
 
+已通过 `SQLITE` 数据库 与 `QT` 的 `QSQL` 模块实现基本功能，可能的待优化项：
 
+- [ ] `Qt` 的数据库连接无法跨线程使用，必须在该线程下创建连接，目前采用需要时创建临时连接的方式。
+- [ ] 将来在 `GUI` 中提供数据库的视图，以及一些基本的 `CRUD` 操作。
 
-### 在开发板上部署深度学习模型
+### 使用性能更佳的人脸识别库
 
-未来会尝试在开发板上部署模型，可能涉及模型的转换（`pytorch`?`onnx`?`ncnn` ?），以及运行他们所需的依赖库。
+ ~~未来会尝试在开发板上部署模型，可能涉及模型的转换（`pytorch`?`onnx`?`ncnn` ?），以及运行他们所需的依赖库。~~
+
+ 本项目使用的人脸识别库 `SeetaFace2` 的人脸特征提取是基于 `ResNet50` 神经网络实现的，但并没有提供 GPU 加速的功能（源码中预留了 GPU 的代码及接口，并未实现 :<），未来计划使用 `SeetaFace6` 的 `GPU` 版本。
+
+ <a href="https://github.com/seetafaceengine/SeetaFace6/?tab=readme-ov-file">
+  <img src="https://github-readme-stats.vercel.app/api/pin/?username=seetafaceengine&repo=SeetaFace6&theme=default" alt="Liniyous/ElaWidgetTools" />
+</a>
+
+#### 待办清单🧐:
+- [x] 编译准备: `WSL` 下安装 `CUDA Toolkit`。
+  -  [CUDA on Windows Subsystem for Linux (WSL)](https://developer.nvidia.com/cuda/wsl/)
+ - [x] 编译 `X86_84 Linux GPU` 版本的 `SeetaFace6`。 
+ - [ ] 测试对比 `SeetaFace2` 与 `SeetaFace6` 的性能表现。
+ - [ ] 交叉编译 `aarch64 Linux CPU` 版本的 `SeetaFace6`。
 
 ### 集成更美观的 Qt-GUI：ElaWidgetTools
 
@@ -50,4 +66,4 @@ cmake --build ./build/
   <img src="https://github-readme-stats.vercel.app/api/pin/?username=Liniyous&repo=ElaWidgetTools&theme=default" alt="Liniyous/ElaWidgetTools" />
 </a>
 
-根据 `repo` 介绍，该 `UI` 库对 `Qt6` 支持良好，交叉编译 `Qt6` 成功后考虑纳入计划~
+服务端已使用该 UI 库。

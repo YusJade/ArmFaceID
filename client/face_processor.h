@@ -61,8 +61,8 @@ class FaceProcessor : public interface::CameraObserver,
   inline void Stop() { is_pause_ = true; }
   void Start();
 
-  [[deprecated]]
-  void SetListener(std::shared_ptr<FaceProcessorListener>&& listener);
+  [[deprecated]] void SetListener(
+      std::shared_ptr<FaceProcessorListener>&& listener);
 
  private:
   bool is_pause_ = false;
@@ -71,7 +71,7 @@ class FaceProcessor : public interface::CameraObserver,
 
   std::queue<cv::Mat> frame_queue_;
   std::shared_ptr<RpcClient> rpc_client_ptr_;
-  int threshold = 20;
+  int threshold = 8;
 };
 
 }  // namespace arm_face_id

@@ -66,11 +66,16 @@ GUI::GUI() {
       QRect(0, 0, profile_pic_label->width(), profile_pic_label->height()));
   profile_pic_label->setPixmap(profile_pic_pixmap);
 
+  QFont font("Arial", 20);
   QLabel* nick_name_label = new QLabel("昵称");
+  nick_name_label->setFont(font);
   nick_name_val_label_ = new QLabel;
+  nick_name_val_label_->setFont(font);
 
   QLabel* email_label = new QLabel("邮箱");
+  email_label->setFont(font);
   email_val_label_ = new QLabel;
+  email_val_label_->setFont(font);
 
   info_layout->addWidget(profile_pic_label, 0, 0, 1, 2, Qt::AlignCenter);
   info_layout->addWidget(nick_name_label, 1, 0);
