@@ -173,9 +173,10 @@ void RegisterPage::InitPage() {
                   "邮箱不能为空", 3000);
               return;
             }
-            FaceDetectorServer::GetInstance()->NeedRegisterFace(
-                data::User{-1, name_input->text().toStdString(),
-                           email_input->text().toStdString()});
+            data::User user;
+            user.email = email_input->text().toStdString();
+            user.nick_name = name_input->text().toStdString();
+            FaceDetectorServer::GetInstance()->NeedRegisterFace(user);
 
             ElaMessageBar::information(
                 ElaMessageBarType::PositionPolicy::TopRight, "注册",

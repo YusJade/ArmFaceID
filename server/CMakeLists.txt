@@ -1,16 +1,15 @@
 # 设置源文件
-set(SOURCES 
-main.cpp 
-rpc_manager.cpp 
-face_database.cpp 
-engine.cpp 
-
-gui/gui.cpp 
-gui/ela_gui.cpp 
-gui/register_page.cpp 
-gui/recognition_page.cpp 
-gui/tableview_page.cpp 
-table_model/user_table_model.cpp)
+set(SOURCES
+    main.cpp
+    rpc_manager.cpp
+    face_database.cpp
+    engine.cpp
+    gui/gui.cpp
+    gui/ela_gui.cpp
+    gui/register_page.cpp
+    gui/recognition_page.cpp
+    gui/tableview_page.cpp
+    table_model/user_table_model.cpp)
 
 set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Concurrent Qt6::Sql)
 if(${Qt5_FOUND})
@@ -23,7 +22,7 @@ add_executable(server ${SOURCES})
 add_dependencies(server utils_headers)
 
 if(USE_ELA_GUI)
-target_compile_definitions(server PUBLIC ELA_GUI)
+  target_compile_definitions(server PUBLIC ELA_GUI)
 endif()
 
 # 链接 gRPC 库
@@ -38,15 +37,20 @@ target_link_libraries(
          face_proto
          utils
          ${OpenCV_LIBS}
-         ${SeetaFace_LIBRARIES}
+         ${SeetaFaceDetector_LIBRARY}
+         ${SeetaFaceRecognizer_LIBRARY}
+         ${SeetaFaceLandmarker_LIBRARY}
+         # ${SeetaFace_LIBRARIES}
          ${ElaWidgets_LIBS})
 
 target_include_directories(
   server
   PUBLIC # ${gRPC_INCLUDE_DIRS}
          ${OpenCV_INCLUDE_DIRS}
-         ${SeetaFace_INCLUDE_DIRS}
-         # ${PROTOBUF_INCLUDE_DIRS}
+         ${SeetaFaceDetector_INCLUDE_DIR}
+         ${SeetaFaceRecognizer_INCLUDE_DIR}
+         ${SeetaFaceLandmarker_INCLUDE_DIR}
+         # ${SeetaFace_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS}
          ${CMAKE_CURRENT_SOURCE_DIR}
-         ${fmt_INCLUDE_DIRS}
+         # ${fmt_INCLUDE_DIRS}
          ${ElaWidgets_INCLUDE_DIRS})

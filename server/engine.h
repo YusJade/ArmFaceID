@@ -13,11 +13,15 @@
 #include <opencv2/objdetect.hpp>
 #include <opencv2/video.hpp>
 #include <opencv2/videoio.hpp>
-#include <seeta/Struct.h>
+#include <seeta/CFaceInfo.h>
+#include <seeta/FaceDetector.h>
+#include <seeta/FaceLandmarker.h>
+#include <seeta/FaceRecognizer.h>
 
 #include "face_database.h"
-#include "face_engine.h"
+// #include "face_engine.h"
 #include "interface.h"
+#include "seeta/Common/CStruct.h"
 
 namespace arm_face_id {
 
@@ -58,6 +62,12 @@ class FaceDetectorServer : public interface::FaceDetector<int64_t>,
   void Start();
   inline void Stop() { is_thread_running_ = false; }
 
+  /*  V3            */
+  vector<float> ExtractFaceFeature(const SeetaImageData &,
+                                   const SeetaFaceInfo &);
+  std::vector<SeetaFaceInfo> DetectFace(const cv::Mat &);
+  /*------------------*/
+
   int64_t RecognizeFace(const cv::Mat &);
   int64_t RecognizeFaceFromDb(const cv::Mat &, data::User *user = nullptr);
 
@@ -66,7 +76,8 @@ class FaceDetectorServer : public interface::FaceDetector<int64_t>,
 
   int64_t RegisterFeature(const cv::Mat &);
 
-  bool IsAlreadyExistInDB(const cv::Mat &, data::User *user = nullptr);
+  bool IsAlreadyExistInDB(const SeetaImageData &simg, const SeetaFaceInfo &face,
+                          data::User *user = nullptr);
 
   void DetectFace(std::vector<cv::Rect> &, const cv::Mat &);
 
@@ -85,16 +96,20 @@ class FaceDetectorServer : public interface::FaceDetector<int64_t>,
  private:
   bool need_register_ = false;
   bool need_recognize_ = false;
-  std::unique_ptr<seeta::FaceEngine> face_engine_;
+  // std::unique_ptr<seeta::FaceEngine> face_engine_;
   std::unique_ptr<std::thread> worker_thread_;
   std::unique_ptr<std::thread> register_thread_;
   bool is_thread_running_ = false;
-  cv::CascadeClassifier classifier_;
+  // cv::CascadeClassifier classifier_;
   std::mutex mutex_;
   std::queue<cv::Mat> frame_queue_;
   std::queue<cv::Mat> register_queue_;
   data::User next_register_user_;
   static std::shared_ptr<FaceDetectorServer> _instance;
+
+  std::unique_ptr<seeta::FaceLandmarker> landmarker_;
+  std::unique_ptr<seeta::FaceDetector> detector_;
+  std::unique_ptr<seeta::FaceRecognizer> recognizer_;
 
   vector<float> last_features_;
 };

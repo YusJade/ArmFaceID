@@ -7,11 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Qt 信号/槽机制
 set(CMAKE_AUTOMOC ON)
 
-option(USE_ELA_GUI
-       "Set to On to use ElaWidgetTools"
-       ON)
-
-
+option(USE_ELA_GUI "Set to On to use ElaWidgetTools" ON)
 
 # Define a function to find and check a package
 function(find_and_check_package package_name)
@@ -46,7 +42,8 @@ if(WIN32)
   set(SeetaFac_INCLUDE_DIRS D:/cmake-install-modules/SeetaFace/include)
   set(fmt_INCLUDE_DIRS D:/cmake-install-modules/spdlog/include/spdlog)
 
-  set(ElaWidgets_LIBS E:/Documents/CodeField/ElaWidgetTools/build/libelawidgettools.a)
+  set(ElaWidgets_LIBS
+      E:/Documents/CodeField/ElaWidgetTools/build/libelawidgettools.a)
   set(ElaWidgets_INCLUDE_DIRS E:/Documents/CodeField/ElaWidgetTools/src/include)
 
   find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent Sql)
@@ -57,7 +54,17 @@ elseif(UNIX AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
   set(Qt6_DIR /home/yu/Qt/6.5.3/gcc_64/lib/cmake/Qt6/)
   set(gRPC_DIR /home/yu/aarch64/lib/cmake/grpc/)
   set(protobuf_DIR /home/yu/aarch64/lib/cmake/protobuf/)
+
   find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent Sql)
+
+  set(CMAKE_MODULE_PATH /home/yu/codefield/SeetaFace6/build/cmake/)
+  find_package(SeetaFaceRecognizer REQUIRED)
+  find_package(SeetaFaceDetector REQUIRED)
+  find_package(SeetaFaceLandmarker REQUIRED)
+
+  # TO FIX CMAKE ERROR
+  set(SeetaFaceLandmarker_INCLUDE_DIR)
+
   set(ElaWidgets_LIBS /home/yu/amd64/elawidget/lib/libelawidgettools.so)
   set(ElaWidgets_INCLUDE_DIRS /home/yu/amd64/elawidget/include/)
   if(${Qt6_FOUND})

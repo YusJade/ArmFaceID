@@ -14,8 +14,10 @@
 
 #include <QImage>
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
 #include <string>
+#include <vector>
 
 #include <QtSql/QSqlError>
 #include <spdlog/fmt/fmt.h>
@@ -33,7 +35,8 @@ constexpr const char* sql_create_tb_usr =
     "nick_name VARCHAR, "
     "face_img BLOB,"
     "email VARCHAR,"
-    "face_feature DOUBLE);";
+    "profile_pic BLOB,"
+    "face_feature BLOB);";
 
 constexpr const char* sql_insert_tb_usr =
     "INSERT INTO tb_user(user_id, nick_name, email, "
@@ -98,43 +101,53 @@ bool FaceDataBase::InitDb() {
   return true;
 }
 
-int FaceDataBase::AddUser(std::string nick_name, std::string email,
-                          QImage face_img) {
-  QByteArray img_bytes;
-  QBuffer buffer(&img_bytes);
-  buffer.open(QIODevice::WriteOnly);
-  face_img.save(&buffer, "JPEG");
-  buffer.close();
+// TODO: 序列化问题
+int FaceDataBase::AddUser(const User& user) {
+  QByteArray face_img_bytes((const char*)user.face_img_bytes.data(),
+                            (qsizetype)user.face_img_bytes.size());
+  // std::copy(user.face_img_bytes.begin(), user.face_img_bytes.end(),
+  //           face_img_bytes.begin());
+  QByteArray profile_pic_bytes((const char*)user.profile_pic_bytes.data(),
+                               (qsizetype)user.profile_pic_bytes.size());
+  // std::copy(user.profile_pic_bytes.begin(), user.profile_pic_bytes.end(),
+  //           profile_pic_bytes.begin());
+  QByteArray face_feature_bytes;
+  QDataStream vec_stream(face_feature_bytes);
+  vec_stream << user.face_feature;
+  // buffer.open(QIODevice::WriteOnly);
+  // face_img.save(&buffer, "JPEG");
+  // buffer.close();
 
   DBConnection db_conn(db_driver, db_name);
   auto& sql_query = db_conn.GetSqlQuery();
   sql_query.prepare(
-      "INSERT INTO tb_user(user_id, nick_name, email, "
-      "face_img) VALUES (NULL, :nick_name, :email, :face_img);");
+      "INSERT INTO tb_user(user_id, nick_name, email, profile_pic, "
+      "face_img, face_feature) VALUES (NULL, :nick_name, :email, :profile_pic, "
+      ":face_img, :face_feature);");
   // sql_query.prepare(
   //     "INSERT INTO tb_user(user_id, nick_name, email, "
   //     "face_img) VALUES (NULL, 'test', 'test', NULL)");
 
-  sql_query.bindValue(":nick_name", QString::fromStdString(nick_name));
-  sql_query.bindValue(":email", QString::fromStdString(email));
-  sql_query.bindValue(":face_img", img_bytes);
+  sql_query.bindValue(":nick_name", QString::fromStdString(user.nick_name));
+  sql_query.bindValue(":email", QString::fromStdString(user.email));
+  sql_query.bindValue(":profile_pic", profile_pic_bytes);
+  sql_query.bindValue(":face_img", face_img_bytes);
+  sql_query.bindValue(":face_feature", face_feature_bytes);
 
   if (sql_query.exec()) {
     spdlog::info("已向数据库插入用户数据 ~ :  {} ({},{})",
-                 sql_query.lastError().databaseText(), nick_name, email);
+                 sql_query.lastError().databaseText(), user.nick_name,
+                 user.email);
     return sql_query.lastInsertId().toInt();
   }
   spdlog::error("无法向数据库插入用户数据！: {} ({},{})",
                 sql_query.lastError().text() +
                     sql_query.lastError().driverText() +
                     sql_query.lastError().databaseText(),
-                nick_name, email);
+                user.nick_name, user.email);
 
   return -1;
 }
-
-// TODO: need impl
-int AddUser(const User& user) { return -1; }
 
 int FaceDataBase::GetUserById(int id, User& res) {
   DBConnection db_conn(db_driver, db_name);
@@ -165,7 +178,8 @@ bool FaceDataBase::RemoveUser(int user_id) { return 0; }
 void FaceDataBase::LoadToCache() {
   auto db_conn = DBConnection(db_driver, db_name);
   auto& sql_query = db_conn.GetSqlQuery();
-  if (!sql_query.exec(sql_select_tb_usr)) {
+  if (!sql_query.exec("SELECT user_id, nick_name, email, profile_pic, "
+                      "face_img, face_feature FROM tb_user;")) {
     spdlog::error("无法读取数据库！>_< : {}",
                   sql_query.lastError().text().toStdString());
     return;
@@ -177,11 +191,28 @@ void FaceDataBase::LoadToCache() {
     std::string nick_name = sql_query.value(1).toString().toStdString();
     std::string email = sql_query.value(2).toString().toStdString();
 
-    auto img_qbytes = sql_query.value(3).toByteArray();
-    std::vector<uint8_t> img_bytes(img_qbytes.size());
-    std::copy(img_qbytes.begin(), img_qbytes.end(), img_bytes.begin());
+    QByteArray img_qbytes = sql_query.value(3).toByteArray();
+    std::vector<uint8_t> profile_pic_bytes(img_qbytes.size());
+    std::copy(img_qbytes.begin(), img_qbytes.end(), profile_pic_bytes.begin());
 
-    users_.push_back(User{user_id, nick_name, email, img_bytes});
+    img_qbytes = sql_query.value(4).toByteArray();
+    std::vector<uint8_t> face_img_bytes(img_qbytes.size());
+    std::copy(img_qbytes.begin(), img_qbytes.end(), face_img_bytes.begin());
+
+    QByteArray feature_qbytes = sql_query.value(5).toByteArray();
+    QDataStream in(feature_qbytes);
+    std::vector<float> face_feature;
+    in >> face_feature;
+
+    User user;
+    user.id = user_id;
+    user.email = email;
+    user.nick_name = nick_name;
+    user.profile_pic_bytes = profile_pic_bytes;
+    user.face_img_bytes = face_img_bytes;
+    user.face_feature = face_feature;
+
+    users_.push_back(user);
   }
 
   spdlog::info("已将 {} 条用户数据从数据库加载到内存中 :O", users_.size());
@@ -195,4 +226,28 @@ User FaceDataBase::GetUserById(int id) {
     }
   }
   return User();
+}
+
+User::User(int id_, std::string nick_name_, std::string email_,
+           const QImage& profile_pic_, const QImage& face_img_,
+           const std::vector<float>& face_feature_) {}
+
+// 重载 << 运算符用于序列化 std::vector<float>
+QDataStream& operator<<(QDataStream& out, const std::vector<float>& vec) {
+  out << static_cast<quint32>(vec.size());  // 写入 vector 的大小
+  for (float value : vec) {
+    out << value;  // 写入每个 float 值
+  }
+  return out;
+}
+
+// 重载 >> 运算符用于反序列化 std::vector<float>
+QDataStream& operator>>(QDataStream& in, std::vector<float>& vec) {
+  quint32 size;
+  in >> size;        // 读取 vector 的大小
+  vec.resize(size);  // 调整 vector 的大小
+  for (quint32 i = 0; i < size; ++i) {
+    in >> vec[i];  // 读取每个 float 值
+  }
+  return in;
 }

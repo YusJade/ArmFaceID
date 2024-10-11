@@ -6,6 +6,7 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
 
+using namespace arm_face_id;
 // #include <spdlog/fmt/bundled/format.h>
 
 auto fmt::formatter<QString>::format(const QString& qstr, format_context& ctx)

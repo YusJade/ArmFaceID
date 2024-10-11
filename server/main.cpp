@@ -13,8 +13,6 @@
 #include <absl/log/initialize.h>
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/server_builder.h>
-#include <seeta/CStruct.h>
-#include <seeta/Struct.h>
 #include <spdlog/spdlog.h>
 
 #include "engine.h"
@@ -23,6 +21,7 @@
 #include "gui/ela_gui.h"
 #include "gui/gui.h"
 #include "rpc_manager.h"
+#include "seeta/Common/CStruct.h"
 
 /**
  ./build/server/server -native_camera_index=1
@@ -48,12 +47,12 @@ int main(int argc, char* argv[]) {
       "There are the availiable flags for this program:");
   absl::ParseCommandLine(argc, argv);
 
-  seeta::ModelSetting FD_model_setting("fd_2_00.dat",
-                                       seeta::ModelSetting::Device::AUTO);
-  seeta::ModelSetting PD_model_setting("pd_2_00_pts5.dat",
-                                       seeta::ModelSetting::Device::AUTO);
-  seeta::ModelSetting FR_model_setting("fr_2_10.dat",
-                                       seeta::ModelSetting::Device::AUTO);
+  seeta::ModelSetting FD_model_setting("sf3.0_models/face_detector.csta",
+                                       SeetaDevice::SEETA_DEVICE_GPU);
+  seeta::ModelSetting FR_model_setting("sf3.0_models/face_recognizer.csta",
+                                       SeetaDevice::SEETA_DEVICE_GPU);
+  seeta::ModelSetting PD_model_setting(
+      "sf3.0_models/face_landmarker_pts68.csta", SeetaDevice::SEETA_DEVICE_GPU);
   arm_face_id::FaceDetectorServer::Settings detector_settings;
   detector_settings.fd_setting = FD_model_setting;
   detector_settings.fr_setting = FR_model_setting;

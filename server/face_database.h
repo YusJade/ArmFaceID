@@ -18,7 +18,15 @@ struct User {
   int id;
   std::string nick_name;
   std::string email;
+  std::vector<uint8_t> profile_pic_bytes;
   std::vector<uint8_t> face_img_bytes;
+  std::vector<float> face_feature;
+
+  User() = default;
+
+  User(int id_, std::string nick_name_, std::string email_,
+       const QImage& profile_pic_, const QImage& face_img_,
+       const std::vector<float>& face_feature_);
 };
 
 class DBConnection {
@@ -67,3 +75,9 @@ class FaceDataBase {
 };
 }  // namespace data
 }  // namespace arm_face_id
+
+// 重载 << 运算符用于序列化 std::vector<float>
+QDataStream& operator<<(QDataStream& out, const std::vector<float>& vec);
+
+// 重载 >> 运算符用于反序列化 std::vector<float>
+QDataStream& operator>>(QDataStream& in, std::vector<float>& vec);

@@ -11,6 +11,8 @@ QVariant table_view::UserTableModel::data(const QModelIndex &index,
     QPixmap pixmap;
     pixmap.loadFromData(img_data);
     return pixmap.scaled(50, 50, Qt::KeepAspectRatio);  // 调整图片大小
+  } else if (index.column() == 5) {
   }
+
   return QSqlTableModel::data(index, role);
 }
