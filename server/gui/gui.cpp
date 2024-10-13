@@ -132,8 +132,8 @@ QWidget* GUI::InitRegisterWidget() {
   QPushButton* register_button = new QPushButton(main_widget);
   register_button->setText("register");
 
-  QObject::connect(register_button, &QPushButton::clicked,
-                   [this] { engine_ptr_->RegisterFace(captured_face_mat_); });
+  // QObject::connect(register_button, &QPushButton::clicked,
+  //  [this] { engine_ptr_->RegisterFace(captured_face_mat_); });
 
   // add Widgets
   face_layout->addWidget(img_label);

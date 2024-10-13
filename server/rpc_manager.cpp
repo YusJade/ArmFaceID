@@ -32,15 +32,24 @@ grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
   return grpc::Status::OK;
 }
 
+/**
+ * @brief
+ *
+ * @param context
+ * @param request
+ * @param response
+ * @return grpc::Status
+ */
 grpc::Status arm_face_id::RpcManagerImpl::Register(
+    // TODO: 暂时不提供注册服务
     grpc::ServerContext* context, const arm_face_id::RegisterRequest* request,
     arm_face_id::RegisterResult* response) {
   const std::string img_byte_seq = request->face_img();
   cv::Mat decoded_mat;
   utils::bytes_to_mat(img_byte_seq, decoded_mat);
-  int64_t id = engine_ptr_->RegisterFace(decoded_mat);
-  if (id == -1) {
-    return grpc::Status(grpc::StatusCode::OUT_OF_RANGE, "face not found.");
-  }
+  // int64_t id = engine_ptr_->RegisterFace(decoded_mat);
+  // if (id == -1) {
+  //   return grpc::Status(grpc::StatusCode::OUT_OF_RANGE, "face not found.");
+  // }
   return grpc::Status::OK;
 }
