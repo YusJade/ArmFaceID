@@ -176,6 +176,7 @@ void RegisterPage::InitPage() {
             data::User user;
             user.email = email_input->text().toStdString();
             user.nick_name = name_input->text().toStdString();
+            user.face_img = cam_frame_lbl_->pixmap().toImage();
             FaceDetectorServer::GetInstance()->NeedRegisterFace(user);
 
             ElaMessageBar::information(
@@ -219,13 +220,13 @@ void RegisterPage::setCameraFrame(const QImage &img) {
     cam_frame_lbl_->setPixmap(pixmap);
 
     // 调整 label 的大小
-    if (cam_frame_lbl_->size() != pixmap.size()) {
-      spdlog::warn("调整摄像展示区域大小: {},{}->{},{}",
-                   cam_frame_lbl_->size().width(),
-                   cam_frame_lbl_->size().height(), pixmap.size().width(),
-                   pixmap.size().height());
-      cam_frame_lbl_->setFixedSize(pixmap.size());
-      cam_frame_lbl_->setMinimumSize(pixmap.size());
-    }
+    // if (cam_frame_lbl_->size() != pixmap.size()) {
+    //   spdlog::warn("调整摄像展示区域大小: {},{}->{},{}",
+    //                cam_frame_lbl_->size().width(),
+    //                cam_frame_lbl_->size().height(), pixmap.size().width(),
+    //                pixmap.size().height());
+    //   cam_frame_lbl_->setFixedSize(pixmap.size());
+    //   cam_frame_lbl_->setMinimumSize(pixmap.size());
+    // }
   }
 }

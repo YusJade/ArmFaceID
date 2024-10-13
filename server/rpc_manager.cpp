@@ -25,9 +25,9 @@ grpc::Status arm_face_id::RpcManagerImpl::RecognizeFace(
   utils::bytes_to_mat(img_byte_seq, decoded_mat);
   int64_t id = -2;
   data::User user_info;
-  id = engine_ptr_->RecognizeFaceFromDb(decoded_mat, &user_info);
+  user_info = engine_ptr_->RecognizeFaceFromDb(decoded_mat);
 
-  response->set_id(id);
+  response->set_id(user_info.id);
   response->set_name(user_info.nick_name);
   return grpc::Status::OK;
 }

@@ -38,7 +38,8 @@ ABSL_FLAG(std::string, network_camera_url, " ",
 // ABSL_FLAG(int, native_camera_index, -1, "[Optional] set the id of camera
 // device.");
 
-constexpr char kServerAddrInfo[] = "192.168.3.3:50051";
+// constexpr char kServerAddrInfo[] = "192.168.3.3:50051";
+constexpr char kServerAddrInfo[] = "localhost:50051";
 
 int main(int argc, char* argv[]) {
   absl::InitializeLog();
@@ -91,7 +92,7 @@ int main(int argc, char* argv[]) {
       .SetSyncServerOption(grpc::ServerBuilder::SyncServerOption::MIN_POLLERS,
                            5);
 
-  std::unique_ptr rpc_server(server_builder.BuildAndStart());
+  std::unique_ptr rpc_server = server_builder.BuildAndStart();
 
   arm_face_id::FaceCamera::Settings cam_settings;
   cam_settings.cam_index = absl::GetFlag(FLAGS_native_camera_index);
