@@ -4,6 +4,7 @@
 #include <qbuffer.h>
 #include <qglobal.h>
 #include <qhashfunctions.h>
+#include <qiodevicebase.h>
 #include <qobjectdefs.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
@@ -103,16 +104,16 @@ bool FaceDataBase::InitDb() {
 
 // TODO: 序列化问题
 int FaceDataBase::AddUser(const User& user) {
-  QByteArray face_img_bytes((const char*)user.face_img_bytes.data(),
-                            (qsizetype)user.face_img_bytes.size());
+  QByteArray face_img_bytes;
+  QDataStream face_img_stream(&face_img_bytes, QIODeviceBase::WriteOnly);
   // std::copy(user.face_img_bytes.begin(), user.face_img_bytes.end(),
   //           face_img_bytes.begin());
-  QByteArray profile_pic_bytes((const char*)user.profile_pic_bytes.data(),
-                               (qsizetype)user.profile_pic_bytes.size());
+  QByteArray profile_pic_bytes;
+  QDataStream profile_pic_stream(&profile_pic_bytes, QIODeviceBase::WriteOnly);
   // std::copy(user.profile_pic_bytes.begin(), user.profile_pic_bytes.end(),
   //           profile_pic_bytes.begin());
   QByteArray face_feature_bytes;
-  QDataStream vec_stream(face_feature_bytes);
+  QDataStream vec_stream(&face_feature_bytes, QIODeviceBase::WriteOnly);
   vec_stream << user.face_feature;
   // buffer.open(QIODevice::WriteOnly);
   // face_img.save(&buffer, "JPEG");
@@ -162,13 +163,33 @@ int FaceDataBase::GetUserById(int id, User& res) {
                   sql_query.lastError().text().toStdString());
     return -1;
   }
+
   sql_query.next();
-  res.id = sql_query.value(0).toInt();
-  res.email = sql_query.value(1).toString().toStdString();
-  res.nick_name = sql_query.value(2).toString().toStdString();
-  QByteArray img = sql_query.value(3).toByteArray();
-  res.face_img_bytes.clear();
-  std::copy(img.begin(), img.end(), res.face_img_bytes.begin());
+
+  int user_id = sql_query.value(0).toInt();
+  std::string nick_name = sql_query.value(1).toString().toStdString();
+  std::string email = sql_query.value(2).toString().toStdString();
+
+  QByteArray profile_pic_qbytes = sql_query.value(3).toByteArray();
+  QImage profile_pic;
+  profile_pic.loadFromData(profile_pic_qbytes);
+
+  QByteArray face_img_qbytes = sql_query.value(3).toByteArray();
+  QImage face_img;
+  face_img.loadFromData(face_img_qbytes);
+
+  QByteArray feature_qbytes = sql_query.value(5).toByteArray();
+  QDataStream in_feature(feature_qbytes);
+  QVector<float> face_feature;
+  in_feature >> face_feature;
+
+  // User user;
+  res.id = user_id;
+  res.email = email;
+  res.nick_name = nick_name;
+  res.profile_pic = profile_pic;
+  res.face_img = face_img;
+  res.face_feature = face_feature;
 
   return res.id;
 }
@@ -191,26 +212,30 @@ void FaceDataBase::LoadToCache() {
     std::string nick_name = sql_query.value(1).toString().toStdString();
     std::string email = sql_query.value(2).toString().toStdString();
 
-    QByteArray img_qbytes = sql_query.value(3).toByteArray();
-    std::vector<uint8_t> profile_pic_bytes(img_qbytes.size());
-    std::copy(img_qbytes.begin(), img_qbytes.end(), profile_pic_bytes.begin());
+    QByteArray profile_pic_qbytes = sql_query.value(3).toByteArray();
+    QImage profile_pic;
+    profile_pic.loadFromData(profile_pic_qbytes);
 
-    img_qbytes = sql_query.value(4).toByteArray();
-    std::vector<uint8_t> face_img_bytes(img_qbytes.size());
-    std::copy(img_qbytes.begin(), img_qbytes.end(), face_img_bytes.begin());
+    QByteArray face_img_qbytes = sql_query.value(3).toByteArray();
+    QImage face_img;
+    face_img.loadFromData(face_img_qbytes);
 
     QByteArray feature_qbytes = sql_query.value(5).toByteArray();
-    QDataStream in(feature_qbytes);
-    std::vector<float> face_feature;
-    in >> face_feature;
+    QDataStream in_feature(feature_qbytes);
+    QVector<float> face_feature;
+    in_feature >> face_feature;
+    // in >> face_feature;
 
     User user;
     user.id = user_id;
     user.email = email;
     user.nick_name = nick_name;
-    user.profile_pic_bytes = profile_pic_bytes;
-    user.face_img_bytes = face_img_bytes;
+    user.profile_pic = profile_pic;
+    user.face_img = face_img;
     user.face_feature = face_feature;
+    // user.profile_pic_bytes = profile_pic_bytes;
+    // user.face_img_bytes = face_img_bytes;
+    // user.face_feature = face_feature;
 
     users_.push_back(user);
   }
@@ -230,7 +255,23 @@ User FaceDataBase::GetUserById(int id) {
 
 User::User(int id_, std::string nick_name_, std::string email_,
            const QImage& profile_pic_, const QImage& face_img_,
-           const std::vector<float>& face_feature_) {}
+           const std::vector<float>& face_feature_)
+    : id(id_),
+      nick_name(nick_name_),
+      email(email_),
+      profile_pic(profile_pic_),
+      face_img(face_img_),
+      face_feature(face_feature_.begin(), face_feature_.end()) {}
+
+User::User(int id_, std::string nick_name_, std::string email_,
+           const QImage& profile_pic_, const QImage& face_img_,
+           const QVector<float>& face_feature_)
+    : id(id_),
+      nick_name(nick_name_),
+      email(email_),
+      profile_pic(profile_pic_),
+      face_img(face_img_),
+      face_feature(face_feature_) {}
 
 // 重载 << 运算符用于序列化 std::vector<float>
 QDataStream& operator<<(QDataStream& out, const std::vector<float>& vec) {

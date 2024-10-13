@@ -1,6 +1,9 @@
 #pragma once
 
+#include <qglobal.h>
+#include <qimage.h>
 #include <qstringview.h>
+#include <qtypes.h>
 
 #include <string>
 #include <vector>
@@ -15,18 +18,28 @@ namespace arm_face_id {
 namespace data {
 
 struct User {
-  int id;
+  int id = -1;
   std::string nick_name;
   std::string email;
-  std::vector<uint8_t> profile_pic_bytes;
-  std::vector<uint8_t> face_img_bytes;
-  std::vector<float> face_feature;
+  QImage profile_pic;
+  QImage face_img;
+  QVector<float> face_feature;
+
+  // QVector<qint8> profile_pic_bytes;
+  // QVector<qint8> face_img_bytes;
+  // std::vector<uint8_t> profile_pic_bytes;
+  // std::vector<uint8_t> face_img_bytes;
+  // std::vector<float> face_feature;
 
   User() = default;
 
   User(int id_, std::string nick_name_, std::string email_,
        const QImage& profile_pic_, const QImage& face_img_,
        const std::vector<float>& face_feature_);
+
+  User(int id_, std::string nick_name_, std::string email_,
+       const QImage& profile_pic_, const QImage& face_img_,
+       const QVector<float>& face_feature_);
 };
 
 class DBConnection {

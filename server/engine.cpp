@@ -2,11 +2,13 @@
 #include "engine.h"
 
 #include <qdatetime.h>
+#include <qglobal.h>
 
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <ctime>
+#include <iterator>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -14,6 +16,7 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <opencv2/core/hal/interface.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/core/utility.hpp>
@@ -51,9 +54,11 @@ std::shared_ptr<FaceDetectorServer> FaceDetectorServer::BuildAndReturn(
 }
 
 FaceDetectorServer::FaceDetectorServer(const Settings& settings) {
-  detector_ = std::make_unique<seeta::FaceDetector>(settings.fd_setting);
-  recognizer_ = std::make_unique<seeta::FaceRecognizer>(settings.fr_setting);
-  landmarker_ = std::make_unique<seeta::FaceLandmarker>(settings.pd_setting);
+  face_detector_ = std::make_unique<seeta::FaceDetector>(settings.fd_setting);
+  face_recognizer_ =
+      std::make_unique<seeta::FaceRecognizer>(settings.fr_setting);
+  face_landmarker_ =
+      std::make_unique<seeta::FaceLandmarker>(settings.pd_setting);
   spdlog::info("已初始化人脸检测识别模块 ~");
   // spdlog::info(cv::getBuildInformation());
 }
@@ -79,18 +84,6 @@ void FaceDetectorServer::Start() {
       if (frame_queue_.empty()) continue;
       cur_frame = frame_queue_.front();
       frame_queue_.pop();
-      std::vector<cv::Rect> faces;
-      DetectFace(faces, cur_frame);
-      if (faces.empty()) {
-        // TODO
-
-        continue;
-      }
-
-      spdlog::info("检测到 {} 张人脸 :O", faces.size());
-      for (auto iter : this->observers_) {
-        iter->OnFaceDetected(cur_frame, faces);
-      }
       if (need_recognize_) {
         RecognizeFaceFromDb(cur_frame);
         // RecognizeFace(cur_frame);
@@ -131,112 +124,55 @@ void FaceDetectorServer::DetectFace(std::vector<cv::Rect>& faces,
   // classifier_.detectMultiScale(frame, faces);
 }
 
-int64_t FaceDetectorServer::RecognizeFace(const cv::Mat& frame) {
-  std::lock_guard<std::mutex> lock_guard(mutex_);
-  SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
-  float similarity = .0;
-  int64_t id = -2;
-  // id = face_engine_->Query(img_date, &similarity);
-  if (id == -2) {
-    spdlog::error("发生内部错误！ :< ");
-    return -2;
+data::User FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img) {
+  data::User matched_user;
+  matched_user.id = -1;
+  SeetaImageData simg{img.cols, img.rows, img.channels(), img.data};
+  vector<SeetaFaceInfo> faces = DetectFaces(simg);
+  if (faces.size() == 0) {
+    return std::move(matched_user);
   }
-  if (id == -1) {
-    spdlog::info("无法识别到人脸 :< ");
-  } else if (similarity > 0.5) {
-    spdlog::info("识别到人脸: id={}, similarity={} :>", id, similarity);
-  } else {
-    spdlog::info("无法断定人脸: id={}, similarity={} :P", id, similarity);
-  }
-  for (auto iter : observers_) {
-    iter->OnFaceRecognized(frame, cv::Rect(), id);
-  }
+  SeetaFaceInfo top_face = faces.front();
+  // vector<SeetaPointF> face_key_point = MarkFaceKeyPoints(simg, top_face);
+  vector<float> face_feature = ExtractFaceFeature(simg, top_face);
 
-  cv::imwrite(fmt::format(".log_imgs/{}_face_recog.png",
-                          QDateTime::currentDateTime().toString()),
-              frame);
-
-  return id;
-}
-
-int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame) {
-  SeetaImageData img_date{frame.cols, frame.rows, frame.channels(), frame.data};
-  float similarity = .0;
-  // auto id = face_engine_->Query(img_date, &similarity);
-  // if (id != -1 && similarity > 0.5) {
-  //   spdlog::info("注册失败: 人脸的注册信息已经存在 :< (id={},
-  //   similarity={})",
-  //                id, similarity);
-
-  //   for (auto iter : observers_) {
-  //     iter->OnFaceRegistered(
-  //         frame, cv::Rect(),
-  //         interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted);
-  //   }
-
-  //   return interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted;
-  // }
-  // id = face_engine_->Register(img_date);
-  // if (id == -1) {
-  //   spdlog::info("注册失败: 检测不到人脸 :< \n");
-  //   for (auto iter : observers_) {
-  //     iter->OnFaceRegistered(
-  //         frame, cv::Rect(),
-  //         interface::FaceDetectorObserver<int64_t>::kFaceNotDetected);
-  //   }
-  // } else {
-  //   spdlog::info("注册成功: id= {} :> \n", id);
-
-  //   for (auto iter : observers_) {
-  //     iter->OnFaceRegistered(frame, cv::Rect(), id);
-  //   }
-  // }
-  // return id;
-  return 0;
-}
-// TODO: 资源竞争
-int64_t FaceDetectorServer::RecognizeFaceFromDb(const cv::Mat& img,
-                                                data::User* info) {
   float top_similarity = 0.0;
-  data::User user;
-  user.id = -1;
-
   float similarity = 0.0;
-  SeetaImageData target_img{img.cols, img.rows, img.channels(), img.data};
-  cv::Mat decoded_mat;
+  // cv::Mat decoded_mat;
   auto& db = data::FaceDataBase::GetInstance();
-  for (auto& iter : db.Users()) {
-    decoded_mat =
-        cv::imdecode(cv::Mat(iter.face_img_bytes), cv::IMREAD_UNCHANGED);
-    SeetaImageData db_img{decoded_mat.cols, decoded_mat.rows,
-                          decoded_mat.channels(), decoded_mat.data};
+  for (auto& user_in_db : db.Users()) {
     {
       std::lock_guard<std::mutex> guard(mutex_);
-      // similarity = face_engine_->Compare(target_img, db_img);
+      similarity = CalculateFaceSimilarity(user_in_db.face_feature.data(),
+                                           face_feature.data());
     }
 
     if (similarity > top_similarity) {
       top_similarity = similarity;
-      user = iter;
+      matched_user = user_in_db;
     }
   }
 
-  if (top_similarity < 0.6) {
-    return -1;
+  if (top_similarity < 0.9) {
+    data::User user_not_matched;
+    user_not_matched.id = -1;
+    return std::move(user_not_matched);
+    // TODO: 告知观察者
   } else {
-    if (info) *info = user;
+    spdlog::info("识别到人脸: id={}, nick_name={}, similarity={} :>",
+                 matched_user.id, matched_user.nick_name, similarity);
     for (auto iter : observers_) {
-      iter->OnFaceRecognized(img, cv::Rect(), user.id);
+      iter->OnFaceRecognized(img, cv::Rect(), matched_user.id);
     }
   }
 
-  return user.id;
+  return std::move(matched_user);
 }
 
 int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame,
                                          const data::User& user) {
   SeetaImageData simg{frame.cols, frame.rows, frame.channels(), frame.data};
-  SeetaFaceInfoArray faces = detector_->detect(simg);
+  SeetaFaceInfoArray faces = face_detector_->detect(simg);
   if (faces.size == 0) {
     spdlog::info("注册失败: 检测不到人脸 :< \n");
     for (auto iter : observers_) {
@@ -251,7 +187,7 @@ int64_t FaceDetectorServer::RegisterFace(const cv::Mat& frame,
   // cv::waitKey();
   // auto id = this->RecognizeFaceFromDb(frame);
   data::User user_check = user;
-  if (!IsAlreadyExistInDB(simg, faces.data[0], &user_check)) {
+  if (!CompareFeaturesInDB(simg, faces.data[0], &user_check)) {
     // cv::imshow("DB INS", frame);
     // cv::waitKey();
     // TODO: const cv::Mat& frame 源对象被修改了！！！
@@ -303,79 +239,25 @@ void FaceDetectorServer::OnCameraShutDown() {}
 void FaceDetectorServer::OnFrameCaptured(cv::Mat frame) {
   frame_queue_.push(frame);
   if (need_register_) {
-    register_queue_.push(frame);
+    register_queue_.push(frame.clone());
     need_register_ = false;
   }
   return;
 }
 
-int64_t FaceDetectorServer::RegisterFeature(const cv::Mat& img) {
-  vector<SeetaFaceInfo> faces;
-  SeetaImageData seeta_img{img.cols, img.rows, img.channels(), img.data};
-  // faces = face_engine_->DetectFaces(seeta_img);
-  if (faces.empty()) {
-    spdlog::warn("SeetaFace 检测不到人脸 :<");
-    return -1;
-  }
-  SeetaFaceInfo top_face = faces.front();
-  spdlog::info("top_face: pos=({},{}),{}*{}, score={}", top_face.pos.x,
-               top_face.pos.y, top_face.pos.width, top_face.pos.height,
-               top_face.score);
-  // if (IsAlreadyExistInDB(img)) {
-
-  // }
-  // int feature_size = face_engine_->FR.GetExtractFeatureSize();
-  // vector<float> features(feature_size);
-  // std::vector<SeetaPointF> points(face_engine_->PD.number());
-
-  auto start = std::chrono::high_resolution_clock::now();
-
-  // face_engine_->PD.mark(seeta_img, top_face.pos, points.data());
-  // face_engine_->FR.Extract(seeta_img, points.data(), features.data());
-
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> duration = end - start;
-  spdlog::info("特征提取耗时: {}", duration.count());
-
-  float simlarity = 0.0;
-  if (last_features_.size() > 0) {
-    start = std::chrono::high_resolution_clock::now();
-    // simlarity = face_engine_->FR.CalculateSimilarity(features.data(),
-    //                                                  last_features_.data());
-    end = std::chrono::high_resolution_clock::now();
-    duration = end - start;
-    spdlog::info("特征对比耗时: {}", duration.count());
-  }
-
-  spdlog::info("{} 与上一张人脸的相似度 :B", simlarity);
-  // last_features_ = features;
-  // data::FaceDataBase::GetInstance().features_vec_.push_back(features);
-  for (auto iter : observers_) {
-    iter->OnFaceRegistered(
-        img, cv::Rect(),
-        interface::FaceDetectorObserver<int64_t>::kFaceAlreadyExisted);
-  }
-  // // 刷新内存中的用户信息
-  // data::FaceDataBase::GetInstance().LoadToCache();
-  // for (auto iter : observers_) {
-  //   iter->OnFaceRegistered(frame, cv::Rect(), 999);
-  // }
-
-  return -1;
-}
-
-// TODO: 尝试使用 SeetaFace 的特征值对比
-bool FaceDetectorServer::IsAlreadyExistInDB(const SeetaImageData& simg,
-                                            const SeetaFaceInfo& face,
-                                            data::User* user) {
+bool FaceDetectorServer::CompareFeaturesInDB(const SeetaImageData& simg,
+                                             const SeetaFaceInfo& face,
+                                             data::User* user) {
   float similarity = 0.0;
   float top_similarity = 0.0;
   data::User matched_user;
   // SeetaImageData seeta_img{img.cols, img.rows, img.channels(), img.data};
-  vector<float> face_feature;
+  QVector<float> face_feature;
   {
     std::lock_guard<std::mutex> guard(mutex_);
-    face_feature = ExtractFaceFeature(simg, face);
+    auto face_feature_stl_vec = ExtractFaceFeature(simg, face);
+    face_feature = QVector<float>(face_feature_stl_vec.begin(),
+                                  face_feature_stl_vec.end());
   }
   if (face_feature.empty()) {
     return true;
@@ -385,7 +267,7 @@ bool FaceDetectorServer::IsAlreadyExistInDB(const SeetaImageData& simg,
   for (auto& user_in_db : db.Users()) {
     {
       std::lock_guard<std::mutex> guard(mutex_);
-      similarity = recognizer_->CalculateSimilarity(
+      similarity = face_recognizer_->CalculateSimilarity(
           user_in_db.face_feature.data(), face_feature.data());
     }
 
@@ -394,10 +276,12 @@ bool FaceDetectorServer::IsAlreadyExistInDB(const SeetaImageData& simg,
       matched_user = user_in_db;
     }
   }
-  if (top_similarity >= 0.6) {
+  if (top_similarity >= 0.9) {
     if (user) {
       *user = matched_user;
     }
+    spdlog::info("检索到数据库内有相似脸部: id={}, similarity={}",
+                 matched_user.id, top_similarity);
     return true;
   }
 
@@ -409,19 +293,66 @@ bool FaceDetectorServer::IsAlreadyExistInDB(const SeetaImageData& simg,
 
 vector<float> FaceDetectorServer::ExtractFaceFeature(
     const SeetaImageData& simg, const SeetaFaceInfo& face) {
-  vector<float> features(recognizer_->GetExtractFeatureSize());
-  vector<SeetaPointF> face_key_points = landmarker_->mark(simg, face.pos);
-  recognizer_->Extract(simg, face_key_points.data(), features.data());
+  vector<float> features(face_recognizer_->GetExtractFeatureSize());
+  vector<SeetaPointF> face_key_points = face_landmarker_->mark(simg, face.pos);
+  face_recognizer_->Extract(simg, face_key_points.data(), features.data());
 
   return std::move(features);
 }
 
-vector<SeetaFaceInfo> FaceDetectorServer::DetectFace(const cv::Mat& img) {
+vector<float> FaceDetectorServer::ExtractFaceFeature(
+    const SeetaImageData& simg, const vector<SeetaPointF>& face_key_points) {
+  vector<float> features(face_recognizer_->GetExtractFeatureSize());
+  face_recognizer_->Extract(simg, face_key_points.data(), features.data());
+
+  return std::move(features);
+}
+
+vector<SeetaFaceInfo> FaceDetectorServer::DetectFaces(const cv::Mat& img) {
   SeetaImageData simg{img.cols, img.rows, img.channels(), img.data};
-  SeetaFaceInfoArray faces = detector_->detect(simg);
+  SeetaFaceInfoArray faces = face_detector_->detect(simg);
   vector<SeetaFaceInfo> faces_vec(faces.size);
   for (int i = 0; i < faces.size; ++i) {
     faces_vec[i] = faces.data[i];
   }
   return std::move(faces_vec);
+}
+
+vector<SeetaPointF> FaceDetectorServer::MarkFaceKeyPoints(
+    const SeetaImageData& simg, const SeetaFaceInfo& face) {
+  vector<SeetaPointF> face_key_points = face_landmarker_->mark(simg, face.pos);
+  spdlog::info("提取脸部特征点: {} 个", face_key_points.size());
+  return std::move(face_key_points);
+}
+
+vector<SeetaFaceInfo> FaceDetectorServer::DetectFaces(
+    const SeetaImageData& simg) {
+  SeetaFaceInfoArray faces = face_detector_->detect(simg);
+  spdlog::info("检测到人脸: {} 张", faces.size);
+
+  vector<SeetaFaceInfo> faces_vector;
+  for (int i = 0; i < faces.size; ++i) {
+    faces_vector.push_back(faces.data[i]);
+    if (i >= faces.size) continue;
+    spdlog::info("脸部 {} 得分: {}", i, faces.data[i].score);
+  }
+
+  return std::move(faces_vector);
+}
+
+float FaceDetectorServer::CalculateFaceSimilarity(
+    const vector<float>& feature1, const vector<float>& feature2) {
+  float similarity = .0;
+  similarity =
+      face_recognizer_->CalculateSimilarity(feature1.data(), feature2.data());
+  spdlog::info("两张脸部的相似度: {}", similarity);
+  return similarity;
+}
+
+float FaceDetectorServer::CalculateFaceSimilarity(const float* feature1,
+                                                  const float* feature2) {
+  float similarity = .0;
+  similarity = face_recognizer_->CalculateSimilarity(feature1, feature2);
+  spdlog::info("两张脸部的相似度: {}", similarity);
+  return similarity;
 }
