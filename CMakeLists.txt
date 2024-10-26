@@ -97,8 +97,8 @@ find_package(fmt)
 # find_package(absl REQUIRED) find_package(spdlog REQUIRED) find_package(fmt
 # CONFIG REQUIRED)
 
-add_subdirectory(proto)
+# add_subdirectory(proto)
 add_subdirectory(server)
-add_subdirectory(client)
-add_subdirectory(model)
+# add_subdirectory(client)
+# add_subdirectory(model)
 add_subdirectory(utils)
