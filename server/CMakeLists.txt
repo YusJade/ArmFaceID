@@ -1,56 +1,44 @@
-# 设置源文件
 set(SOURCES
-    main.cpp
-    rpc_manager.cpp
-    face_database.cpp
-    engine.cpp
-    gui/gui.cpp
-    gui/ela_gui.cpp
-    gui/register_page.cpp
-    gui/recognition_page.cpp
-    gui/tableview_page.cpp
-    table_model/user_table_model.cpp)
+    src/main.cpp
+    src/face_database.cpp
+    src/engine.cpp
+    src/camera.cpp
+    src/gui.cpp
+    src/utils/base.cpp
+    )
 
-set(QT_LIBS Qt6::Core Qt6::Widgets Qt6::Concurrent Qt6::Sql)
-if(${Qt5_FOUND})
-  set(QT_LIBS Qt5::Core Qt5::Widgets Qt5::Concurrent Qt5::Sql)
+if(${Qt6_FOUND})
+set(Qt_LIBS Qt6::Core Qt6::Widgets Qt6::Sql Qt6::Multimedia Qt6::MultimediaWidgets)
+elseif(${Qt5_FOUND})
+  set(Qt_LIBS Qt5::Core Qt5::Widgets Qt5::Sql Qt5::Multimedia Qt5::MultimediaWidgets)
 endif()
 
-# 创建可执行文件
 add_executable(server ${SOURCES})
 
-add_dependencies(server utils_headers)
+# add_dependencies(server utils_headers)
 
-if(USE_ELA_GUI)
-  target_compile_definitions(server PUBLIC ELA_GUI)
-endif()
-
-# 链接 gRPC 库
 target_link_libraries(
   server
   PUBLIC spdlog::spdlog
-         ${QT_LIBS}
+         rpc
+         ${Qt_LIBS}
          absl::flags
          absl::log
          absl::flags_parse
          absl::flags_usage
-         face_proto
-         utils
          ${OpenCV_LIBS}
          ${SeetaFaceDetector_LIBRARY}
          ${SeetaFaceRecognizer_LIBRARY}
-         ${SeetaFaceLandmarker_LIBRARY}
-         # ${SeetaFace_LIBRARIES}
-         ${ElaWidgets_LIBS})
+         ${SeetaFaceLandmarker_LIBRARY})
 
 target_include_directories(
   server
-  PUBLIC # ${gRPC_INCLUDE_DIRS}
+  PUBLIC 
+         include
+         ${CMAKE_SOURCE_DIR}/third_party
+         ${CMAKE_SOURCE_DIR}/third_party/treasure_chest
          ${OpenCV_INCLUDE_DIRS}
          ${SeetaFaceDetector_INCLUDE_DIR}
          ${SeetaFaceRecognizer_INCLUDE_DIR}
          ${SeetaFaceLandmarker_INCLUDE_DIR}
-         # ${SeetaFace_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIRS}
-         ${CMAKE_CURRENT_SOURCE_DIR}
-         # ${fmt_INCLUDE_DIRS}
          ${ElaWidgets_INCLUDE_DIRS})

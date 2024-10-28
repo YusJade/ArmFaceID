@@ -1,4 +1,6 @@
-export SeetaFaceRecognizer_ROOT_DIR=/home/yu/codefield/SeetaFace6/build/include/
-export SeetaFaceDetector_ROOT_DIR=/home/yu/codefield/SeetaFace6/build/include/
-export SeetaFaceLandmarker_ROOT_DIR=/home/yu/codefield/SeetaFace6/build/include/
-export LD_LIBRARY_PATH=/home/yu/codefield/SeetaFace6/build/lib64/:$LD_LIBRARY_PATH
+#!/bin/bash
+
+export SeetaFace6_DIR=/home/yu/codefield/SeetaFace6/SeetaFace6
+
+# export SeetaFace6_DIR=/home/yu/codefield/SeetaFace6/SeetaFace6
+export LD_LIBRARY_PATH=$SeetaFace6_DIR/lib64/:$LD_LIBRARY_PATH
