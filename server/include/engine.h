@@ -64,7 +64,7 @@ class FaceEngine {
   float CalculateFaceSimilarity(const std::vector<float> &feature1,
                                 const std::vector<float> &feature2);
 
-  data::User RecognizeFaceFromDb(const SeetaFaceInfo &);
+  data::User RecognizeFaceFromDb(const SeetaImageData &);
 
   int64_t RegisterFace(const SeetaImageData &, const SeetaFaceInfo &,
                        const data::User &);

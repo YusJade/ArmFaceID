@@ -51,7 +51,15 @@ void FaceEngine::InitializeFeatures() {
   }
 }
 
-data::User FaceEngine::RecognizeFaceFromDb(const SeetaFaceInfo& simg) {}
+data::User FaceEngine::RecognizeFaceFromDb(const SeetaImageData& simg) {
+  data::User res{-1};
+  auto faces = DetectFaces(simg);
+  if (faces.empty()) {
+    return res;
+  }
+  CompareFeaturesInDB(simg, faces.front(), &res);
+  return res;
+}
 
 int64_t FaceEngine::RegisterFace(const SeetaImageData& simg,
                                  const SeetaFaceInfo& face_info,

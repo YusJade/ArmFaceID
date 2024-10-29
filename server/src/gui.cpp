@@ -1,6 +1,7 @@
 #include "gui.h"
 
 #include <qimage.h>
+#include <qmessagebox.h>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
 #include <qpixmap.h>
@@ -8,6 +9,7 @@
 #include <qradiobutton.h>
 #include <qstringview.h>
 
+#include <QMessageBox>
 #include <cstdint>
 
 #include <opencv2/core/mat.hpp>
@@ -94,7 +96,9 @@ void GUI::SetupConnection() {
     int64_t id = engine_->RegisterFace(current_face_image_, current_face_info_,
                                        new_user);
     if (id == -1) {
-      spdlog::error("注册失败");
+      QMessageBox::information(this, "注册", "注册失败！");
+    } else {
+      QMessageBox::information(this, "注册", "注册成功！");
     }
   });
 }
