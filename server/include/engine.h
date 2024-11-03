@@ -66,13 +66,18 @@ class FaceEngine {
 
   data::User RecognizeFaceFromDb(const SeetaImageData &);
 
+  /**
+   * @brief 注册人脸身份
+   *
+   * @return int64_t -1 表示注册失败
+   */
   int64_t RegisterFace(const SeetaImageData &, const SeetaFaceInfo &,
                        const data::User &);
 
   /**
    * @brief
-   * 与数据库缓存中的人脸特征值进行对比，若存在相似度大于阈值的特征，则返回
-   * True， 该操作不会将数据库中的特征加载到缓存中，而是读取当前的缓存。
+   * 与内存中的人脸特征值进行对比，若存在相似度大于阈值的特征，则返回
+   * True
    * @param[in] simg 包含人脸的图像数据
    * @param[in] face 指定图像中的一个人脸信息
    * @param[out] user 若匹配到相似的人脸，则获得其信息

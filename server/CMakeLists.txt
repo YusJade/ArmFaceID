@@ -13,8 +13,8 @@ elseif(${Qt5_FOUND})
   set(Qt_LIBS Qt5::Core Qt5::Widgets Qt5::Sql Qt5::Multimedia Qt5::MultimediaWidgets)
 endif()
 
+add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)
 add_executable(server ${SOURCES})
-
 # add_dependencies(server utils_headers)
 
 target_link_libraries(

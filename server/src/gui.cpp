@@ -89,9 +89,9 @@ void GUI::SetupConnection() {
     std::string email = email_line_edit->text().toStdString();
     QImage profile_pic =
         utils::generate_hash_avatar(QString::fromStdString(username));
-    QImage face_qimg = utils::mat_to_qimage(
-        cv::Mat{current_face_image_.width, current_face_image_.height,
-                current_face_image_.channels, current_face_image_.data});
+    cv::Mat mat{current_face_image_.height, current_face_image_.width,
+                CV_8UC(current_face_image_.channels), current_face_image_.data};
+    QImage face_qimg = utils::mat_to_qimage(mat);
     data::User new_user{-1, username, email, profile_pic, face_qimg};
     int64_t id = engine_->RegisterFace(current_face_image_, current_face_info_,
                                        new_user);

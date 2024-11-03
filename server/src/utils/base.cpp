@@ -1,8 +1,15 @@
 #include "utils/base.h"
 
+#include <qbuffer.h>
+#include <qimage.h>
+#include <qnamespace.h>
+#include <qstringview.h>
+
 #include <fmt/core.h>
+#include <opencv2/core/hal/interface.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/imgproc.hpp>
+#include <spdlog/spdlog.h>
 
 using namespace arm_face_id;
 // #include <spdlog/fmt/bundled/format.h>
@@ -14,7 +21,20 @@ auto fmt::formatter<QString>::format(const QString& qstr, format_context& ctx)
   return formatter<string_view>::format(str, ctx);
 }
 
-QImage arm_face_id::utils::mat_to_qimage(const cv::Mat& mat) {
+QImage utils::base64_to_qimage(const QString& base64_str,
+                               const QString& format) {
+  QByteArray byte_arr(base64_str.toUtf8());
+  QBuffer buffer(&byte_arr);
+  buffer.open(QIODevice::ReadOnly);
+  QImage img;
+  bool success = img.load(&buffer, format.toStdString().c_str());
+  if (!success) {
+    spdlog::warn("无法将 Base64 解码为图片！");
+  }
+  return img;
+}
+
+QImage utils::mat_to_qimage(const cv::Mat& mat) {
   // 检查cv::Mat是否为空
   if (mat.empty()) {
     return QImage();
@@ -51,21 +71,22 @@ QImage arm_face_id::utils::mat_to_qimage(const cv::Mat& mat) {
 // 转换出Mat为四通道，无法被Seetaface识别
 cv::Mat arm_face_id::utils::qimage_to_mat(const QImage& qimage) {
   cv::Mat mat;
-  switch (qimage.format()) {
+  QImage formatted = qimage.convertedTo(QImage::Format_RGB888);
+  switch (formatted.format()) {
     case QImage::Format_RGB32: {
-      mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC4,
-                    (void*)qimage.bits(), qimage.bytesPerLine());
+      mat = cv::Mat(formatted.height(), formatted.width(), CV_8UC4,
+                    (void*)formatted.bits(), formatted.bytesPerLine());
       break;
     }
     case QImage::Format_RGB888: {
-      mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC3,
-                    (void*)qimage.bits(), qimage.bytesPerLine());
+      mat = cv::Mat(formatted.height(), formatted.width(), CV_8UC3,
+                    (void*)formatted.bits(), formatted.bytesPerLine());
       cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR);
       break;
     }
     case QImage::Format_Grayscale8: {
-      mat = cv::Mat(qimage.height(), qimage.width(), CV_8UC1,
-                    (void*)qimage.bits(), qimage.bytesPerLine());
+      mat = cv::Mat(formatted.height(), formatted.width(), CV_8UC1,
+                    (void*)formatted.bits(), formatted.bytesPerLine());
       break;
     }
     default: {

@@ -129,53 +129,6 @@ int DBConnection::InsertUser(const User& user) {
 
 bool DBConnection::DeleteUser(int user_id) { return 0; }
 
-// void DBConnection::LoadToCache() {
-//   auto db_conn = DBConnection(db_driver, db_name);
-//   auto& sql_query = db_conn.GetSqlQuery();
-//   if (!sql_query.exec("SELECT user_id, user_name, email, profile_pic, "
-//                       "face_img, face_feature FROM tb_user;")) {
-//     spdlog::error("无法读取数据库！>_< : {}",
-//                   sql_query.lastError().text().toStdString());
-//     return;
-//   }
-
-//   users_.clear();
-//   while (sql_query.next()) {
-//     int user_id = sql_query.value(0).toInt();
-//     std::string nick_name = sql_query.value(1).toString().toStdString();
-//     std::string email = sql_query.value(2).toString().toStdString();
-
-//     QByteArray profile_pic_qbytes = sql_query.value(3).toByteArray();
-//     QImage profile_pic;
-//     profile_pic.loadFromData(profile_pic_qbytes);
-
-//     QByteArray face_img_qbytes = sql_query.value(3).toByteArray();
-//     QImage face_img;
-//     face_img.loadFromData(face_img_qbytes);
-
-//     QByteArray feature_qbytes = sql_query.value(5).toByteArray();
-//     QDataStream in_feature(feature_qbytes);
-//     QVector<float> face_feature;
-//     in_feature >> face_feature;
-//     // in >> face_feature;
-
-//     User user;
-//     user.id = user_id;
-//     user.email = email;
-//     user.user_name = nick_name;
-//     user.profile_pic = profile_pic;
-//     user.face_img = face_img;
-//     // user.profile_pic_bytes = profile_pic_bytes;
-//     // user.face_img_bytes = face_img_bytes;
-//     // user.face_feature = face_feature;
-
-//     users_.push_back(user);
-//   }
-
-//   spdlog::info("已将 {} 条用户数据从数据库加载到内存中 :O", users_.size());
-//   return;
-// }
-
 User DBConnection::SelectUserById(int id) {
   QSqlQuery& q = GetSqlQuery();
 
@@ -227,20 +180,28 @@ std::vector<User> DBConnection::SelectAllUser() {
 
     QByteArray face_img_qbytes = q_.value(2).toByteArray();
     QImage face_img;
-    face_img.loadFromData(face_img_qbytes);
+    QDataStream face_stream(face_img_qbytes);
+    face_stream >> face_img;
+    // face_img.loadFromData(face_img_qbytes);
 
     std::string email = q_.value(3).toString().toStdString();
 
     QByteArray profile_pic_qbytes = q_.value(4).toByteArray();
     QImage profile_pic;
-    profile_pic.loadFromData(profile_pic_qbytes);
+    QDataStream profile_stream(profile_pic_qbytes);
+    profile_stream >> profile_pic;
+    // profile_pic.loadFromData(profile_pic_qbytes);
 
     user.id = user_id;
     user.email = email;
     user.user_name = user_name;
     user.profile_pic = profile_pic;
     user.face_img = face_img;
-
+    spdlog::info(
+        "Database: loaded user id={} username={}, face_img=[{}x{}], "
+        "profile_pic=[{}x{}]",
+        user.id, user.user_name, user.face_img.width(), user.face_img.height(),
+        user.profile_pic.width(), user.profile_pic.height());
     res.push_back(user);
   }
   return res;

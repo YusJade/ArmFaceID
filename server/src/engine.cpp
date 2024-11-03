@@ -13,6 +13,8 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <seeta/CFaceInfo.h>
 #include <spdlog/spdlog.h>
 
@@ -38,11 +40,15 @@ FaceEngine::FaceEngine(const Settings& settings) {
 void FaceEngine::InitializeFeatures() {
   data::DBConnection db_conn;
   for (auto& usr : db_conn.SelectAllUser()) {
+    // usr.face_img.save("loaded_face.jpg");
     cv::Mat cv_img = utils::qimage_to_mat(usr.face_img);
+    // cv::imwrite("converted_face.jpg", cv_img);
     SeetaImageData simg{cv_img.cols, cv_img.rows, cv_img.channels(),
                         cv_img.data};
     std::vector<SeetaFaceInfo> face_infos = DetectFaces(simg);
     if (face_infos.empty()) {
+      cv::imshow("load", cv_img);
+      cv::waitKey();
       spdlog::error("用户 {} 的注册脸图失效！", usr.id);
       continue;
     }
@@ -52,6 +58,9 @@ void FaceEngine::InitializeFeatures() {
 }
 
 data::User FaceEngine::RecognizeFaceFromDb(const SeetaImageData& simg) {
+  if (simg.channels != 3) {
+    return data::User{-3};
+  }
   data::User res{-1};
   auto faces = DetectFaces(simg);
   if (faces.empty()) {

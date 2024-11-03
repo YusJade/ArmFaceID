@@ -1,5 +1,7 @@
 #pragma once
 
+#include <qstringview.h>
+
 #include <QCryptographicHash>
 #include <QImage>
 #include <QPainter>
@@ -24,6 +26,9 @@ struct fmt::formatter<QString> : formatter<string_view> {
 
 namespace arm_face_id {
 namespace utils {
+
+QImage base64_to_qimage(const QString& base64_str,
+                        const QString& format = "PNG");
 
 // 将cv::Mat转换为QImage
 QImage mat_to_qimage(const cv::Mat& mat);
