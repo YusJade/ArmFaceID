@@ -16,6 +16,8 @@
 #include <QImage>
 #include <cstring>
 #include <string>
+#include <thread>
+#include <unordered_map>
 #include <vector>
 
 #include <QtSql/QSqlError>
@@ -47,6 +49,18 @@ constexpr const char* sql_select_tb_usr_by_id =
     "SELECT user_id, user_name, face_img, email, profile_pic FROM tb_user "
     "WHERE user_id = "
     "?;";
+
+std::unordered_map<std::thread::id, DBConnection> DBConnection::connection_pool;
+
+DBConnection& DBConnection::GetConnection() {
+  std::thread::id cur_thread_id = std::this_thread::get_id();
+  if (connection_pool.count(cur_thread_id)) {
+    return connection_pool.at(cur_thread_id);
+  }
+  connection_pool.insert_or_assign(cur_thread_id, DBConnection());
+
+  return connection_pool.at(cur_thread_id);
+}
 
 DBConnection::DBConnection(std::string driver, std::string db_name)
     : db_(QSqlDatabase::addDatabase(

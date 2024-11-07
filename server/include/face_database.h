@@ -6,6 +6,7 @@
 #include <qtypes.h>
 
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -38,15 +39,14 @@ class DBConnection {
   ~DBConnection();
 
   static bool InitializeDatabase();
+  static DBConnection& GetConnection();
+
   int InsertUser(const data::User&);
   bool DeleteUser(int user_id);
   std::vector<User> SelectAllUser();
   User SelectUserById(int id);
-
-  [[deprecated]]
-  void LoadToCache();
-  [[deprecated]]
-  const std::vector<UserFeature>& Users() const {
+  [[deprecated]] void LoadToCache();
+  [[deprecated]] const std::vector<UserFeature>& Users() const {
     return users_;
   }
 
@@ -58,6 +58,8 @@ class DBConnection {
   QSqlQuery& GetSqlQuery() { return q_; }
 
   std::vector<UserFeature> users_;
+
+  static std::unordered_map<std::thread::id, DBConnection> connection_pool;
 };
 
 }  // namespace data
