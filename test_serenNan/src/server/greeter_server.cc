@@ -6,13 +6,13 @@
 
 #include "helloworld.grpc.pb.h"
 
+using example::Greeter;
+using example::HelloReply;
+using example::HelloRequest;
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
-using helloworld::Greeter;
-using helloworld::HelloReply;
-using helloworld::HelloRequest;
 
 // 实现 Greeter 服务
 class GreeterServiceImpl final : public Greeter::Service {

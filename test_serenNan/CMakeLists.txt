@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(my_grpc_project)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # 添加 gRPC 和 Protocol Buffers 的库
 find_package(protobuf REQUIRED)
