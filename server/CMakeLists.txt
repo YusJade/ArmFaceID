@@ -8,9 +8,9 @@ set(SOURCES
     )
 
 if(${Qt6_FOUND})
-set(Qt_LIBS Qt6::Core Qt6::Widgets Qt6::Sql Qt6::Multimedia Qt6::MultimediaWidgets)
+set(Qt_LIBS Qt6::Core Qt6::Widgets Qt6::Sql)
 elseif(${Qt5_FOUND})
-  set(Qt_LIBS Qt5::Core Qt5::Widgets Qt5::Sql Qt5::Multimedia Qt5::MultimediaWidgets)
+  set(Qt_LIBS Qt5::Core Qt5::Widgets Qt5::Sql)
 endif()
 
 add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE)

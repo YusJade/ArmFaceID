@@ -4,14 +4,12 @@
 #include <qbuffer.h>
 #include <qglobal.h>
 #include <qhashfunctions.h>
-#include <qiodevicebase.h>
 #include <qobjectdefs.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
 #include <qstringview.h>
 #include <qthread.h>
 #include <qtsqlglobal.h>
-#include <qtypes.h>
 
 #include <QImage>
 #include <cstring>

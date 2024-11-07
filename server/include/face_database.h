@@ -3,7 +3,6 @@
 #include <qglobal.h>
 #include <qimage.h>
 #include <qstringview.h>
-#include <qtypes.h>
 
 #include <string>
 #include <utility>
