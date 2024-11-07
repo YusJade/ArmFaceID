@@ -1,4 +1,13 @@
-# 示例
+# 运行示例
+
+在proto文件夹下创建一个build文件夹，存储编译后的文件。
+使用protoc生成两个文件：helloworld.pb.cc和helloworld.grpc.pb.cc
+```bash
+cd proto
+mkdir build
+protoc --cpp_out=./build helloworld.proto
+protoc --grpc_out=./build --plugin=protoc-gen-grpc=/usr/local/bin/grpc_cpp_plugin helloworld.proto
+```
 
 在项目根目录下运行以下命令：
 ```bash
@@ -13,7 +22,7 @@ make
 ./src/server/greeter_server 
 ```
 出现
-```bash
+```text
 Server listening on 0.0.0.0:5005
 ```
 表示服务端启动成功，客户端连接成功。
@@ -23,9 +32,12 @@ Server listening on 0.0.0.0:5005
 ./src/client/greeter_client
 ```
 出现
-```bash
+```text
 Greeter received: Hello world
 ```
+
+# 代码结构介绍
+
 
 # 错误处理
 

@@ -1,8 +1,8 @@
 # 添加服务端源文件
 set(SERVER_SOURCES
     greeter_server.cc
-    ../../generated/helloworld.pb.cc
-    ../../generated/helloworld.grpc.pb.cc
+    ../../proto/build/helloworld.pb.cc
+    ../../proto/build/helloworld.grpc.pb.cc
 )
 
 # 添加可执行文件

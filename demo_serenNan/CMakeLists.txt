@@ -10,7 +10,7 @@ find_package(protobuf REQUIRED)
 find_package(gRPC REQUIRED)
 
 # 添加生成的代码
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/generated)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/proto/build)
 
 # 添加子目录
 add_subdirectory(src/server)
