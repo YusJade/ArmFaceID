@@ -1,6 +1,5 @@
 #pragma once
 
-#include <qcameradevice.h>
 #include <qlabel.h>
 #include <qmainwindow.h>
 
