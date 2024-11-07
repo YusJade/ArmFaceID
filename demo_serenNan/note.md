@@ -36,9 +36,6 @@ Server listening on 0.0.0.0:5005
 Greeter received: Hello world
 ```
 
-# 代码结构介绍
-
-
 # 错误处理
 
 ## CMake Error
