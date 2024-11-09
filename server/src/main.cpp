@@ -2,6 +2,7 @@
 #include <qimage.h>
 #include <qobject.h>
 #include <qstringview.h>
+#include <qtenvironmentvariables.h>
 
 #include <QApplication>
 #include <QDataStream>
@@ -34,6 +35,8 @@
 
 using arm_face_id::RecognitionRequest;
 using arm_face_id::RecognitionResponse;
+using arm_face_id::RegistrationRequest;
+using arm_face_id::RegistrationResponse;
 using arm_face_id::data::User;
 
 ABSL_FLAG(int, camera_index, 0, "本地摄像头 index");
@@ -73,16 +76,20 @@ int main(int argc, char* argv[]) {
         auto resp_begin_time_point = std::chrono::high_resolution_clock::now();
 
         QByteArray byte_arr(req.image().data(), req.image().size());
+        byte_arr = QByteArray::fromBase64(byte_arr);
         QImage qimage;
         qimage.loadFromData(byte_arr);
         qimage = qimage.convertToFormat(QImage::Format_RGB888);
         cv::Mat mat = arm_face_id::utils::qimage_to_mat(qimage);
-        // cv::imshow("rpc", mat);
+
         User res = engine->RecognizeFaceFromDb(
             SeetaImageData{mat.cols, mat.rows, mat.channels(), mat.data});
+
         if (res.id == -3) {
           return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
-                              "图像格式错误！");
+                              "图像格式错误");
+        } else if (res.id == -1) {
+          return grpc::Status(grpc::StatusCode::OK, "没有识别到身份");
         }
 
         resp.mutable_res()->set_user_id(res.id);
@@ -100,6 +107,11 @@ int main(int argc, char* argv[]) {
         SPDLOG_INFO("处理一条人脸识别请求，耗时 {} s", took_time.count());
 
         return grpc::Status(grpc::StatusCode::OK, "识别成功");
+      });
+
+  server.RegisterRPCHandler<RegistrationRequest, RegistrationResponse>(
+      [&](RegistrationRequest& req, RegistrationResponse& resp) {
+        return grpc::Status(grpc::StatusCode::INTERNAL, "接口尚未完成");
       });
 
   std::thread rpc_thread(&arm_face_id::RpcServer::Run, &server);
