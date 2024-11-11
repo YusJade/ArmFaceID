@@ -16,3 +16,4 @@ db_*
 .*
 /sf3.0_models
 /**/*build*
+envoy.yaml

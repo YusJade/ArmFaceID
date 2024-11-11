@@ -1,8 +1,8 @@
 
+#include <qglobal.h>
 #include <qimage.h>
 #include <qobject.h>
 #include <qstringview.h>
-#include <qtenvironmentvariables.h>
 
 #include <QApplication>
 #include <QDataStream>
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
       [=](RecognitionRequest& req, /* 从客户端接受到的请求消息 */
           RecognitionResponse& resp /* 将要返回的响应消息 */) {
         auto resp_begin_time_point = std::chrono::high_resolution_clock::now();
-
+        SPDLOG_INFO("接受到一个识别请求");
         QByteArray byte_arr(req.image().data(), req.image().size());
         byte_arr = QByteArray::fromBase64(byte_arr);
         QImage qimage;
@@ -109,9 +109,50 @@ int main(int argc, char* argv[]) {
         return grpc::Status(grpc::StatusCode::OK, "识别成功");
       });
 
+  // TODO 人脸注册接口
+  // 有个编码为base64 的图片存放在string里，如何把它转换为qimage
   server.RegisterRPCHandler<RegistrationRequest, RegistrationResponse>(
       [&](RegistrationRequest& req, RegistrationResponse& resp) {
-        return grpc::Status(grpc::StatusCode::INTERNAL, "接口尚未完成");
+        auto resp_begin_time_point = std::chrono::high_resolution_clock::now();
+        SPDLOG_INFO("接受到一个注册请求");
+        QByteArray byte_arr(req.info().face_image().data(),
+                            req.info().face_image().size());
+        byte_arr = QByteArray::fromBase64(byte_arr);
+        QImage qimage;
+        qimage.loadFromData(byte_arr);
+        qimage = qimage.convertToFormat(QImage::Format_RGB888);
+        cv::Mat mat = arm_face_id::utils::qimage_to_mat(qimage);
+
+        User res = engine->RecognizeFaceFromDb(
+            SeetaImageData{mat.cols, mat.rows, mat.channels(), mat.data});
+
+        if (res.id == -3) {
+          return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,"图片格式错误");
+        }
+
+        if (res.id == -2) {
+          return grpc::Status(grpc::StatusCode::ALREADY_EXISTS,
+                              "用户已存在");
+        }
+
+        if (res.id == -1) {
+          return grpc::Status(grpc::StatusCode::OK, "用户注册失败");
+        }
+
+        resp.mutable_res()->set_user_id(res.id);
+        resp.mutable_res()->set_user_name(res.user_name);
+        resp.mutable_res()->set_email(res.email);
+        resp.mutable_res()->set_face_image(resp.res().face_image());
+        resp.mutable_res()->set_profile_picture(resp.res().face_image());
+        resp.mutable_res()->set_last_recognized_datetime(
+            resp.res().face_image());
+
+        auto resp_finish_time_point = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> took_time =
+            resp_finish_time_point - resp_begin_time_point;
+        SPDLOG_INFO("处理一条注册人脸请求，耗时 {} s", took_time.count());
+
+        return grpc::Status(grpc::StatusCode::INTERNAL, "用户注册成功");
       });
 
   std::thread rpc_thread(&arm_face_id::RpcServer::Run, &server);

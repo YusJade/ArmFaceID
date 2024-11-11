@@ -73,10 +73,17 @@ data::User FaceEngine::RecognizeFaceFromDb(const SeetaImageData& simg) {
 int64_t FaceEngine::RegisterFace(const SeetaImageData& simg,
                                  const SeetaFaceInfo& face_info,
                                  const data::User& user) {
+  // TODO 细分错误类型
+  // 检查图片是否有效
+  if (simg.channels != 3) {
+    return -3;
+  }
+
   // 检查数据库内是否已存在该人脸
   if (CompareFeaturesInDB(simg, face_info)) {
-    return -1;
+    return -2;
   }
+  
   // 向数据库插入人脸信息
   data::DBConnection db_conn;
   int64_t id = db_conn.InsertUser(user);
