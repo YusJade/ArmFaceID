@@ -7,6 +7,8 @@
 #include <QApplication>
 #include <QDataStream>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <thread>
 
@@ -27,6 +29,7 @@
 #include "face_database.h"
 #include "grpc/include/rpc_server.h"
 #include "gui.h"
+#include "seeta/CFaceInfo.h"
 #include "seeta/Common/CStruct.h"
 #include "sync_queue/core.h"
 #include "utils/base.h"
@@ -76,7 +79,7 @@ int main(int argc, char* argv[]) {
         auto resp_begin_time_point = std::chrono::high_resolution_clock::now();
         SPDLOG_INFO("接受到一个识别请求");
         QByteArray byte_arr(req.image().data(), req.image().size());
-        byte_arr = QByteArray::fromBase64(byte_arr);
+        // byte_arr = QByteArray::fromBase64(byte_arr);
         QImage qimage;
         qimage.loadFromData(byte_arr);
         qimage = qimage.convertToFormat(QImage::Format_RGB888);
@@ -110,42 +113,49 @@ int main(int argc, char* argv[]) {
       });
 
   // TODO 人脸注册接口
-  // 有个编码为base64 的图片存放在string里，如何把它转换为qimage
   server.RegisterRPCHandler<RegistrationRequest, RegistrationResponse>(
       [&](RegistrationRequest& req, RegistrationResponse& resp) {
         auto resp_begin_time_point = std::chrono::high_resolution_clock::now();
         SPDLOG_INFO("接受到一个注册请求");
         QByteArray byte_arr(req.info().face_image().data(),
                             req.info().face_image().size());
-        byte_arr = QByteArray::fromBase64(byte_arr);
+        // byte_arr = QByteArray::fromBase64(byte_arr);
         QImage qimage;
         qimage.loadFromData(byte_arr);
         qimage = qimage.convertToFormat(QImage::Format_RGB888);
         cv::Mat mat = arm_face_id::utils::qimage_to_mat(qimage);
-
-        User res = engine->RecognizeFaceFromDb(
-            SeetaImageData{mat.cols, mat.rows, mat.channels(), mat.data});
-
-        if (res.id == -3) {
-          return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,"图片格式错误");
+        SeetaImageData image_data{mat.cols, mat.rows, mat.channels(), mat.data};
+        // 检测人脸
+        std::vector<SeetaFaceInfo> face_infos = engine->DetectFaces(image_data);
+        if (face_infos.empty()) {
+          return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
+                              "未检测到人脸");
         }
+        // 使用检测到的人脸信息
+        SeetaFaceInfo face_info = face_infos.front();
 
-        if (res.id == -2) {
+        // 创建用户对象
+        User user;
+        user.id = req.info().user_id();
+        user.user_name = req.info().user_name();
+        user.email = req.info().email();
+        // user.face_img = QImage::fromData(QByteArray::fromBase64(
+        //     req.info().face_image().data(), req.info().face_image().size()));
+
+        int64_t id = engine->RegisterFace(image_data, face_info, user);
+        
+        if (id == -3) {
+          return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
+                              "图像格式错误");
+        }
+        if (id == -2) {
           return grpc::Status(grpc::StatusCode::ALREADY_EXISTS,
-                              "用户已存在");
+                              "人脸信息已存在");
+        }
+        if (id == -1) {
+          return grpc::Status(grpc::StatusCode::INTERNAL, "数据库插入失败");
         }
 
-        if (res.id == -1) {
-          return grpc::Status(grpc::StatusCode::OK, "用户注册失败");
-        }
-
-        resp.mutable_res()->set_user_id(res.id);
-        resp.mutable_res()->set_user_name(res.user_name);
-        resp.mutable_res()->set_email(res.email);
-        resp.mutable_res()->set_face_image(resp.res().face_image());
-        resp.mutable_res()->set_profile_picture(resp.res().face_image());
-        resp.mutable_res()->set_last_recognized_datetime(
-            resp.res().face_image());
 
         auto resp_finish_time_point = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> took_time =
