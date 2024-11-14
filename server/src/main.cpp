@@ -74,9 +74,9 @@ int main(int argc, char* argv[]) {
       [=](RecognitionRequest& req, /* 从客户端接受到的请求消息 */
           RecognitionResponse& resp /* 将要返回的响应消息 */) {
         auto resp_begin_time_point = std::chrono::high_resolution_clock::now();
-
+        SPDLOG_DEBUG("received base64 img: {}", req.image());
         QByteArray byte_arr(req.image().data(), req.image().size());
-        byte_arr = QByteArray::fromBase64(byte_arr);
+        // byte_arr = QByteArray::fromBase64(byte_arr);
         QImage qimage;
         qimage.loadFromData(byte_arr);
         qimage = qimage.convertToFormat(QImage::Format_RGB888);
@@ -140,6 +140,8 @@ int main(int argc, char* argv[]) {
     return app.exec();
   }
 
+  QCoreApplication app(argc, argv);
+  app.exec();
   rpc_thread.join();
 
   return 0;
