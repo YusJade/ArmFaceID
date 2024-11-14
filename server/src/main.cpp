@@ -134,13 +134,16 @@ int main(int argc, char* argv[]) {
         // 使用检测到的人脸信息
         SeetaFaceInfo face_info = face_infos.front();
 
+        // TODO: 校验用户名邮箱，不为空且格式正确
+
         // 创建用户对象
         User user;
         user.id = req.info().user_id();
         user.user_name = req.info().user_name();
         user.email = req.info().email();
-        // user.face_img = QImage::fromData(QByteArray::fromBase64(
-        //     req.info().face_image().data(), req.info().face_image().size()));
+        user.face_img = qimage;
+        user.profile_pic = arm_face_id::utils::generate_hash_avatar(
+            QString::fromStdString(user.user_name));
 
         int64_t id = engine->RegisterFace(image_data, face_info, user);
 

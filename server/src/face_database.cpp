@@ -101,6 +101,10 @@ bool DBConnection::InitializeDatabase() {
 }
 
 int DBConnection::InsertUser(const User& user) {
+  if (user.face_img.isNull()) {
+    return -1;
+  }
+
   QByteArray face_img_bytes;
   QDataStream face_img_stream(&face_img_bytes, QIODeviceBase::WriteOnly);
   face_img_stream << user.face_img;
