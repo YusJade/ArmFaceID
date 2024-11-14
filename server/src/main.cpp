@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
         SPDLOG_INFO("接受到一个注册请求");
         QByteArray byte_arr(req.info().face_image().data(),
                             req.info().face_image().size());
-        // byte_arr = QByteArray::fromBase64(byte_arr);
+        //byte_arr = QByteArray::fromBase64(byte_arr);
         QImage qimage;
         qimage.loadFromData(byte_arr);
         qimage = qimage.convertToFormat(QImage::Format_RGB888);
@@ -127,6 +127,9 @@ int main(int argc, char* argv[]) {
         SeetaImageData image_data{mat.cols, mat.rows, mat.channels(), mat.data};
         // 检测人脸
         std::vector<SeetaFaceInfo> face_infos = engine->DetectFaces(image_data);
+        // if (image_data.data == nullptr) {
+        //   spdlog::info("数据为空");
+        // }
         if (face_infos.empty()) {
           return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
                               "未检测到人脸");
@@ -139,8 +142,8 @@ int main(int argc, char* argv[]) {
         user.id = req.info().user_id();
         user.user_name = req.info().user_name();
         user.email = req.info().email();
-        // user.face_img = QImage::fromData(QByteArray::fromBase64(
-        //     req.info().face_image().data(), req.info().face_image().size()));
+        user.face_img.loadFromData(req.info().face_image());
+        user.profile_pic.loadFromData(req.info().profile_picture());
 
         int64_t id = engine->RegisterFace(image_data, face_info, user);
         
