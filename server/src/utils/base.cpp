@@ -14,8 +14,9 @@
 using namespace arm_face_id;
 // #include <spdlog/fmt/bundled/format.h>
 
-auto fmt::formatter<QString>::format(const QString& qstr, format_context& ctx)
-    const -> format_context::iterator {
+auto fmt::formatter<QString>::format(const QString& qstr,
+                                     format_context& ctx) const
+    -> format_context::iterator {
   std::string str = qstr.toStdString();
   // ctx.out() = std::copy(str.begin(), str.end(), ctx.out());
   return formatter<string_view>::format(str, ctx);
@@ -117,29 +118,42 @@ void arm_face_id::utils::bytes_to_mat(std::string bytes_str, cv::Mat& res) {
 }
 
 QImage utils::generate_hash_avatar(const QString& username) {
-  // 创建一个 625x625 的图像
-  QImage image(625, 625, QImage::Format_RGB32);
+  // 创建一个 250x250 的图像
+  const int blockSize = 50;  // 每个块的大小
+  const int gridSize = 5;    // 网格尺寸（5x5）
+  const int imageSize = gridSize * blockSize;
+  QImage image(imageSize, imageSize, QImage::Format_RGB32);
   image.fill(Qt::white);
 
   // 使用 QCryptographicHash 生成哈希值
   QByteArray hash =
       QCryptographicHash::hash(username.toUtf8(), QCryptographicHash::Md5);
 
-  // 将哈希值转换为颜色值
+  // 将哈希值的前三个字节作为颜色值
   QColor color;
-  color.setRgb(hash[0], hash[1], hash[2]);
+  color.setRgb(static_cast<quint8>(hash[0]), static_cast<quint8>(hash[1]),
+               static_cast<quint8>(hash[2]));
 
-  // 使用 QPainter 绘制 5x5 的块
   QPainter painter(&image);
   painter.setBrush(color);
   painter.setPen(Qt::NoPen);
 
-  for (int row = 0; row < 5; ++row) {
-    for (int col = 0; col < 5; ++col) {
-      // 计算块的位置和大小
-      int x = col * 125;
-      int y = row * 125;
-      painter.drawRect(x, y, 125, 125);
+  // 遍历 5x5 网格，仅绘制对称的左侧
+  for (int row = 0; row < gridSize; ++row) {
+    for (int col = 0; col < gridSize / 2 + 1; ++col) {  // 左侧 + 中间列
+      // 使用哈希值决定当前块是否填充颜色
+      int hashIndex = row * gridSize + col;
+      if (hashIndex < hash.size() &&
+          static_cast<quint8>(hash[hashIndex]) % 2 == 0) {
+        // 计算块的位置
+        int x = col * blockSize;
+        int y = row * blockSize;
+
+        // 绘制对称的块
+        painter.drawRect(x, y, blockSize, blockSize);  // 左侧块
+        painter.drawRect((gridSize - 1 - col) * blockSize, y, blockSize,
+                         blockSize);  // 对称块
+      }
     }
   }
 

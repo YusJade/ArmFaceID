@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+#include <absl/time/clock.h>
+#include <absl/time/time.h>
 #include <fmt/core.h>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -40,7 +42,9 @@ FaceEngine::FaceEngine(const Settings& settings) {
 void FaceEngine::InitializeFeatures() {
   data::DBConnection db_conn;
   for (auto& usr : db_conn.SelectAllUser()) {
-    // usr.face_img.save("loaded_face.jpg");
+    // usr.face_img.save(QString::fromStdString(
+    //     fmt::format("./faces_loaded_{}.jpg",
+    //     absl::FormatTime(absl::Now()))));
     cv::Mat cv_img = utils::qimage_to_mat(usr.face_img);
     // cv::imwrite("converted_face.jpg", cv_img);
     SeetaImageData simg{cv_img.cols, cv_img.rows, cv_img.channels(),
@@ -66,7 +70,28 @@ data::User FaceEngine::RecognizeFaceFromDb(const SeetaImageData& simg) {
   if (faces.empty()) {
     return res;
   }
-  CompareFeaturesInDB(simg, faces.front(), &res);
+  auto face_feature = ExtractFaceFeature(simg, faces.front());
+  float similarity = 0.0;
+  float top_similarity = 0.0;
+
+  for (auto& usr : users_) {
+    {
+      std::lock_guard<std::mutex> guard(mutex_);
+      similarity = face_recognizer_->CalculateSimilarity(usr.feature.data(),
+                                                         face_feature.data());
+      SPDLOG_DEBUG("对比相似度：{} # ({},{})", similarity, usr.user.id,
+                   usr.user.user_name);
+    }
+
+    if (similarity > top_similarity) {
+      res = usr.user;
+      top_similarity = similarity;
+    }
+  }
+
+  if (top_similarity < 0.75) {
+    return data::User{-1};
+  }
   return res;
 }
 
@@ -83,7 +108,7 @@ int64_t FaceEngine::RegisterFace(const SeetaImageData& simg,
   if (CompareFeaturesInDB(simg, face_info)) {
     return -2;
   }
-  
+
   // 向数据库插入人脸信息
   data::DBConnection db_conn;
   int64_t id = db_conn.InsertUser(user);
@@ -115,7 +140,7 @@ bool FaceEngine::CompareFeaturesInDB(const SeetaImageData& simg,
     return true;
   }
 
-  data::DBConnection db_conn;
+  // data::DBConnection db_conn;
   for (auto& usr : users_) {
     {
       std::lock_guard<std::mutex> guard(mutex_);
@@ -128,7 +153,7 @@ bool FaceEngine::CompareFeaturesInDB(const SeetaImageData& simg,
       matched_user = usr.user;
     }
   }
-  if (top_similarity >= 0.8) {
+  if (top_similarity >= 0.83) {
     if (user) *user = matched_user;
     spdlog::info("检索到数据库内有相似脸部: id={}, similarity={}",
                  matched_user.id, top_similarity);

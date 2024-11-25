@@ -18,6 +18,8 @@
 #include <absl/flags/usage.h>
 #include <absl/log/globals.h>
 #include <absl/log/initialize.h>
+#include <absl/time/clock.h>
+#include <absl/time/time.h>
 #include <grpcpp/support/status.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui.hpp>
@@ -25,6 +27,7 @@
 #include <spdlog/spdlog.h>
 
 #include "camera.h"
+#include "database/mysql.h"
 #include "engine.h"
 #include "face_database.h"
 #include "grpc/include/rpc_server.h"
@@ -36,6 +39,7 @@
 
 #include "face.pb.h"
 
+using arm_face_id::MySqlSchema;
 using arm_face_id::RecognitionRequest;
 using arm_face_id::RecognitionResponse;
 using arm_face_id::RegistrationRequest;
@@ -58,8 +62,8 @@ int main(int argc, char* argv[]) {
                                        SeetaDevice::SEETA_DEVICE_GPU);
   seeta::ModelSetting FR_model_setting("sf3.0_models/face_recognizer.csta",
                                        SeetaDevice::SEETA_DEVICE_GPU);
-  seeta::ModelSetting PD_model_setting(
-      "sf3.0_models/face_landmarker_pts68.csta", SeetaDevice::SEETA_DEVICE_GPU);
+  seeta::ModelSetting PD_model_setting("sf3.0_models/face_landmarker_pts5.csta",
+                                       SeetaDevice::SEETA_DEVICE_GPU);
   arm_face_id::FaceEngine::Settings engine_settings;
   engine_settings.fd_setting = FD_model_setting;
   engine_settings.fr_setting = FR_model_setting;
@@ -76,8 +80,9 @@ int main(int argc, char* argv[]) {
   server.RegisterRPCHandler<RecognitionRequest, RecognitionResponse>(
       [=](RecognitionRequest& req, /* 从客户端接受到的请求消息 */
           RecognitionResponse& resp /* 将要返回的响应消息 */) {
+        SPDLOG_INFO("接收一条人脸识别请求");
         auto resp_begin_time_point = std::chrono::high_resolution_clock::now();
-        SPDLOG_DEBUG("received base64 img: {}", req.image());
+        // SPDLOG_DEBUG("received base64 img: {}", req.image());
         QByteArray byte_arr(req.image().data(), req.image().size());
         // byte_arr = QByteArray::fromBase64(byte_arr);
         QImage qimage;
@@ -92,23 +97,38 @@ int main(int argc, char* argv[]) {
           return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
                               "图像格式错误");
         } else if (res.id == -1) {
+          resp.mutable_res()->set_user_id(-1);
+          resp.mutable_res()->set_user_name("");
+          resp.mutable_res()->set_email("");
+          resp.mutable_res()->set_face_image("");
+          resp.mutable_res()->set_profile_picture("");
           return grpc::Status(grpc::StatusCode::OK, "没有识别到身份");
         }
+
+        arm_face_id::data::DBConnection conn;
+        res = conn.SelectUserById(res.id);
+        QByteArray profile_pic_bytes;
+        QDataStream stream(&profile_pic_bytes, QIODevice::WriteOnly);
+        stream << res.profile_pic;
+        res.profile_pic.save("head.jpg");
 
         resp.mutable_res()->set_user_id(res.id);
         resp.mutable_res()->set_user_name(res.user_name);
         resp.mutable_res()->set_email(res.email);
         resp.mutable_res()->set_face_image(resp.res().face_image());
-        resp.mutable_res()->set_profile_picture(resp.res().face_image());
+        resp.mutable_res()->set_profile_picture(
+            profile_pic_bytes.toStdString());
         resp.mutable_res()->set_last_recognized_datetime(
-            resp.res().face_image());
+            absl::FormatTime(absl::Now()));
 
         auto resp_finish_time_point = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> took_time =
             resp_finish_time_point - resp_begin_time_point;
 
-        SPDLOG_INFO("处理一条人脸识别请求，耗时 {} s", took_time.count());
-
+        SPDLOG_INFO("处理一条人脸识别请求，耗时 {} s: ({},{},{},{}x{},size:{})",
+                    took_time.count(), res.id, res.user_name, res.email,
+                    res.face_img.width(), res.face_img.height(),
+                    (int)profile_pic_bytes.size());
         return grpc::Status(grpc::StatusCode::OK, "识别成功");
       });
 
@@ -164,7 +184,7 @@ int main(int argc, char* argv[]) {
             resp_finish_time_point - resp_begin_time_point;
         SPDLOG_INFO("处理一条注册人脸请求，耗时 {} s", took_time.count());
 
-        return grpc::Status(grpc::StatusCode::INTERNAL, "用户注册成功");
+        return grpc::Status(grpc::StatusCode::OK, "用户注册成功");
       });
 
   std::thread rpc_thread(&arm_face_id::RpcServer::Run, &server);
@@ -194,6 +214,7 @@ int main(int argc, char* argv[]) {
   }
 
   QCoreApplication app(argc, argv);
+
   app.exec();
   rpc_thread.join();
 

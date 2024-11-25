@@ -5,6 +5,8 @@ set(SOURCES
     src/camera.cpp
     src/gui.cpp
     src/utils/base.cpp
+    src/database/mysql.cpp
+    src/database/user.cpp
     )
 
 if(${Qt6_FOUND})

@@ -167,9 +167,11 @@ User DBConnection::SelectUserById(int id) {
 
     std::string email = q.value(3).toString().toStdString();
 
+    // TODO: 读数据库有效
     QByteArray profile_pic_qbytes = q.value(4).toByteArray();
     QImage profile_pic;
-    profile_pic.loadFromData(profile_pic_qbytes);
+    QDataStream profile_stream(profile_pic_qbytes);
+    profile_stream >> profile_pic;
 
     user.id = user_id;
     user.email = email;
