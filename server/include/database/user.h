@@ -2,6 +2,7 @@
 
 #include <qimage.h>
 
+#include <cstdint>
 #include <string>
 
 namespace arm_face_id {
@@ -9,7 +10,7 @@ namespace domain {
 using std::string;
 
 struct User {
-  string user_id;
+  int64_t user_id;
   string user_name;
   string email;
   QImage profile_pic;

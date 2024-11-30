@@ -1,6 +1,5 @@
 set(SOURCES
     src/main.cpp
-    src/face_database.cpp
     src/engine.cpp
     src/camera.cpp
     src/gui.cpp
@@ -31,7 +30,8 @@ target_link_libraries(
          ${OpenCV_LIBS}
          ${SeetaFaceDetector_LIBRARY}
          ${SeetaFaceRecognizer_LIBRARY}
-         ${SeetaFaceLandmarker_LIBRARY})
+         ${SeetaFaceLandmarker_LIBRARY}
+         ${SeetaQualityAssessor_LIBRARY})
 
 target_include_directories(
   server
@@ -43,4 +43,4 @@ target_include_directories(
          ${SeetaFaceDetector_INCLUDE_DIR}
          ${SeetaFaceRecognizer_INCLUDE_DIR}
          ${SeetaFaceLandmarker_INCLUDE_DIR}
-         ${ElaWidgets_INCLUDE_DIRS})
+         ${SeetaQualityAssessor_INCLUDE_DIR})

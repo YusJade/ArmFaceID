@@ -12,7 +12,14 @@
 #include <seeta/FaceDetector.h>
 #include <seeta/FaceLandmarker.h>
 #include <seeta/FaceRecognizer.h>
+#include <seeta/QualityOfClarity.h>
+#include <seeta/QualityOfIntegrity.h>
+#include <seeta/QualityOfPose.h>
+#include <seeta/QualityOfResolution.h>
 
+#include "Common/Struct.h"
+#include "QualityStructure.h"
+#include "database/schema.h"
 #include "face_database.h"
 #include "seeta/Common/CStruct.h"
 
@@ -36,9 +43,13 @@ class FaceEngine {
     seeta::ModelSetting pd_setting;
     // 初始化 seeta::FaceEngine 在人脸识别模块
     seeta::ModelSetting fr_setting;
+  };
 
-    // OpenCV 级联分类器在路径
-    std::string classifier_path;
+  struct QualityAnalyzeResult {
+    seeta::QualityLevel resolution;
+    seeta::QualityLevel clarity;
+    seeta::QualityLevel integrity;
+    seeta::QualityLevel pose;
   };
 
  public:
@@ -51,7 +62,25 @@ class FaceEngine {
   // inline void Stop() { is_thread_running_ = false; }
 
   // 读取数据库脸图生成特征缓存。
-  void InitializeFeatures();
+  void LoadFeaturesToMem(Schema &schema);
+
+  QualityAnalyzeResult AnalyzeQuality(const SeetaImageData &simg,
+                                      const SeetaFaceInfo &face);
+
+  bool AddNewFeatureToMem(const SeetaImageData &simg, const SeetaFaceInfo &face,
+                          int64_t face_id);
+
+  /**
+   * @brief 从内存缓存中检查系统内是否存在相似的人脸
+   *
+   * @param simg
+   * @param face
+   * @param id
+   * @return true
+   * @return false
+   */
+  bool CheckIfFaceExist(const SeetaImageData &simg, const SeetaFaceInfo &face,
+                        int64_t *id = nullptr, float threshold = 0.85);
 
   std::vector<float> ExtractFaceFeature(const SeetaImageData &,
                                         const SeetaFaceInfo &);
@@ -64,15 +93,16 @@ class FaceEngine {
   float CalculateFaceSimilarity(const std::vector<float> &feature1,
                                 const std::vector<float> &feature2);
 
-  data::User RecognizeFaceFromDb(const SeetaImageData &);
+  int64_t RecognizeFaceFromMem(const SeetaImageData &, float threshold = 0.85);
 
   /**
    * @brief 注册人脸身份
    *
    * @return int64_t -1 表示注册失败
    */
-  int64_t RegisterFace(const SeetaImageData &, const SeetaFaceInfo &,
-                       const data::User &);
+  [[deprecated("剥离业务逻辑")]] int64_t RegisterFace(const SeetaImageData &,
+                                                      const SeetaFaceInfo &,
+                                                      const data::User &);
 
   /**
    * @brief
@@ -84,20 +114,23 @@ class FaceEngine {
    * @return true 数据库中没有匹配的特征
    * @return false 在数据库中发现了匹配的特征
    */
-  bool CompareFeaturesInDB(const SeetaImageData &simg,
-                           const SeetaFaceInfo &face,
-                           data::User *user = nullptr);
+  [[deprecated]] bool CompareFeaturesInDB(const SeetaImageData &simg,
+                                          const SeetaFaceInfo &face,
+                                          data::User *user = nullptr);
 
  private:
   std::mutex mutex_;
   std::unique_ptr<seeta::FaceLandmarker> face_landmarker_;
   std::unique_ptr<seeta::FaceDetector> face_detector_;
   std::unique_ptr<seeta::FaceRecognizer> face_recognizer_;
-
-  struct UserWithFeature {
-    data::User user;
+  seeta::QualityOfResolution resolution_assessor_;  // 人脸分辨率评估器
+  seeta::QualityOfClarity clarity_assessor_;        // 人脸清晰度评估器
+  seeta::QualityOfIntegrity integrity_assessor_;    // 人脸完整度评估器
+  seeta::QualityOfPose pose_assessor_;              // 人脸姿态评估器
+  struct FaceFeature {
+    int64_t id = -1;
     std::vector<float> feature;
   };
-  std::vector<UserWithFeature> users_;
+  std::vector<FaceFeature> face_features_cach_;
 };
 }  // namespace arm_face_id

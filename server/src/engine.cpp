@@ -20,6 +20,7 @@
 #include <seeta/CFaceInfo.h>
 #include <spdlog/spdlog.h>
 
+#include "database/schema.h"
 #include "face_database.h"
 #include "seeta/Common/CStruct.h"
 #include "seeta/FaceDetector.h"
@@ -35,13 +36,25 @@ FaceEngine::FaceEngine(const Settings& settings) {
       std::make_unique<seeta::FaceRecognizer>(settings.fr_setting);
   face_landmarker_ =
       std::make_unique<seeta::FaceLandmarker>(settings.pd_setting);
-  spdlog::info("已初始化人脸检测识别模块 ~");
+  std::cout << R"(
+================================================================================
+
+ █████╗ ██████╗ ███╗   ███╗      ███████╗ █████╗  ██████╗███████╗    ██╗██████╗ 
+██╔══██╗██╔══██╗████╗ ████║      ██╔════╝██╔══██╗██╔════╝██╔════╝    ██║██╔══██╗
+███████║██████╔╝██╔████╔██║█████╗█████╗  ███████║██║     █████╗█████╗██║██║  ██║
+██╔══██║██╔══██╗██║╚██╔╝██║╚════╝██╔══╝  ██╔══██║██║     ██╔══╝╚════╝██║██║  ██║
+██║  ██║██║  ██║██║ ╚═╝ ██║      ██║     ██║  ██║╚██████╗███████╗    ██║██████╔╝
+╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝      ╚═╝     ╚═╝  ╚═╝ ╚═════╝╚══════╝    ╚═╝╚═════╝ 
+                                                                                
+================================================================================
+)" << std::endl;
+  SPDLOG_INFO("Initialized FaceEngine :>");
   // spdlog::info(cv::getBuildInformation());
 }
 
-void FaceEngine::InitializeFeatures() {
-  data::DBConnection db_conn;
-  for (auto& usr : db_conn.SelectAllUser()) {
+void FaceEngine::LoadFeaturesToMem(Schema& schema) {
+  // data::DBConnection db_conn;
+  for (auto& usr : schema.ListAllUsers()) {
     // usr.face_img.save(QString::fromStdString(
     //     fmt::format("./faces_loaded_{}.jpg",
     //     absl::FormatTime(absl::Now()))));
@@ -53,46 +66,98 @@ void FaceEngine::InitializeFeatures() {
     if (face_infos.empty()) {
       cv::imshow("load", cv_img);
       cv::waitKey();
-      spdlog::error("用户 {} 的注册脸图失效！", usr.id);
+      SPDLOG_WARN(
+          "Failed to extract features from user`s face image (id={}), this "
+          "user is diable!",
+          usr.user_id);
       continue;
     }
     std::vector<float> feature = ExtractFaceFeature(simg, face_infos.front());
-    users_.push_back(UserWithFeature{usr, feature});
+    face_features_cach_.push_back(FaceFeature{usr.user_id, feature});
   }
 }
 
-data::User FaceEngine::RecognizeFaceFromDb(const SeetaImageData& simg) {
-  if (simg.channels != 3) {
-    return data::User{-3};
+bool FaceEngine::CheckIfFaceExist(const SeetaImageData& simg,
+                                  const SeetaFaceInfo& face, int64_t* id,
+                                  float threshold) {
+  auto checked_feature = ExtractFaceFeature(simg, face);
+  float top_similarity = 0.0;
+  int64_t top_face_id = -1;
+
+  for (auto face_feature : face_features_cach_) {
+    std::lock_guard<std::mutex> guard(mutex_);
+    float cur_similarity = face_recognizer_->CalculateSimilarity(
+        face_feature.feature.data(), checked_feature.data());
+    if (cur_similarity > top_similarity) {
+      top_similarity = cur_similarity;
+      top_face_id = face_feature.id;
+    }
   }
-  data::User res{-1};
+
+  SPDLOG_INFO("Top similar face id: {} ({})", top_face_id, top_similarity);
+
+  if (top_similarity >= threshold) {
+    if (id) *id = top_face_id;
+    return true;
+  }
+  return false;
+}
+
+FaceEngine::QualityAnalyzeResult FaceEngine::AnalyzeQuality(
+    const SeetaImageData& simg, const SeetaFaceInfo& face) {
+  int feature_size = face_recognizer_->GetExtractFeatureSize();
+  SeetaPointF points[feature_size];
+  face_landmarker_->mark(simg, face.pos, points);
+
+  auto resolution =
+      resolution_assessor_.check(simg, face.pos, points, feature_size);
+  auto clarity = clarity_assessor_.check(simg, face.pos, points, feature_size);
+  auto integrity =
+      integrity_assessor_.check(simg, face.pos, points, feature_size);
+  auto pose = pose_assessor_.check(simg, face.pos, points, feature_size);
+
+  return QualityAnalyzeResult{resolution.level, clarity.level, integrity.level,
+                              pose.level};
+}
+
+bool FaceEngine::AddNewFeatureToMem(const SeetaImageData& simg,
+                                    const SeetaFaceInfo& face,
+                                    int64_t face_id) {
+  auto features = ExtractFaceFeature(simg, face);
+  face_features_cach_.push_back(FaceFeature{face_id, features});
+  return true;
+}
+
+int64_t FaceEngine::RecognizeFaceFromMem(const SeetaImageData& simg,
+                                         float threshold) {
+  if (simg.channels != 3) {
+    return -3;
+  }
   auto faces = DetectFaces(simg);
   if (faces.empty()) {
-    return res;
+    return -1;
   }
   auto face_feature = ExtractFaceFeature(simg, faces.front());
   float similarity = 0.0;
   float top_similarity = 0.0;
-
-  for (auto& usr : users_) {
+  int user_id = -1;
+  for (auto& cur : face_features_cach_) {
     {
       std::lock_guard<std::mutex> guard(mutex_);
-      similarity = face_recognizer_->CalculateSimilarity(usr.feature.data(),
+      similarity = face_recognizer_->CalculateSimilarity(cur.feature.data(),
                                                          face_feature.data());
-      SPDLOG_DEBUG("对比相似度：{} # ({},{})", similarity, usr.user.id,
-                   usr.user.user_name);
     }
 
     if (similarity > top_similarity) {
-      res = usr.user;
+      user_id = cur.id;
       top_similarity = similarity;
     }
   }
 
-  if (top_similarity < 0.75) {
-    return data::User{-1};
+  if (top_similarity < threshold) {
+    return -1;
   }
-  return res;
+  return user_id;
 }
 
 int64_t FaceEngine::RegisterFace(const SeetaImageData& simg,
@@ -110,15 +175,16 @@ int64_t FaceEngine::RegisterFace(const SeetaImageData& simg,
   }
 
   // 向数据库插入人脸信息
-  data::DBConnection db_conn;
-  int64_t id = db_conn.InsertUser(user);
-  if (id == -1) {
-    return -1;
-  }
-  // 更新内存中的人脸特征
-  users_.push_back(UserWithFeature{user, ExtractFaceFeature(simg, face_info)});
+  // data::DBConnection db_conn;
+  // int64_t id = db_conn.InsertUser(user);
+  // if (id == -1) {
+  //   return -1;
+  // }
+  // // 更新内存中的人脸特征
+  // face_features_cach_.push_back(
+  //     FaceFeature{user.id, ExtractFaceFeature(simg, face_info)});
 
-  return id;
+  return -1;
 }
 
 // 比对是否符合注册条件
@@ -141,7 +207,7 @@ bool FaceEngine::CompareFeaturesInDB(const SeetaImageData& simg,
   }
 
   // data::DBConnection db_conn;
-  for (auto& usr : users_) {
+  for (auto& usr : face_features_cach_) {
     {
       std::lock_guard<std::mutex> guard(mutex_);
       similarity = face_recognizer_->CalculateSimilarity(usr.feature.data(),
@@ -150,13 +216,12 @@ bool FaceEngine::CompareFeaturesInDB(const SeetaImageData& simg,
 
     if (similarity > top_similarity) {
       top_similarity = similarity;
-      matched_user = usr.user;
+      // matched_user = usr.user;
     }
   }
   if (top_similarity >= 0.83) {
     if (user) *user = matched_user;
-    spdlog::info("检索到数据库内有相似脸部: id={}, similarity={}",
-                 matched_user.id, top_similarity);
+    SPDLOG_INFO("id={}, similarity={}", matched_user.id, top_similarity);
     return true;
   }
 
@@ -186,19 +251,18 @@ std::vector<SeetaPointF> FaceEngine::MarkFaceKeyPoints(
     const SeetaImageData& simg, const SeetaFaceInfo& face) {
   std::vector<SeetaPointF> face_key_points =
       face_landmarker_->mark(simg, face.pos);
-  spdlog::info("提取脸部特征点: {} 个", face_key_points.size());
   return std::move(face_key_points);
 }
 
 std::vector<SeetaFaceInfo> FaceEngine::DetectFaces(const SeetaImageData& simg) {
   SeetaFaceInfoArray faces = face_detector_->detect(simg);
-  spdlog::info("检测到人脸: {} 张", faces.size);
+  SPDLOG_INFO("Detectd {} faces on image.", faces.size);
 
   std::vector<SeetaFaceInfo> faces_vector;
   for (int i = 0; i < faces.size; ++i) {
     faces_vector.push_back(faces.data[i]);
     if (i >= faces.size) continue;
-    spdlog::info("脸部 {} 得分: {}", i, faces.data[i].score);
+    SPDLOG_INFO("Face<{}> got score {}.", i, faces.data[i].score);
   }
 
   return std::move(faces_vector);
@@ -209,6 +273,6 @@ float FaceEngine::CalculateFaceSimilarity(const std::vector<float>& feature1,
   float similarity = .0;
   similarity =
       face_recognizer_->CalculateSimilarity(feature1.data(), feature2.data());
-  spdlog::info("两张脸部的相似度: {}", similarity);
+  SPDLOG_INFO("Similarity of the two faces: {}.", similarity);
   return similarity;
 }
