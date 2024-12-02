@@ -146,6 +146,7 @@ int64_t FaceEngine::RecognizeFaceFromMem(const SeetaImageData& simg,
       std::lock_guard<std::mutex> guard(mutex_);
       similarity = face_recognizer_->CalculateSimilarity(cur.feature.data(),
                                                          face_feature.data());
+      SPDLOG_INFO("{} Similarity with face(id={})", similarity, cur.id);
     }
 
     if (similarity > top_similarity) {

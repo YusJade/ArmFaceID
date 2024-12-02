@@ -153,9 +153,9 @@ bool MySqlSchema::UpdateUser(int user_id,
 User MySqlSchema::GetUserByID(int user_id) {
   QSqlQuery q(*db_);
   q.prepare(R"(
-        SELECT user_id, username, email, profile_pic, face_img
+        SELECT user_id, user_name, email, profile_pic, face_img
         FROM tb_user
-        WHERE id = :user_id)");
+        WHERE user_id = :user_id)");
 
   q.bindValue(":user_id", user_id);
 

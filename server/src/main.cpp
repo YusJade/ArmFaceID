@@ -115,9 +115,11 @@ int main(int argc, char* argv[]) {
             SeetaImageData{mat.cols, mat.rows, mat.channels(), mat.data});
 
         if (res == -3) {
+          SPDLOG_ERROR("Bad image format!");
           return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
                               "图像格式错误");
         } else if (res == -1) {
+          SPDLOG_INFO("No identification recognized.");
           return grpc::Status(grpc::StatusCode::OK, "没有识别到身份");
         }
 
@@ -136,6 +138,12 @@ int main(int argc, char* argv[]) {
         resp.mutable_res()->set_last_recognized_datetime(
             absl::FormatTime(absl::Now()));
 
+        SPDLOG_INFO(
+            "Identification recognized: user_id={}, user_name={}, email={}, "
+            "profile_pic({}x{}), face_img({}x{})",
+            result_user.user_id, result_user.user_name, result_user.email,
+            result_user.profile_pic.width(), result_user.profile_pic.height(),
+            result_user.face_img.width(), result_user.face_img.height());
         return grpc::Status(grpc::StatusCode::OK, "识别成功");
       });
 
@@ -187,6 +195,7 @@ int main(int argc, char* argv[]) {
         // 直接向内存中追加新注册的人脸特征信息，避免高频率地从数据库加载数据
         engine->AddNewFeatureToMem(face_simg, face, registered_user.user_id);
 
+        SPDLOG_INFO("Success to register.");
         return grpc::Status(grpc::StatusCode::OK, "用户注册成功");
       });
 
